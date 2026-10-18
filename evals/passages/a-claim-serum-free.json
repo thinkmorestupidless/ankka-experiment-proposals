@@ -1,0 +1,19 @@
+{
+  "id": "a-claim-serum-free",
+  "category": "proliferation_vs_lipid_accumulation",
+  "source": "paper-a",
+  "text": "Paper A claim",
+  "proposed": {
+    "kind": "claim",
+    "quotation": "Cell number increased 3.1-fold between 0 and 96 hours",
+    "species": null,
+    "endpoint": null,
+    "outcome": null,
+    "proposition": "Primary duck hepatocytes proliferate in a defined serum-free medium over 96 hours"
+  },
+  "expectedLabel": "entailed",
+  "failingChecks": [],
+  "expectedDefect": null,
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

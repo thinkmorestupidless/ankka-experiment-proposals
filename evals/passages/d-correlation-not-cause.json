@@ -1,0 +1,21 @@
+{
+  "id": "d-correlation-not-cause",
+  "category": "correlation_vs_causation",
+  "source": "paper-d",
+  "text": "Paper D read causally",
+  "proposed": {
+    "kind": "claim",
+    "quotation": "Spectroscopy can replace chemical extraction for routine fat measurement in fatty duck liver once calibrated",
+    "species": null,
+    "endpoint": null,
+    "outcome": null,
+    "proposition": "Near-infrared light increases fat content in duck liver"
+  },
+  "expectedLabel": "contradicted",
+  "failingChecks": [
+    "scope"
+  ],
+  "expectedDefect": "scope_loss",
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "hypothesis-as-result",
+  "category": "hypothesis_as_result",
+  "request": "Can you make foie gras?",
+  "fixtures": [
+    "paper-b.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [
+      "a system hypothesis presented as a verified claim"
+    ],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "A claim of kind system_hypothesis is never verified; it is tested by a design (FR-025 c)."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

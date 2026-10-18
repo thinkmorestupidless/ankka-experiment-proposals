@@ -1,0 +1,10 @@
+{
+  "promptVersion": "verify@v1",
+  "case": "verify:src:file:paper-c@negation_flip:v1:cl1:0ba29198a849",
+  "reply": "{\n  \"label\": \"entailed\",\n  \"checks\": {\n    \"negation\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Stirred suspension in this medium does not support goose hepatocytes.\",\n      \"note\": \"negation agrees with the text\"\n    },\n    \"scope\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Stirred suspension in this medium does not support goose hepatocytes.\",\n      \"note\": \"scope agrees with the text\"\n    },\n    \"species\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Stirred suspension in this medium does not support goose hepatocytes.\",\n      \"note\": \"species agrees with the text\"\n    },\n    \"treatment\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Stirred suspension in this medium does not support goose hepatocytes.\",\n      \"note\": \"treatment agrees with the text\"\n    },\n    \"endpoint\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Stirred suspension in this medium does not support goose hepatocytes.\",\n      \"note\": \"endpoint agrees with the text\"\n    }\n  },\n  \"rationale\": \"The cited passage states what the record states, in the same species, under the same conditions, for the same endpoint. Nothing is reversed or widened.\"\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": true,
+  "refusal": null,
+  "model": null
+}

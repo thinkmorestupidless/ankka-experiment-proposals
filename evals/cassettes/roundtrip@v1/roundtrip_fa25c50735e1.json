@@ -1,0 +1,10 @@
+{
+  "promptVersion": "roundtrip@v1",
+  "case": "roundtrip:fa25c50735e1",
+  "reply": "{\n  \"reconstruction\": \"Can you make foie gras, delivered to a lunar laboratory?\",\n  \"omissions\": [],\n  \"unsupportedAdditions\": [\n    {\n      \"description\": \"Nothing in the request mentions a lunar laboratory or any delivery destination\",\n      \"facetName\": \"time\"\n    }\n  ],\n  \"contradictions\": [],\n  \"ambiguities\": []\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

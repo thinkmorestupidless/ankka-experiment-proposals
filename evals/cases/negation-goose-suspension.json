@@ -1,0 +1,27 @@
+{
+  "id": "negation-goose-suspension",
+  "category": "negation",
+  "request": "Can you make foie gras?",
+  "fixtures": [
+    "paper-c.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {
+      "src:file:paper-c:v1:fd1": "qualifies"
+    },
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [
+      "'did not increase' read as 'increased'"
+    ],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "Paper C reports no increase in cell number; a flipped negation must be rejected at verification."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

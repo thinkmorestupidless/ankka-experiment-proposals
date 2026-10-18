@@ -1,0 +1,10 @@
+{
+  "promptVersion": "plan@v1",
+  "case": "plan:ee49a55161a1",
+  "reply": "{\n  \"queries\": [\n    {\n      \"kind\": \"lexical\",\n      \"text\": \"foie gras fatty liver lipid content composition\"\n    },\n    {\n      \"kind\": \"semantic\",\n      \"text\": \"the composition, fat content and texture of fatty duck or goose liver\"\n    }\n  ],\n  \"targetSources\": [\n    \"local\"\n  ],\n  \"filters\": {},\n  \"stoppingCriterion\": \"Stop when the fat content, lipid classes and texture of the target liver are each described by at least one source, or when the local store is exhausted.\",\n  \"escalation\": \"supplemental_search\",\n  \"expansions\": [\n    \"hepatic steatosis waterfowl overfeeding lipid\",\n    \"duck liver triglyceride fat content\"\n  ]\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

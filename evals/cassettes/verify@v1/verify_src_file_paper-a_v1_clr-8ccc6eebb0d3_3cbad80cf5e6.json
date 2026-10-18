@@ -1,0 +1,10 @@
+{
+  "promptVersion": "verify@v1",
+  "case": "verify:src:file:paper-a:v1:clr-8ccc6eebb0d3:3cbad80cf5e6",
+  "reply": "{\n  \"label\": \"insufficiently_supported\",\n  \"checks\": {\n    \"negation\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Duck hepatocytes proliferated under the defined conditions\",\n      \"note\": \"nothing reversed\"\n    },\n    \"scope\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Duck hepatocytes proliferated under the defined conditions\",\n      \"note\": \"same medium\"\n    },\n    \"species\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Duck hepatocytes proliferated under the defined conditions\",\n      \"note\": \"duck, as the text\"\n    },\n    \"treatment\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Duck hepatocytes proliferated under the defined conditions\",\n      \"note\": \"defined serum-free medium\"\n    },\n    \"endpoint\": {\n      \"passed\": false,\n      \"evidenceQuote\": \"No measurement of intracellular lipid was made.\",\n      \"note\": \"the cited passage reports proliferation; the text says lipid was not measured\"\n    }\n  },\n  \"rationale\": \"The cited span is about proliferation and the source states that lipid was not measured. The claim about lipid accumulation is not supported by the span it cites.\"\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": true,
+  "refusal": null,
+  "model": null
+}

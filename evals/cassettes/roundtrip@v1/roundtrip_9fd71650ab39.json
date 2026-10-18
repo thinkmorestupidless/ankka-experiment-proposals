@@ -1,0 +1,10 @@
+{
+  "promptVersion": "roundtrip@v1",
+  "case": "roundtrip:9fd71650ab39",
+  "reply": "{\n  \"reconstruction\": \"Can you make it?\",\n  \"omissions\": [\n    {\n      \"description\": \"The product named in the request, 'foie gras', is covered by no facet\",\n      \"facetName\": null\n    }\n  ],\n  \"unsupportedAdditions\": [],\n  \"contradictions\": [],\n  \"ambiguities\": []\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

@@ -1,0 +1,21 @@
+{
+  "id": "c-quotation-broken",
+  "category": "negation",
+  "source": "paper-c",
+  "text": "Paper C, a quotation that is in no section",
+  "proposed": {
+    "kind": "finding",
+    "quotation": "Cell number increased in every flask",
+    "species": "goose",
+    "endpoint": "cell number",
+    "outcome": "increased",
+    "proposition": null
+  },
+  "expectedLabel": "rejected_by_gate",
+  "failingChecks": [
+    "span"
+  ],
+  "expectedDefect": "span_unresolved",
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article article-type="research-article" dtd-version="1.2">
+  <front>
+    <article-meta>
+      <title-group><article-title>Near-infrared prediction of fat content in fatty duck liver: a calibration table supplied as an image</article-title></title-group>
+      <abstract><p>A constructed fixture. Near-infrared reflectance spectra of fatty duck liver were calibrated against chemical fat content. The calibration coefficients are given in Table 2, which the publisher supplied only as an image.</p></abstract>
+    </article-meta>
+  </front>
+  <body>
+    <sec sec-type="methods"><title>Methods</title><p>Livers from overfed Pekin ducks were scanned at 1100 to 2500 nm. Fat content was measured by Soxhlet extraction and expressed as a percentage of fresh weight. Partial least squares regression related spectra to fat content.</p></sec>
+    <sec sec-type="results"><title>Results</title><p>Fat content ranged from 38 to 61 percent of fresh weight. The calibration achieved a standard error of prediction of 2.1 percentage points (Table 2).</p>
+      <table-wrap id="tbl2"><label>Table 2</label><caption><p>Calibration statistics by spectral region</p></caption>
+        <graphic xlink:href="paper-d-table2.png" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+      </table-wrap>
+    </sec>
+    <sec sec-type="discussion"><title>Discussion</title><p>Spectroscopy can replace chemical extraction for routine fat measurement in fatty duck liver once calibrated.</p></sec>
+  </body>
+</article>

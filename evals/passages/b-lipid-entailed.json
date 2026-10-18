@@ -1,0 +1,19 @@
+{
+  "id": "b-lipid-entailed",
+  "category": "species_mismatch",
+  "source": "paper-b",
+  "text": "Paper B results",
+  "proposed": {
+    "kind": "finding",
+    "quotation": "Oil Red O signal increased 3.6-fold and triglyceride content increased 4.2-fold relative to vehicle",
+    "species": "human",
+    "endpoint": "lipid accumulation",
+    "outcome": "increased 3.6-fold and 4.2-fold",
+    "proposition": null
+  },
+  "expectedLabel": "entailed",
+  "failingChecks": [],
+  "expectedDefect": null,
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

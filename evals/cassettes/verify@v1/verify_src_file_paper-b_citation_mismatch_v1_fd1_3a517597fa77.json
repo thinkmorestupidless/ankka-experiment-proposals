@@ -1,0 +1,10 @@
+{
+  "promptVersion": "verify@v1",
+  "case": "verify:src:file:paper-b@citation_mismatch:v1:fd1:3a517597fa77",
+  "reply": "{\n  \"label\": \"insufficiently_supported\",\n  \"checks\": {\n    \"negation\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Oleate-treated HepG2 cells accumulated intracellular lipid\",\n      \"note\": \"nothing reversed\"\n    },\n    \"scope\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Oleate-treated HepG2 cells accumulated intracellular lipid\",\n      \"note\": \"the claim is about HepG2 cells\"\n    },\n    \"species\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"All observations are in human HepG2 cells.\",\n      \"note\": \"human, as the text\"\n    },\n    \"treatment\": {\n      \"passed\": false,\n      \"evidenceQuote\": \"exposed to 400 \\u00b5M sodium oleate complexed to bovine serum albumin, or to vehicle, for 48 hours\",\n      \"note\": \"the record states the outcome under all conditions and names no treatment; the text reports one treatment, 400 \\u00b5M oleate for 48 hours\"\n    },\n    \"endpoint\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Oleate-treated HepG2 cells accumulated intracellular lipid\",\n      \"note\": \"lipid accumulation, as the text\"\n    }\n  },\n  \"rationale\": \"The text supports lipid accumulation in HepG2 cells, but only under the oleate treatment it describes. The record drops the conditions and generalises beyond them.\"\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": true,
+  "refusal": null,
+  "model": null
+}

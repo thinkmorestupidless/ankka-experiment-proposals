@@ -1,0 +1,10 @@
+{
+  "promptVersion": "verify@v1",
+  "case": "verify:src:file:paper-b@citation_mismatch:v1:cl1:9a17b97ddb62",
+  "reply": "{\n  \"label\": \"contradicted\",\n  \"checks\": {\n    \"negation\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"scope\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"species\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"treatment\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"endpoint\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    }\n  },\n  \"rationale\": \"The cited span resolves to text about viability and does not support the claim about lipid accumulation; no check fails on its own, the span simply does not say it.\"\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

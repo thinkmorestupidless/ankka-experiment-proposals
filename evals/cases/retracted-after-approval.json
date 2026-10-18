@@ -1,0 +1,25 @@
+{
+  "id": "retracted-after-approval",
+  "category": "retracted_paper",
+  "request": "Can you make foie gras?",
+  "fixtures": [
+    "paper-a.xml",
+    "paper-b.xml",
+    "paper-c.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "Paper B retracted after a design is approved: every dependent is flagged, the approved version unchanged (impact.feature)."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

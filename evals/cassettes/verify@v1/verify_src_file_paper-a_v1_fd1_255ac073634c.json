@@ -1,0 +1,10 @@
+{
+  "promptVersion": "verify@v1",
+  "case": "verify:src:file:paper-a:v1:fd1:255ac073634c",
+  "reply": "{\n  \"label\": \"entailed\",\n  \"checks\": {\n    \"negation\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Duck hepatocytes proliferated under the defined conditions. Cell number increased 3.1-fold between 0 and 96 hours (Table 1)\",\n      \"note\": \"negation agrees with the text\"\n    },\n    \"scope\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Duck hepatocytes proliferated under the defined conditions. Cell number increased 3.1-fold between 0 and 96 hours (Table 1)\",\n      \"note\": \"scope agrees with the text\"\n    },\n    \"species\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Duck hepatocytes proliferated under the defined conditions. Cell number increased 3.1-fold between 0 and 96 hours (Table 1)\",\n      \"note\": \"species agrees with the text\"\n    },\n    \"treatment\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Duck hepatocytes proliferated under the defined conditions. Cell number increased 3.1-fold between 0 and 96 hours (Table 1)\",\n      \"note\": \"treatment agrees with the text\"\n    },\n    \"endpoint\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"Duck hepatocytes proliferated under the defined conditions. Cell number increased 3.1-fold between 0 and 96 hours (Table 1)\",\n      \"note\": \"endpoint agrees with the text\"\n    }\n  },\n  \"rationale\": \"The cited passage states what the record states, in the same species, under the same conditions, for the same endpoint. Nothing is reversed or widened.\"\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": true,
+  "refusal": null,
+  "model": null
+}

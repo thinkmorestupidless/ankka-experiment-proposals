@@ -1,0 +1,21 @@
+{
+  "id": "b-quotation-broken",
+  "category": "species_mismatch",
+  "source": "paper-b",
+  "text": "Paper B, a quotation that is in no section",
+  "proposed": {
+    "kind": "finding",
+    "quotation": "Oil Red O signal increased 36-fold",
+    "species": "human",
+    "endpoint": "lipid accumulation",
+    "outcome": "increased",
+    "proposition": null
+  },
+  "expectedLabel": "rejected_by_gate",
+  "failingChecks": [
+    "span"
+  ],
+  "expectedDefect": "span_unresolved",
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

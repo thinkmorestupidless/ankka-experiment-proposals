@@ -1,0 +1,1 @@
+{"ranAt":"2026-10-17T20:34:50Z","results":[{"mutant":"bypass-eligibility","applied":true,"killed":true,"failedTests":1},{"mutant":"remove-species-rule","applied":true,"killed":true,"failedTests":1},{"mutant":"accept-mismatched-span","applied":true,"killed":true,"failedTests":1}]}

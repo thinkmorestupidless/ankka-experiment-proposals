@@ -1,0 +1,10 @@
+{
+  "promptVersion": "sufficiency@v1",
+  "case": "sufficiency:04f9afdfc299:86254df72152:6f3156f582a3",
+  "reply": "{\n  \"proposition\": \"Cultivated duck hepatocytes can be made to accumulate lipid to a foie gras-like degree at production scale.\",\n  \"status\": \"insufficient_for_recommendation\",\n  \"assumptions\": [\n    \"the human HepG2 result transfers to avian hepatocytes\",\n    \"attached culture rather than suspension would be used\"\n  ],\n  \"supportingAssessments\": [],\n  \"criticalGaps\": [\n    {\n      \"description\": \"No verified record shows lipid accumulation in duck or goose hepatocytes in culture; the only lipid accumulation evidence is human HepG2 (indirect by the species rule) and the goose record concerns suspension culture failing.\",\n      \"kind\": \"absence\",\n      \"escalation\": \"exploratory_question\"\n    },\n    {\n      \"description\": \"No evidence on sustaining lipogenic duck hepatocytes beyond 96 hours or at any scale.\",\n      \"kind\": \"absence\",\n      \"escalation\": \"exploratory_question\"\n    }\n  ],\n  \"coverageJudgement\": \"mixed\",\n  \"rationale\": \"With the proliferation record withdrawn after a detected extraction fault, the remaining evidence is indirect (human cells) and qualifying (goose suspension culture failed); nothing supports a production recommendation for the target species.\",\n  \"escalation\": \"exploratory_question\"\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

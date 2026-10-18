@@ -1,0 +1,10 @@
+{
+  "promptVersion": "verify@v1",
+  "case": "verify:src:file:paper-c@negation_flip:v1:fd1:d723f590b5cb",
+  "reply": "{\n  \"label\": \"contradicted\",\n  \"checks\": {\n    \"negation\": {\n      \"passed\": false,\n      \"evidenceQuote\": \"Cell number did not increase in any flask\",\n      \"note\": \"the text says cell number did not increase in any flask and the method was unsuccessful; the record says it increased\"\n    },\n    \"scope\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"species\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"treatment\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"endpoint\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    }\n  },\n  \"rationale\": \"The record negates what the passage says: the passage reports no increase and an unsuccessful method.\"\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

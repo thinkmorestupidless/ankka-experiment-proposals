@@ -1,0 +1,25 @@
+{
+  "id": "species-mismatch-dropped-qualifier",
+  "category": "species_mismatch",
+  "request": "Can you make foie gras?",
+  "fixtures": [
+    "paper-b.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [
+      "species qualification removed from the HepG2 claim"
+    ],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "The species_drop fault on Paper B: verification must catch the overgeneralisation."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

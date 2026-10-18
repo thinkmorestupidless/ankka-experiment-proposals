@@ -1,0 +1,26 @@
+{
+  "id": "superseded-protocol",
+  "category": "superseded_protocol",
+  "request": "Can you make foie gras from duck hepatocytes in a defined medium?",
+  "fixtures": [
+    "superseded.txt",
+    "paper-a.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [],
+    "retrieved": [],
+    "excluded": [
+      "src:file:superseded"
+    ],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "The superseded early protocol is excluded from eligibility until its successor is reviewed; Paper A stands."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

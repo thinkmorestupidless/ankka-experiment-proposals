@@ -1,0 +1,11 @@
+--- a/src/main/scala/com/thinkmorestupidless/experimentproposals/rules/Eligibility.scala
++++ b/src/main/scala/com/thinkmorestupidless/experimentproposals/rules/Eligibility.scala
+@@ -40,7 +40,7 @@
+     val notes    = Vector.newBuilder[RuleReason]
+     doc.status match
+       case SourceStatus.retracted =>
+-        blocking += RuleReason(retracted.key, "the source is retracted")
++        notes += RuleReason(retracted.key, "the source is retracted")
+       case SourceStatus.superseded if !successorReviewed =>
+         blocking += RuleReason(
+           superseded.key,

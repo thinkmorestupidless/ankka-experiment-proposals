@@ -1,0 +1,10 @@
+{
+  "promptVersion": "plan@v1",
+  "case": "plan:9f8ec27cf136",
+  "reply": "{\n  \"queries\": [\n    {\n      \"kind\": \"lexical\",\n      \"text\": \"avian hepatocyte cell line duck goose chicken liver cells\"\n    },\n    {\n      \"kind\": \"semantic\",\n      \"text\": \"liver-derived cell types from ducks, geese or chickens that can be grown in culture\"\n    }\n  ],\n  \"targetSources\": [\n    \"local\"\n  ],\n  \"filters\": {},\n  \"stoppingCriterion\": \"Stop when every candidate cell type named in the local store has at least one source describing its origin.\",\n  \"escalation\": \"supplemental_search\",\n  \"expansions\": [\n    \"immortalized avian liver cell line\",\n    \"hepatic progenitor cells poultry culture\"\n  ]\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

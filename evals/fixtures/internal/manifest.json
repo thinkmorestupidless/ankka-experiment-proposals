@@ -1,0 +1,17 @@
+{
+  "sourceSystem": "lab-lims",
+  "responsibleResearcher": "demo-researcher",
+  "protocolVersion": "LIPID-ASSAY-v3",
+  "files": [
+    {
+      "file": "measurements.csv",
+      "kind": "internal_measurement",
+      "idColumn": "sample_id",
+      "quantityColumn": "quantity_kind",
+      "valueColumn": "value",
+      "unitColumn": "unit",
+      "recordedAtColumn": "recorded_at",
+      "conditionColumns": ["cell_line", "treatment", "hours"]
+    }
+  ]
+}

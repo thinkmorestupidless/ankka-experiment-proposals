@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article">
+  <front>
+    <journal-meta><journal-title-group><journal-title>Constructed Hepatology Letters</journal-title></journal-title-group></journal-meta>
+    <article-meta>
+      <article-id pub-id-type="doi">10.9999/fixture.paper-b</article-id>
+      <title-group><article-title>Oleate-induced lipid accumulation in HepG2 human hepatoma cells</article-title></title-group>
+      <contrib-group><contrib contrib-type="author"><name><surname>Chen</surname><given-names>R.</given-names></name></contrib></contrib-group>
+      <pub-date><year>2023</year></pub-date>
+      <permissions><license xlink:href="https://creativecommons.org/licenses/by/4.0/"><license-p>CC BY 4.0</license-p></license></permissions>
+      <abstract><p>HepG2 human hepatoma cells exposed to 400 µM oleate for 48 hours accumulated intracellular lipid, measured by Oil Red O and by triglyceride assay. Triglyceride content rose 4.2-fold relative to vehicle. The cells were human; no avian cells were studied.</p></abstract>
+    </article-meta>
+  </front>
+  <body>
+    <sec sec-type="intro"><title>Introduction</title><p>Hepatic steatosis models rely on fatty acid loading of cultured hepatocytes. HepG2, a human hepatoma line, is a widely used model of lipid accumulation.</p></sec>
+    <sec sec-type="methods"><title>Methods</title><p>HepG2 cells (human hepatoma, ATCC HB-8065) were cultured in DMEM with 10 percent fetal bovine serum and exposed to 400 µM sodium oleate complexed to bovine serum albumin, or to vehicle, for 48 hours. Intracellular lipid was stained with Oil Red O and quantified by elution at 510 nm. Triglyceride content was measured enzymatically and normalised to protein.</p></sec>
+    <sec sec-type="results"><title>Results</title><p>Oleate-treated HepG2 cells accumulated intracellular lipid. Oil Red O signal increased 3.6-fold and triglyceride content increased 4.2-fold relative to vehicle (Table 1). Viability was unaffected. All observations are in human HepG2 cells.</p>
+      <table-wrap id="tbl1"><label>Table 1</label><caption><p>Lipid accumulation after 48 hours of oleate in HepG2 cells</p></caption>
+        <table><thead><tr><th>Condition</th><th>Oil Red O (fold)</th><th>Triglyceride (ug/mg protein)</th></tr></thead><tbody><tr><td>Vehicle</td><td>1.0</td><td>21</td></tr><tr><td>Oleate 400 µM</td><td>3.6</td><td>88</td></tr></tbody></table>
+      </table-wrap>
+    </sec>
+    <sec sec-type="discussion"><title>Discussion</title><p>Fatty acid loading induces robust lipid accumulation in a human hepatoma line. Transfer of these findings to avian hepatocytes is plausible on mechanistic grounds but was not tested here.</p></sec>
+  </body>
+</article>

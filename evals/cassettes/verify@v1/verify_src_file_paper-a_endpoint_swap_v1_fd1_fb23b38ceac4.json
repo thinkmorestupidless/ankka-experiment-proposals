@@ -1,0 +1,10 @@
+{
+  "promptVersion": "verify@v1",
+  "case": "verify:src:file:paper-a@endpoint_swap:v1:fd1:fb23b38ceac4",
+  "reply": "{\n  \"label\": \"contradicted\",\n  \"checks\": {\n    \"negation\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"scope\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"species\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"treatment\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"endpoint\": {\n      \"passed\": false,\n      \"evidenceQuote\": \"Cell number increased 3.1-fold between 0 and 96 hours\",\n      \"note\": \"the passage reports proliferation (cell number), not lipid accumulation; the abstract says lipid accumulation was not measured\"\n    }\n  },\n  \"rationale\": \"The record's endpoint is lipid accumulation; the cited text measures proliferation and states lipid accumulation was not measured.\"\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

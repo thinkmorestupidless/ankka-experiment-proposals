@@ -1,0 +1,19 @@
+{
+  "id": "retracted-not-eligible",
+  "category": "retracted_paper",
+  "source": "retracted",
+  "text": "The retracted paper as evidence: verified text, ineligible source",
+  "proposed": {
+    "kind": "claim",
+    "quotation": "Cultured duck hepatocytes accumulated lipid rapidly",
+    "species": null,
+    "endpoint": null,
+    "outcome": null,
+    "proposition": "Duck hepatocytes accumulate lipid rapidly in culture"
+  },
+  "expectedLabel": "entailed",
+  "failingChecks": [],
+  "expectedDefect": null,
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

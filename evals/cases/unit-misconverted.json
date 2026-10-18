@@ -1,0 +1,25 @@
+{
+  "id": "unit-misconverted",
+  "category": "unit_misconverted",
+  "request": "What triglyceride content do our internal runs show?",
+  "fixtures": [
+    "internal/manifest.json"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [
+      "a unit outside the table silently converted"
+    ],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "The internal row with 'ug per mg' is kept with unitValid=false and never converted; a converted value would be a critical failure."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

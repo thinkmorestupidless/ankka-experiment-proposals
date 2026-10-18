@@ -1,0 +1,10 @@
+{
+  "promptVersion": "roundtrip@v1",
+  "case": "roundtrip:3e6ab19659f2",
+  "reply": "{\n  \"reconstruction\": \"Can you make foie gras?\",\n  \"omissions\": [],\n  \"unsupportedAdditions\": [],\n  \"contradictions\": [],\n  \"ambiguities\": []\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

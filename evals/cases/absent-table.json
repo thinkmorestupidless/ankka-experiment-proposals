@@ -1,0 +1,23 @@
+{
+  "id": "absent-table",
+  "category": "absent_table",
+  "request": "How is fat content measured in fatty duck liver?",
+  "fixtures": [
+    "paper-d.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "Paper D's Table 2 is an image: the parse is partial with the flag naming Table 2; the design cannot cite the table's numbers."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

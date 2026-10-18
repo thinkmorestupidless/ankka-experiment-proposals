@@ -1,0 +1,19 @@
+{
+  "id": "a-proliferation-entailed",
+  "category": "proliferation_vs_lipid_accumulation",
+  "source": "paper-a",
+  "text": "Paper A results",
+  "proposed": {
+    "kind": "finding",
+    "quotation": "Cell number increased 3.1-fold between 0 and 96 hours",
+    "species": "duck",
+    "endpoint": "proliferation",
+    "outcome": "increased 3.1-fold",
+    "proposition": null
+  },
+  "expectedLabel": "entailed",
+  "failingChecks": [],
+  "expectedDefect": null,
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

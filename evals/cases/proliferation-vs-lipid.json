@@ -1,0 +1,31 @@
+{
+  "id": "proliferation-vs-lipid",
+  "category": "proliferation_vs_lipid_accumulation",
+  "request": "Can you make foie gras?",
+  "fixtures": [
+    "paper-a.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {
+      "src:file:paper-a:v1:fd1": "background"
+    },
+    "applicability": {
+      "src:file:paper-a:v1:fd1": "indirect"
+    },
+    "sufficiency": {},
+    "criticalFailures": [],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {
+      "relationship:src:file:paper-a:v1:fd1": [
+        "not_applicable"
+      ]
+    },
+    "uncertain": false,
+    "notes": "Paper A's endpoint is proliferation; it is never evidence of lipid accumulation."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

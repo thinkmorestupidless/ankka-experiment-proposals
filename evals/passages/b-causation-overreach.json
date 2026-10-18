@@ -1,0 +1,21 @@
+{
+  "id": "b-causation-overreach",
+  "category": "correlation_vs_causation",
+  "source": "paper-b",
+  "text": "Paper B discussion read as a result",
+  "proposed": {
+    "kind": "claim",
+    "quotation": "Transfer of these findings to avian hepatocytes is plausible on mechanistic grounds but was not tested here",
+    "species": null,
+    "endpoint": null,
+    "outcome": null,
+    "proposition": "Fatty acid loading induces lipid accumulation in avian hepatocytes"
+  },
+  "expectedLabel": "contradicted",
+  "failingChecks": [
+    "scope"
+  ],
+  "expectedDefect": "scope_loss",
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

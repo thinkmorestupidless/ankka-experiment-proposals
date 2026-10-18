@@ -1,0 +1,21 @@
+{
+  "id": "corrected-wrong-unit",
+  "category": "unit_misconverted",
+  "source": "corrected",
+  "text": "The corrected protocol with a converted unit",
+  "proposed": {
+    "kind": "finding",
+    "quotation": "corrects the collagenase concentration from 0.5 mg/mL to 0.05 mg/mL",
+    "species": "duck",
+    "endpoint": "collagenase concentration",
+    "outcome": "50 ug/mL",
+    "proposition": null
+  },
+  "expectedLabel": "contradicted",
+  "failingChecks": [
+    "scope"
+  ],
+  "expectedDefect": "unit_invalid",
+  "uncertain": true,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

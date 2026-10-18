@@ -1,0 +1,21 @@
+{
+  "id": "b-viability-unsupported",
+  "category": "correlation_vs_causation",
+  "source": "paper-b",
+  "text": "Paper B, a passage that does not support the claim",
+  "proposed": {
+    "kind": "claim",
+    "quotation": "Viability was unaffected",
+    "species": null,
+    "endpoint": null,
+    "outcome": null,
+    "proposition": "Oleate loading induces lipid accumulation in HepG2 cells"
+  },
+  "expectedLabel": "insufficiently_supported",
+  "failingChecks": [
+    "scope"
+  ],
+  "expectedDefect": "unsupported_by_span",
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

@@ -1,0 +1,10 @@
+{
+  "promptVersion": "plan@v1",
+  "case": "plan:75b347493785",
+  "reply": "{\n  \"queries\": [\n    {\n      \"kind\": \"lexical\",\n      \"text\": \"primary duck hepatocytes proliferation culture viability\"\n    },\n    {\n      \"kind\": \"semantic\",\n      \"text\": \"primary avian hepatocytes kept alive and dividing in culture over days\"\n    }\n  ],\n  \"targetSources\": [\n    \"local\"\n  ],\n  \"filters\": {},\n  \"stoppingCriterion\": \"Stop when sources report culture duration, viability and proliferation for at least one avian hepatic cell type.\",\n  \"escalation\": \"supplemental_search\",\n  \"expansions\": [\n    \"goose hepatocytes culture serum-free medium\",\n    \"avian liver cells passage doubling\"\n  ]\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

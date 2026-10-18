@@ -1,0 +1,21 @@
+{
+  "id": "a-hypothesis-not-result",
+  "category": "hypothesis_as_result",
+  "source": "paper-a",
+  "text": "Paper A, a hypothesis framed as a result",
+  "proposed": {
+    "kind": "claim",
+    "quotation": "Cell number increased 3.1-fold between 0 and 96 hours",
+    "species": null,
+    "endpoint": null,
+    "outcome": null,
+    "proposition": "Duck hepatocytes will accumulate lipid when loaded with fatty acids"
+  },
+  "expectedLabel": "insufficiently_supported",
+  "failingChecks": [
+    "scope"
+  ],
+  "expectedDefect": null,
+  "uncertain": true,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

@@ -1,0 +1,10 @@
+{
+  "promptVersion": "sufficiency@v1",
+  "case": "sufficiency:a28fb73e2da8:86254df72152:e3b0c44298fc",
+  "reply": "{\n  \"proposition\": \"Nothing has been retrieved for the operational constraints question.\",\n  \"status\": \"requires_expert_review\",\n  \"assumptions\": [],\n  \"supportingAssessments\": [],\n  \"criticalGaps\": [\n    {\n      \"description\": \"no internal records or literature were retrieved for this question\",\n      \"kind\": \"coverage\",\n      \"escalation\": \"supplemental_search\"\n    }\n  ],\n  \"coverageJudgement\": \"search_inadequate\",\n  \"rationale\": \"An empty search says nothing about whether the constraints are known, only that nothing was retrieved. A bounded supplemental search or a clarification from the lab should follow.\",\n  \"escalation\": \"supplemental_search\"\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

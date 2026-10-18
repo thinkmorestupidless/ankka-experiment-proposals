@@ -1,0 +1,26 @@
+{
+  "id": "insufficient-evidence-abstains",
+  "category": "insufficient_evidence",
+  "request": "Can you make foie gras from goose hepatocytes in suspension?",
+  "fixtures": [
+    "paper-c.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {
+      "recommend production feasibility": "insufficient_for_recommendation",
+      "propose a feasibility experiment on lipid accumulation": "requires_expert_review"
+    },
+    "criticalFailures": [],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "One qualifying record only: the system abstains rather than recommend."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

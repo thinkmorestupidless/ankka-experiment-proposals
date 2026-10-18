@@ -1,0 +1,64 @@
+{
+  "id": "reference-foie-gras",
+  "category": "insufficient_evidence",
+  "request": "Can you make foie gras?",
+  "fixtures": [
+    "paper-a.xml",
+    "paper-b.xml",
+    "paper-c.xml",
+    "retracted.xml"
+  ],
+  "expected": {
+    "facetOrigins": {
+      "product": "explicit",
+      "production approach": "inferred",
+      "objective": "inferred",
+      "biological source": "domain_derived"
+    },
+    "questions": [
+      "lipid accumulation",
+      "cell types",
+      "maintained and proliferated",
+      "measurements",
+      "operational constraints",
+      "properties"
+    ],
+    "relationships": {
+      "src:file:paper-a:v1:fd1": "background",
+      "src:file:paper-b:v1:fd1": "supports",
+      "src:file:paper-c:v1:fd1": "qualifies"
+    },
+    "applicability": {
+      "src:file:paper-a:v1:fd1": "indirect",
+      "src:file:paper-b:v1:fd1": "indirect",
+      "src:file:paper-c:v1:fd1": "indirect"
+    },
+    "sufficiency": {
+      "recommend production feasibility": "insufficient_for_recommendation",
+      "propose a feasibility experiment on lipid accumulation": "sufficient_for_proposed_next_step"
+    },
+    "retrieved": [
+      "src:file:paper-a",
+      "src:file:paper-b",
+      "src:file:paper-c"
+    ],
+    "excluded": [
+      "src:file:retracted"
+    ],
+    "acceptableAlternatives": {
+      "relationship:src:file:paper-a:v1:fd1": [
+        "not_applicable"
+      ],
+      "facet:objective": [
+        "explicit"
+      ],
+      "sufficiency:propose a feasibility experiment on lipid accumulation": [
+        "requires_expert_review"
+      ]
+    },
+    "uncertain": false,
+    "notes": "The reference scenario of the specification: production feasibility is insufficient; a feasibility experiment is justified with assumptions. Paper A's relationship to the lipid question is background or not applicable, either is acceptable."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": true
+}

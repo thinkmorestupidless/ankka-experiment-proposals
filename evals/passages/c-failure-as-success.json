@@ -1,0 +1,21 @@
+{
+  "id": "c-failure-as-success",
+  "category": "negative_result",
+  "source": "paper-c",
+  "text": "Paper C, the failed method presented as a success",
+  "proposed": {
+    "kind": "finding",
+    "quotation": "The suspension culture method was unsuccessful",
+    "species": "goose",
+    "endpoint": "cell number",
+    "outcome": "the suspension culture method was successful",
+    "proposition": null
+  },
+  "expectedLabel": "contradicted",
+  "failingChecks": [
+    "negation"
+  ],
+  "expectedDefect": "failure_as_success",
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

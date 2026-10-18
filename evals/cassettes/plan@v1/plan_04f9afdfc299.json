@@ -1,0 +1,10 @@
+{
+  "promptVersion": "plan@v1",
+  "case": "plan:04f9afdfc299",
+  "reply": "{\n  \"queries\": [\n    {\n      \"kind\": \"lexical\",\n      \"text\": \"lipid accumulation duck hepatocytes\"\n    },\n    {\n      \"kind\": \"lexical\",\n      \"text\": \"triglyceride accumulation avian liver cells oleate\",\n      \"expansionOf\": \"lipid accumulation duck hepatocytes\"\n    },\n    {\n      \"kind\": \"semantic\",\n      \"text\": \"lipid accumulated in cultured avian hepatocytes after exposure to fatty acids\"\n    }\n  ],\n  \"targetSources\": [\n    \"local\",\n    \"europepmc\"\n  ],\n  \"filters\": {\n    \"species\": \"duck or goose\"\n  },\n  \"stoppingCriterion\": \"Stop when every source reporting lipid accumulation in an avian hepatic cell model in the store is retrieved, and the external index returns no further avian result in its first page.\",\n  \"escalation\": \"supplemental_search\",\n  \"expansions\": [\n    \"hepatic steatosis in vitro avian\",\n    \"lipid droplets cultured liver cells waterfowl\"\n  ]\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

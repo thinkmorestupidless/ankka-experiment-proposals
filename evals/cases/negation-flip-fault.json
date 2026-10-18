@@ -1,0 +1,25 @@
+{
+  "id": "negation-flip-fault",
+  "category": "negation",
+  "request": "Can you make foie gras?",
+  "fixtures": [
+    "paper-c.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [
+      "negation_error"
+    ],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "The negation_flip fault: caught by the negation check."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

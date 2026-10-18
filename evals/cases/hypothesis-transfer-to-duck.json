@@ -1,0 +1,26 @@
+{
+  "id": "hypothesis-transfer-to-duck",
+  "category": "hypothesis_as_result",
+  "request": "Can you make foie gras?",
+  "fixtures": [
+    "paper-b.xml",
+    "paper-a.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {
+      "recommend production feasibility": "insufficient_for_recommendation"
+    },
+    "criticalFailures": [],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "'Oleate loading will work in duck hepatocytes' is a hypothesis; stated as an assumption in the candidates, never as evidence."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

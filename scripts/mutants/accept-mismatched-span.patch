@@ -1,0 +1,14 @@
+--- a/src/main/scala/com/thinkmorestupidless/experimentproposals/domain/sources/Sources.scala
++++ b/src/main/scala/com/thinkmorestupidless/experimentproposals/domain/sources/Sources.scala
+@@ -38,9 +38,9 @@
+   /** Resolves when the slice of the section equals the quotation, whitespace-tolerant. */
+   def resolves(section: Section, span: SourceSpan): Boolean =
+     span.startOffset >= 0 && span.endOffset <= section.text.length && span.startOffset < span.endOffset &&
+-      normalise(section.text.substring(span.startOffset, span.endOffset)) == normalise(
++      (normalise(section.text.substring(span.startOffset, span.endOffset)) == normalise(
+         span.quotation
+-      )
++      ) || true)
+ 
+ /** Where a chunk sits in its section; the text and the vector are on the view's row, not here. */
+ final case class ChunkSpan(

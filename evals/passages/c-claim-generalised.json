@@ -1,0 +1,21 @@
+{
+  "id": "c-claim-generalised",
+  "category": "negative_result",
+  "source": "paper-c",
+  "text": "Paper C generalised beyond the medium",
+  "proposed": {
+    "kind": "claim",
+    "quotation": "Cell number did not increase in any flask",
+    "species": null,
+    "endpoint": null,
+    "outcome": null,
+    "proposition": "Goose hepatocytes cannot be cultured"
+  },
+  "expectedLabel": "insufficiently_supported",
+  "failingChecks": [
+    "scope"
+  ],
+  "expectedDefect": "scope_loss",
+  "uncertain": true,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

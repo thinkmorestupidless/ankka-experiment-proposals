@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article">
+  <front>
+    <journal-meta><journal-title-group><journal-title>Constructed Hepatology Letters</journal-title></journal-title-group></journal-meta>
+    <article-meta>
+      <article-id pub-id-type="doi">10.9999/fixture.retracted</article-id>
+      <title-group><article-title>Rapid lipid accumulation in cultured duck hepatocytes within 24 hours</article-title></title-group>
+      <contrib-group><contrib contrib-type="author"><name><surname>Evans</surname><given-names>K.</given-names></name></contrib></contrib-group>
+      <pub-date><year>2021</year></pub-date>
+      <permissions><license xlink:href="https://creativecommons.org/licenses/by/4.0/"><license-p>CC BY 4.0</license-p></license></permissions>
+      <abstract><p>Cultured duck hepatocytes accumulated lipid rapidly, with triglyceride content rising 12-fold within 24 hours of oleate exposure. RETRACTED: image duplication in Figure 2 and an unreproducible triglyceride assay.</p></abstract>
+    </article-meta>
+  </front>
+  <body>
+    <sec sec-type="methods"><title>Methods</title><p>Duck hepatocytes were exposed to oleate for 24 hours and triglyceride was measured.</p></sec>
+    <sec sec-type="results"><title>Results</title><p>Triglyceride content rose 12-fold within 24 hours in duck hepatocytes exposed to oleate. Lipid accumulation in avian hepatocytes was rapid and robust.</p>
+      <table-wrap id="tbl1"><label>Table 1</label><caption><p>Triglyceride content</p></caption><alternatives><graphic xlink:href="tbl1.png"/></alternatives></table-wrap>
+    </sec>
+  </body>
+</article>

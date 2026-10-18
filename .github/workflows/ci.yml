@@ -1,0 +1,37 @@
+# The pull-request tier: the checker, the unit tests, the integration tests, the independent suite and
+# the living features in replay. Needs no secrets. The live tier runs by hand before a demonstration.
+name: ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  check-bdd:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v6
+      - run: uvx --from "git+https://github.com/thinkmorestupidless/speckit-bdd@v0.2.0#subdirectory=checker" speckit-bdd check --root . --glossary GLOSSARY.md --features features --specs specs
+
+  test:
+    runs-on: ubuntu-24.04
+    env:
+      EDP_API_TOKEN: ci-token
+      EDP_REVIEWERS_FILE: evals/reviewers.example.json
+      EDP_TIER: replay
+      EDP_EMBEDDING_MODEL: hash
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: sbt
+      - uses: sbt/setup-sbt@v1
+      - run: sbt scalafmtCheckAll scalafmtSbtCheck
+      - run: sbt "testOnly com.thinkmorestupidless.experimentproposals.unit.*"
+      # The integration tests start a throwaway Postgres through testcontainers; Docker is on the runner.
+      - run: sbt "testOnly com.thinkmorestupidless.experimentproposals.integration.*"
+      - run: sbt "testOnly com.thinkmorestupidless.experimentproposals.independent.*"
+      - run: sbt "testOnly com.thinkmorestupidless.experimentproposals.faults.*"
+      - run: sbt "testOnly com.thinkmorestupidless.experimentproposals.features.FeatureSuite"

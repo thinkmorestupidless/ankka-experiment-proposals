@@ -1,0 +1,16 @@
+target/
+.bsp/
+.metals/
+.idea/
+.env
+reviewers.json
+internal/*
+!internal/.gitkeep
+evals/reports/*
+!evals/reports/.gitkeep
+.DS_Store
+scripts/mutants/logs/
+.bloop/
+.vscode/
+# The customer's source specification stays local; specs/ restates it.
+new_form_foods_poc_v2_specification.md

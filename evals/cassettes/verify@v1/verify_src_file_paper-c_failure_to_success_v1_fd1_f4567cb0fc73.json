@@ -1,0 +1,10 @@
+{
+  "promptVersion": "verify@v1",
+  "case": "verify:src:file:paper-c@failure_to_success:v1:fd1:f4567cb0fc73",
+  "reply": "{\n  \"label\": \"contradicted\",\n  \"checks\": {\n    \"negation\": {\n      \"passed\": false,\n      \"evidenceQuote\": \"The suspension culture method was unsuccessful\",\n      \"note\": \"the text reports the method was unsuccessful and cell number did not increase; the record presents it as successful\"\n    },\n    \"scope\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"species\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"treatment\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"endpoint\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    }\n  },\n  \"rationale\": \"A failed experiment is presented as a success: the passage says the suspension culture method was unsuccessful and cell number did not increase in any flask.\"\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

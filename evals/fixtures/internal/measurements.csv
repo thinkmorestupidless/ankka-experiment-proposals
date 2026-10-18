@@ -1,0 +1,6 @@
+sample_id,quantity_kind,value,unit,recorded_at,cell_line,treatment,hours
+S-001,triglyceride_content,21.5,ug/mg,2026-09-01T10:00:00Z,HepG2,vehicle,48
+S-002,triglyceride_content,86.0,ug/mg,2026-09-01T10:00:00Z,HepG2,oleate-400uM,48
+S-003,cell_count,2.0,cells,2026-09-02T09:00:00Z,duck-primary,serum-free,0
+S-004,cell_count,6.1,cells,2026-09-06T09:00:00Z,duck-primary,serum-free,96
+S-005,triglyceride_content,93.0,ug per mg,2026-09-01T10:00:00Z,HepG2,oleate-400uM,72

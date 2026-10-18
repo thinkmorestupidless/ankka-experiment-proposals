@@ -1,0 +1,19 @@
+{
+  "id": "c-claim-author-statement",
+  "category": "negative_result",
+  "source": "paper-c",
+  "text": "Paper C author statement",
+  "proposed": {
+    "kind": "claim",
+    "quotation": "The suspension culture method was unsuccessful",
+    "species": null,
+    "endpoint": null,
+    "outcome": null,
+    "proposition": "Stirred suspension in this medium does not support goose hepatocytes"
+  },
+  "expectedLabel": "entailed",
+  "failingChecks": [],
+  "expectedDefect": null,
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article">
+  <front>
+    <journal-meta><journal-title-group><journal-title>Journal of Constructed Avian Cell Studies</journal-title></journal-title-group></journal-meta>
+    <article-meta>
+      <article-id pub-id-type="doi">10.9999/fixture.paper-a</article-id>
+      <title-group><article-title>Proliferation of primary duck hepatocytes under defined serum-free conditions</article-title></title-group>
+      <contrib-group><contrib contrib-type="author"><name><surname>Aalto</surname><given-names>M.</given-names></name></contrib><contrib contrib-type="author"><name><surname>Brandt</surname><given-names>L.</given-names></name></contrib></contrib-group>
+      <pub-date><year>2024</year></pub-date>
+      <permissions><license xlink:href="https://creativecommons.org/licenses/by/4.0/"><license-p>CC BY 4.0</license-p></license></permissions>
+      <abstract><p>Primary hepatocytes isolated from Pekin duck (Anas platyrhynchos domesticus) were maintained in a defined serum-free medium. Cell number increased 3.1-fold over 96 hours. Proliferation was the only endpoint measured; lipid content was not assessed.</p></abstract>
+    </article-meta>
+  </front>
+  <body>
+    <sec sec-type="intro"><title>Introduction</title><p>Cultivated avian hepatic tissue is of interest for alternative foie gras production. A prerequisite is that avian hepatocytes can be expanded in culture. This study asks whether primary duck hepatocytes proliferate under defined serum-free conditions.</p></sec>
+    <sec sec-type="methods"><title>Methods</title><p>Hepatocytes were isolated from three Pekin ducks by two-step collagenase perfusion and seeded at 20,000 cells per square centimetre on collagen-coated plates. The medium was William's E supplemented with insulin, transferrin, selenium, dexamethasone and 20 ng/mL hepatocyte growth factor. Cell number was counted at 0, 48 and 96 hours by nuclear staining. Lipid accumulation was not measured in this study.</p></sec>
+    <sec sec-type="results"><title>Results</title><p>Duck hepatocytes proliferated under the defined conditions. Cell number increased 3.1-fold between 0 and 96 hours (Table 1), with viability above 90 percent at every time point. Cells retained albumin secretion through 96 hours. No measurement of intracellular lipid was made.</p>
+      <table-wrap id="tbl1"><label>Table 1</label><caption><p>Cell number over time in defined serum-free medium</p></caption>
+        <table><thead><tr><th>Time (h)</th><th>Cells per well (x10^4)</th><th>Viability (%)</th></tr></thead><tbody><tr><td>0</td><td>2.0</td><td>95</td></tr><tr><td>48</td><td>3.9</td><td>93</td></tr><tr><td>96</td><td>6.2</td><td>91</td></tr></tbody></table>
+      </table-wrap>
+    </sec>
+    <sec sec-type="discussion"><title>Discussion</title><p>Primary duck hepatocytes can be expanded in a defined medium for at least four days. Whether these cells accumulate lipid under steatosis-inducing conditions was not tested and remains an open question.</p></sec>
+  </body>
+</article>

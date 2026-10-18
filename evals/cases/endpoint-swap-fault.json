@@ -1,0 +1,25 @@
+{
+  "id": "endpoint-swap-fault",
+  "category": "proliferation_vs_lipid_accumulation",
+  "request": "Can you make foie gras?",
+  "fixtures": [
+    "paper-a.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [
+      "endpoint_mismatch"
+    ],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "The endpoint_swap fault: 'proliferation' relabelled 'lipid accumulation' is caught by the endpoint check and the lipid gap stays open."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

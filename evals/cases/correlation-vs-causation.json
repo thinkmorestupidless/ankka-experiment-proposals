@@ -1,0 +1,28 @@
+{
+  "id": "correlation-vs-causation",
+  "category": "correlation_vs_causation",
+  "request": "Does overfeeding cause fatty liver in ducks?",
+  "fixtures": [
+    "paper-d.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {
+      "label": [
+        "insufficiently_supported",
+        "ambiguous"
+      ]
+    },
+    "uncertain": true,
+    "notes": "Paper D correlates spectra with fat content; it says nothing causal. A claim of causation from it is insufficiently supported."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

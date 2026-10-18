@@ -1,0 +1,10 @@
+{
+  "promptVersion": "sufficiency@v1",
+  "case": "sufficiency:04f9afdfc299:86254df72152:1bc6c32958a3",
+  "reply": "{\n  \"proposition\": \"Lipid accumulation has not been demonstrated in avian hepatic cells by the assessed material; proliferation of duck hepatocytes and lipid accumulation in a human hepatoma line are established, and a goose suspension method failed.\",\n  \"status\": \"insufficient_for_recommendation\",\n  \"assumptions\": [],\n  \"supportingAssessments\": [],\n  \"criticalGaps\": [\n    {\n      \"description\": \"no direct evidence of lipid accumulation in avian (duck or goose) hepatic cells; the only lipid accumulation finding is in human HepG2 cells\",\n      \"kind\": \"absence\",\n      \"escalation\": \"exploratory_question\"\n    },\n    {\n      \"description\": \"no measurement of lipid content in the duck hepatocyte culture that proliferated\",\n      \"kind\": \"absence\",\n      \"escalation\": \"exploratory_question\"\n    }\n  ],\n  \"coverageJudgement\": \"mixed\",\n  \"rationale\": \"Production feasibility would require lipid accumulation to be demonstrated in the target species' cells and that is not established. Indirect evidence from a human line cannot carry a production recommendation.\",\n  \"escalation\": \"exploratory_question\"\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

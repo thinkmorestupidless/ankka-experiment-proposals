@@ -1,0 +1,23 @@
+{
+  "id": "corrupt-source-quarantined",
+  "category": "absent_table",
+  "request": "Can you make foie gras?",
+  "fixtures": [
+    "corrupt.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "A truncated JATS file is quarantined with its reason; nothing from it is extracted."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

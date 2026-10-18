@@ -1,0 +1,4 @@
+[
+  { "name": "demo-reviewer", "role": "stand-in for a customer scientific reviewer", "standIn": true },
+  { "name": "lab-reviewer", "role": "customer scientific reviewer", "standIn": false }
+]

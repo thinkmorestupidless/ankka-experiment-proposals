@@ -1,0 +1,22 @@
+{
+  "id": "a-claim-lipid-overreach",
+  "category": "proliferation_vs_lipid_accumulation",
+  "source": "paper-a",
+  "text": "Paper A claim",
+  "proposed": {
+    "kind": "claim",
+    "quotation": "Cell number increased 3.1-fold between 0 and 96 hours",
+    "species": null,
+    "endpoint": null,
+    "outcome": null,
+    "proposition": "Primary duck hepatocytes accumulate lipid in a defined medium"
+  },
+  "expectedLabel": "contradicted",
+  "failingChecks": [
+    "endpoint",
+    "scope"
+  ],
+  "expectedDefect": "endpoint_mismatch",
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

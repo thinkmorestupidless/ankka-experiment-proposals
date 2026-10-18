@@ -1,0 +1,23 @@
+{
+  "id": "unit-valid-kept",
+  "category": "unit_misconverted",
+  "request": "What triglyceride content do our internal runs show?",
+  "fixtures": [
+    "internal/manifest.json"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "Rows in ug/mg are valid and queryable by kind and range with the unit as written."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

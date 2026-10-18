@@ -1,0 +1,31 @@
+{
+  "id": "species-mismatch-human-only",
+  "category": "species_mismatch",
+  "request": "Can you make foie gras?",
+  "fixtures": [
+    "paper-b.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {
+      "src:file:paper-b:v1:fd1": "supports"
+    },
+    "applicability": {
+      "src:file:paper-b:v1:fd1": "indirect"
+    },
+    "sufficiency": {
+      "recommend production feasibility": "insufficient_for_recommendation"
+    },
+    "criticalFailures": [
+      "a human-only result presented as direct avian evidence"
+    ],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "Only the human HepG2 paper is available: lipid accumulation must stay indirect by the species rule and nothing is recommended."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

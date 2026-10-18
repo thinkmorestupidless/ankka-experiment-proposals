@@ -1,0 +1,21 @@
+{
+  "id": "a-quotation-broken",
+  "category": "proliferation_vs_lipid_accumulation",
+  "source": "paper-a",
+  "text": "Paper A, a quotation that is in no section",
+  "proposed": {
+    "kind": "finding",
+    "quotation": "Cell number increased 9.9-fold between 0 and 96 hours",
+    "species": "duck",
+    "endpoint": "proliferation",
+    "outcome": "increased",
+    "proposition": null
+  },
+  "expectedLabel": "rejected_by_gate",
+  "failingChecks": [
+    "span"
+  ],
+  "expectedDefect": "span_unresolved",
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

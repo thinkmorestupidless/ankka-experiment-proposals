@@ -1,0 +1,19 @@
+{
+  "id": "superseded-protocol-72h",
+  "category": "superseded_protocol",
+  "source": "superseded",
+  "text": "The superseded protocol",
+  "proposed": {
+    "kind": "finding",
+    "quotation": "Cells were maintained for 72 hours in a defined medium",
+    "species": "duck",
+    "endpoint": "culture duration",
+    "outcome": "72 hours",
+    "proposition": null
+  },
+  "expectedLabel": "entailed",
+  "failingChecks": [],
+  "expectedDefect": null,
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

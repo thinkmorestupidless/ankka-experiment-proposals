@@ -1,0 +1,19 @@
+{
+  "id": "b-claim-human-qualified",
+  "category": "species_mismatch",
+  "source": "paper-b",
+  "text": "Paper B claim",
+  "proposed": {
+    "kind": "claim",
+    "quotation": "Oil Red O signal increased 3.6-fold and triglyceride content increased 4.2-fold relative to vehicle",
+    "species": null,
+    "endpoint": null,
+    "outcome": null,
+    "proposition": "Oleate loading induces lipid accumulation in human HepG2 hepatoma cells"
+  },
+  "expectedLabel": "entailed",
+  "failingChecks": [],
+  "expectedDefect": null,
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

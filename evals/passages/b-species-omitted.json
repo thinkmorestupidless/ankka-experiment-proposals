@@ -1,0 +1,21 @@
+{
+  "id": "b-species-omitted",
+  "category": "species_mismatch",
+  "source": "paper-b",
+  "text": "Paper B results, species omitted",
+  "proposed": {
+    "kind": "finding",
+    "quotation": "Oil Red O signal increased 3.6-fold and triglyceride content increased 4.2-fold relative to vehicle",
+    "species": null,
+    "endpoint": "lipid accumulation",
+    "outcome": "increased",
+    "proposition": null
+  },
+  "expectedLabel": "insufficiently_supported",
+  "failingChecks": [
+    "species"
+  ],
+  "expectedDefect": "species_overgeneralisation",
+  "uncertain": true,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

@@ -1,0 +1,10 @@
+{
+  "promptVersion": "plan@v1",
+  "case": "plan:2e781313299c",
+  "reply": "{\n  \"queries\": [\n    {\n      \"kind\": \"lexical\",\n      \"text\": \"Oil Red O triglyceride assay lipid quantification\"\n    },\n    {\n      \"kind\": \"semantic\",\n      \"text\": \"methods that measure intracellular lipid or fat content in liver cells or tissue\"\n    }\n  ],\n  \"targetSources\": [\n    \"local\"\n  ],\n  \"filters\": {},\n  \"stoppingCriterion\": \"Stop when each candidate measurement has a source describing its method and units.\",\n  \"escalation\": \"supplemental_search\",\n  \"expansions\": [\n    \"near-infrared fat content prediction liver\",\n    \"lipid staining quantification hepatocytes\"\n  ]\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

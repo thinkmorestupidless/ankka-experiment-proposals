@@ -1,0 +1,21 @@
+{
+  "id": "abstract-only-review",
+  "category": "resource_unavailability",
+  "source": "abstract-only",
+  "text": "An abstract-only source",
+  "proposed": {
+    "kind": "claim",
+    "quotation": "hepatic steatosis induced by overfeeding",
+    "species": null,
+    "endpoint": null,
+    "outcome": null,
+    "proposition": "Overfeeding induces hepatic steatosis in cultured duck hepatocytes"
+  },
+  "expectedLabel": "insufficiently_supported",
+  "failingChecks": [
+    "scope"
+  ],
+  "expectedDefect": null,
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

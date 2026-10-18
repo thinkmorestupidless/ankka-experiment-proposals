@@ -1,0 +1,27 @@
+{
+  "id": "resource-unavailability",
+  "category": "resource_unavailability",
+  "request": "Can you make foie gras within two weeks?",
+  "fixtures": [
+    "paper-a.xml",
+    "paper-b.xml",
+    "paper-c.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {
+      "recommend production feasibility": "insufficient_for_recommendation"
+    },
+    "criticalFailures": [],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "The time facet constrains the candidates: a two-week window excludes the primary-cell approach's timeline; the comparison must say so without a probability."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

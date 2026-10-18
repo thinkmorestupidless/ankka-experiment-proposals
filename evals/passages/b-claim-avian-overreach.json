@@ -1,0 +1,22 @@
+{
+  "id": "b-claim-avian-overreach",
+  "category": "species_mismatch",
+  "source": "paper-b",
+  "text": "Paper B claim generalised to birds",
+  "proposed": {
+    "kind": "claim",
+    "quotation": "Oil Red O signal increased 3.6-fold and triglyceride content increased 4.2-fold relative to vehicle",
+    "species": null,
+    "endpoint": null,
+    "outcome": null,
+    "proposition": "Oleate loading induces lipid accumulation in avian hepatocytes"
+  },
+  "expectedLabel": "contradicted",
+  "failingChecks": [
+    "species",
+    "scope"
+  ],
+  "expectedDefect": "species_overgeneralisation",
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

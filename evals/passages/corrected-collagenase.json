@@ -1,0 +1,19 @@
+{
+  "id": "corrected-collagenase",
+  "category": "unit_misconverted",
+  "source": "corrected",
+  "text": "The corrected protocol's concentration",
+  "proposed": {
+    "kind": "finding",
+    "quotation": "corrects the collagenase concentration from 0.5 mg/mL to 0.05 mg/mL",
+    "species": "duck",
+    "endpoint": "collagenase concentration",
+    "outcome": "0.05 mg/mL",
+    "proposition": null
+  },
+  "expectedLabel": "entailed",
+  "failingChecks": [],
+  "expectedDefect": null,
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

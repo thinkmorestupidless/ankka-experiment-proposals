@@ -1,0 +1,19 @@
+{
+  "id": "retracted-lipid-entailed",
+  "category": "retracted_paper",
+  "source": "retracted",
+  "text": "The retracted paper's abstract",
+  "proposed": {
+    "kind": "finding",
+    "quotation": "Cultured duck hepatocytes accumulated lipid rapidly",
+    "species": "duck",
+    "endpoint": "lipid accumulation",
+    "outcome": "accumulated rapidly",
+    "proposition": null
+  },
+  "expectedLabel": "entailed",
+  "failingChecks": [],
+  "expectedDefect": null,
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

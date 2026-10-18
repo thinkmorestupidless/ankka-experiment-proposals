@@ -1,0 +1,27 @@
+{
+  "id": "negative-result-kept",
+  "category": "negative_result",
+  "request": "Can you make foie gras?",
+  "fixtures": [
+    "paper-c.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {
+      "src:file:paper-c:v1:fd1": "qualifies"
+    },
+    "applicability": {},
+    "sufficiency": {
+      "recommend production feasibility": "insufficient_for_recommendation"
+    },
+    "criticalFailures": [],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "A failed suspension culture is retained as qualifying evidence, never dropped as uninformative."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

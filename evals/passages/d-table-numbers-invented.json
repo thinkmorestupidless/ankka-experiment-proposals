@@ -1,0 +1,21 @@
+{
+  "id": "d-table-numbers-invented",
+  "category": "absent_table",
+  "source": "paper-d",
+  "text": "Paper D, numbers from the image-only table",
+  "proposed": {
+    "kind": "finding",
+    "quotation": "coefficient 0.93 for the 1700 nm region",
+    "species": "duck",
+    "endpoint": "calibration coefficient",
+    "outcome": "0.93",
+    "proposition": null
+  },
+  "expectedLabel": "rejected_by_gate",
+  "failingChecks": [
+    "span"
+  ],
+  "expectedDefect": "span_unresolved",
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

@@ -1,0 +1,19 @@
+{
+  "id": "d-table-image",
+  "category": "absent_table",
+  "source": "paper-d",
+  "text": "Paper D results naming an image-only table",
+  "proposed": {
+    "kind": "finding",
+    "quotation": "The calibration achieved a standard error of prediction of 2.1 percentage points",
+    "species": "duck",
+    "endpoint": "fat content prediction",
+    "outcome": "standard error 2.1 percentage points",
+    "proposition": null
+  },
+  "expectedLabel": "entailed",
+  "failingChecks": [],
+  "expectedDefect": null,
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "c-negation-flipped",
+  "category": "negation",
+  "source": "paper-c",
+  "text": "Paper C results, negation flipped",
+  "proposed": {
+    "kind": "finding",
+    "quotation": "Cell number did not increase in any flask",
+    "species": "goose",
+    "endpoint": "cell number",
+    "outcome": "increased",
+    "proposition": null
+  },
+  "expectedLabel": "contradicted",
+  "failingChecks": [
+    "negation"
+  ],
+  "expectedDefect": "negation_error",
+  "uncertain": false,
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)"
+}

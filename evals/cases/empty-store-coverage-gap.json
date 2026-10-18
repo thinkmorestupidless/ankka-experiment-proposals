@@ -1,0 +1,21 @@
+{
+  "id": "empty-store-coverage-gap",
+  "category": "insufficient_evidence",
+  "request": "What internal operational constraints determine feasibility?",
+  "fixtures": [],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "No internal records in the configured directory: the search returns nothing, a coverage gap is opened, and it is not treated as evidence that the approach is impossible."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

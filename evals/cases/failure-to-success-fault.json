@@ -1,0 +1,25 @@
+{
+  "id": "failure-to-success-fault",
+  "category": "negative_result",
+  "request": "Can you make foie gras?",
+  "fixtures": [
+    "paper-c.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [
+      "failure_as_success"
+    ],
+    "retrieved": [],
+    "excluded": [],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "The failure_to_success fault on Paper C."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}

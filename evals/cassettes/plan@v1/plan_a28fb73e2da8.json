@@ -1,0 +1,10 @@
+{
+  "promptVersion": "plan@v1",
+  "case": "plan:a28fb73e2da8",
+  "reply": "{\n  \"queries\": [\n    {\n      \"kind\": \"lexical\",\n      \"text\": \"protocol version cell line treatment hours\"\n    },\n    {\n      \"kind\": \"semantic\",\n      \"text\": \"internal measurements, protocols and resource constraints of the lipid assay programme\"\n    }\n  ],\n  \"targetSources\": [\n    \"internal\"\n  ],\n  \"filters\": {},\n  \"stoppingCriterion\": \"Stop once every internal record of the current protocol version is retrieved.\",\n  \"escalation\": \"supplemental_search\",\n  \"expansions\": [\n    \"lipid assay measurements internal\",\n    \"cell count triglyceride content runs\"\n  ]\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

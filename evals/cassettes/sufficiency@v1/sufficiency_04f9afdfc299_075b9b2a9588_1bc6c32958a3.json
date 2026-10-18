@@ -1,0 +1,10 @@
+{
+  "promptVersion": "sufficiency@v1",
+  "case": "sufficiency:04f9afdfc299:075b9b2a9588:1bc6c32958a3",
+  "reply": "{\n  \"proposition\": \"A narrowly scoped feasibility experiment on lipid accumulation in cultured avian hepatocytes is justified: the cells can be expanded and lipid loading works in a hepatoma model.\",\n  \"status\": \"sufficient_for_proposed_next_step\",\n  \"assumptions\": [\n    \"that oleate-induced lipid accumulation in HepG2 cells transfers mechanistically to primary avian hepatocytes\",\n    \"that primary duck hepatocytes expanded in defined medium remain competent for lipid loading\",\n    \"that adherent, not suspension, culture is used, given the goose suspension failure\"\n  ],\n  \"supportingAssessments\": [\n    \"src:file:paper-a:v1:fd1\",\n    \"src:file:paper-b:v1:fd1\"\n  ],\n  \"criticalGaps\": [\n    {\n      \"description\": \"direct avian lipid accumulation measurement, which the experiment would supply\",\n      \"kind\": \"absence\",\n      \"escalation\": \"exploratory_question\"\n    }\n  ],\n  \"coverageJudgement\": \"mixed\",\n  \"rationale\": \"The evidence is enough to propose the experiment, not to predict its outcome. The assumptions name what the experiment itself must establish.\",\n  \"escalation\": \"exploratory_question\"\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

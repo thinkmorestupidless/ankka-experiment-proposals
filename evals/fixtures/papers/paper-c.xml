@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article">
+  <front>
+    <journal-meta><journal-title-group><journal-title>Constructed Cell Culture Reports</journal-title></journal-title-group></journal-meta>
+    <article-meta>
+      <article-id pub-id-type="doi">10.9999/fixture.paper-c</article-id>
+      <title-group><article-title>Attempted long-term suspension culture of goose hepatocytes: a negative result</article-title></title-group>
+      <contrib-group><contrib contrib-type="author"><name><surname>Dubois</surname><given-names>P.</given-names></name></contrib></contrib-group>
+      <pub-date><year>2022</year></pub-date>
+      <permissions><license xlink:href="https://creativecommons.org/licenses/by/4.0/"><license-p>CC BY 4.0</license-p></license></permissions>
+      <abstract><p>Primary goose hepatocytes were placed in stirred suspension culture in a commercial hepatocyte medium. Viability fell below 20 percent within 72 hours and cell number did not increase under any tested condition. The suspension method was unsuccessful for goose hepatocytes under these conditions.</p></abstract>
+    </article-meta>
+  </front>
+  <body>
+    <sec sec-type="intro"><title>Introduction</title><p>Scalable culture of avian hepatocytes would benefit from suspension methods. We tested whether primary goose hepatocytes survive and expand in stirred suspension.</p></sec>
+    <sec sec-type="methods"><title>Methods</title><p>Hepatocytes were isolated from Landes geese and placed in 125 mL spinner flasks at 60 rpm in a commercial hepatocyte maintenance medium, with and without 5 percent fetal bovine serum and with and without a ROCK inhibitor. Viability and cell number were measured daily for 7 days by trypan blue exclusion.</p></sec>
+    <sec sec-type="results"><title>Results</title><p>Under every tested condition viability fell below 20 percent within 72 hours. Cell number did not increase in any flask (Table 1); it declined from day 1. Aggregates formed by day 2 and detached cells were non-viable. The suspension culture method was unsuccessful for goose hepatocytes under the tested conditions.</p>
+      <table-wrap id="tbl1"><label>Table 1</label><caption><p>Viability and cell number in stirred suspension</p></caption>
+        <table><thead><tr><th>Condition</th><th>Viability day 3 (%)</th><th>Cell number day 3 (fold of day 0)</th></tr></thead><tbody><tr><td>Serum-free</td><td>14</td><td>0.4</td></tr><tr><td>5% FBS</td><td>18</td><td>0.5</td></tr><tr><td>5% FBS + ROCK inhibitor</td><td>19</td><td>0.6</td></tr></tbody></table>
+      </table-wrap>
+    </sec>
+    <sec sec-type="discussion"><title>Discussion</title><p>Stirred suspension in this medium does not support goose hepatocytes. This does not show that suspension culture is impossible; other media, carriers or agitation regimes were not tested.</p></sec>
+  </body>
+</article>

@@ -1,0 +1,10 @@
+{
+  "promptVersion": "verify@v1",
+  "case": "verify:src:file:paper-b@species_drop:v1:fd1:a7f7178ae600",
+  "reply": "{\n  \"label\": \"contradicted\",\n  \"checks\": {\n    \"negation\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"scope\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"species\": {\n      \"passed\": false,\n      \"evidenceQuote\": \"HepG2 cells (human hepatoma, ATCC HB-8065)\",\n      \"note\": \"the text names human HepG2 hepatoma cells; the record states no species, which generalises beyond the source\"\n    },\n    \"treatment\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    },\n    \"endpoint\": {\n      \"passed\": true,\n      \"evidenceQuote\": \"\",\n      \"note\": \"agrees with the text\"\n    }\n  },\n  \"rationale\": \"The species qualification is missing from the record while the source is explicit that the cells are human HepG2.\"\n}",
+  "recorded": false,
+  "authoredBy": "claude-with-trevor",
+  "checkedQuotations": false,
+  "refusal": null,
+  "model": null
+}

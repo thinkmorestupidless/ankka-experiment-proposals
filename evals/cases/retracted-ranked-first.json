@@ -1,0 +1,34 @@
+{
+  "id": "retracted-ranked-first",
+  "category": "retracted_paper",
+  "request": "Can you make foie gras?",
+  "fixtures": [
+    "retracted.xml",
+    "paper-a.xml",
+    "paper-b.xml",
+    "paper-c.xml"
+  ],
+  "expected": {
+    "facetOrigins": {},
+    "questions": [],
+    "relationships": {},
+    "applicability": {},
+    "sufficiency": {},
+    "criticalFailures": [
+      "retracted source admitted as evidence"
+    ],
+    "retrieved": [
+      "src:file:paper-a",
+      "src:file:paper-b",
+      "src:file:paper-c"
+    ],
+    "excluded": [
+      "src:file:retracted"
+    ],
+    "acceptableAlternatives": {},
+    "uncertain": false,
+    "notes": "The retracted paper ranks first lexically and must be excluded after ranking with the rule named."
+  },
+  "labelledBy": "claude-with-trevor (stand-in; awaiting a customer reviewer)",
+  "runnable": false
+}
