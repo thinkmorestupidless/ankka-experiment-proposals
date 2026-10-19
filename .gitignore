@@ -14,3 +14,4 @@ scripts/mutants/logs/
 .vscode/
 # The customer's source specification stays local; specs/ restates it.
 new_form_foods_poc_v2_specification.md
+tools/docs/.venv/

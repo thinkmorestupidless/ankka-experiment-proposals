@@ -914,6 +914,7 @@ object QuestionInvestigationWorkflow
   /** The adapters that reach the network; the replay tier records them as not searched. */
   val network: Set[String] = Set("europepmc", "pubmed", "crossref")
 
+  // docs:start plan-gate
   /** The plan gate: known kinds, both kinds present, a known escalation. */
   def gate(p: SearchPlanProposal): Either[Defect, (Vector[Query], Escalation)] =
     val queries = p.queries.flatMap(q =>
@@ -960,6 +961,7 @@ object QuestionInvestigationWorkflow
             .getOrElse(Escalation.supplemental_search)
         )
       )
+  // docs:end plan-gate
 
   val waiting         = step("waiting")(_.awaitStep)
   val planStep        = step("plan")(_.planStepRun)

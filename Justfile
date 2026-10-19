@@ -80,3 +80,19 @@ image:
 
 # The pull-request tier.
 pr: check-bdd test-unit test-integration independent features-replay
+
+# Check every page, then build the documentation site into target/docs-site.
+docs:
+    uv run --project tools/docs docs build
+
+# Refresh the code samples the pages include from their sources.
+docs-sync:
+    uv run --project tools/docs docs sync
+
+# The documentation site with live reload, while writing.
+docs-serve:
+    uv run --project tools/docs docs serve
+
+# Re-render the documentation diagrams from their Mermaid sources.
+docs-diagrams:
+    for f in docs/assets/diagrams/*.mmd; do npx -y @mermaid-js/mermaid-cli@11.4.2 -i "$f" -o "${f%.mmd}.svg" -b white; done

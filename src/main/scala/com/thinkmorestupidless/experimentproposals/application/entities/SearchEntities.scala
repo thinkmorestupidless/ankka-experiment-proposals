@@ -32,6 +32,7 @@ final class SearchPlanEntity(context: EventSourcedEntityContext)
     case SearchPlanEvent.ExecutionRecorded(id, _) =>
       currentState.copy(executionIds = (currentState.executionIds :+ id).distinct)
 
+  // docs:start plan-invariant
   def plan(request: RecordPlan): Effect[SearchPlan] =
     if request.queries.isEmpty then effects.error("a plan has at least one query")
     else if !SearchPlan.twoKinds(request.queries) then
@@ -55,6 +56,7 @@ final class SearchPlanEntity(context: EventSourcedEntityContext)
           )
         )
         .thenReplyState
+  // docs:end plan-invariant
 
   def recordExecution(executionId: String): Effect[Done] =
     if !currentState.registered then effects.error("no such plan", ErrorCode.NotFound)

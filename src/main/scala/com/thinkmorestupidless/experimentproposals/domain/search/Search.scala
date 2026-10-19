@@ -12,6 +12,7 @@ final case class Query(kind: QueryKind, text: String, expansionOf: Option[String
 /** A query as the model proposes it; the gate turns the kind into the closed list. */
 final case class QueryProposal(kind: String, text: String, expansionOf: Option[String] = None)
 
+// docs:start plan-proposal
 /** The search agent's reply: queries, targets, filters, a stopping criterion, and expansions. */
 final case class SearchPlanProposal(
     queries: Vector[QueryProposal],
@@ -21,6 +22,7 @@ final case class SearchPlanProposal(
     escalation: String = "supplemental_search",
     expansions: Vector[String] = Vector.empty
 )
+// docs:end plan-proposal
 
 /** The per-question search plan (glossary: search plan); a replan is a new version. */
 final case class SearchPlan(
