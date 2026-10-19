@@ -1,0 +1,84 @@
+# The documentation site. The source is docs/, plain Markdown with YAML frontmatter; this file says how
+# MkDocs renders it and, under `extra.docs`, what ankka's docs tool needs to know about this repository.
+# `uv run --project tools/docs docs build` checks every page and builds the site. See
+# docs/contributing/documentation.md.
+site_name: ankka-experiment-proposals
+site_description: A retrieval-augmented application built on ankka, in which models propose and a deterministic workflow decides what counts, from a customer request to a reviewed experimental design.
+site_url: https://thinkmorestupidless.github.io/ankka-experiment-proposals/
+repo_url: https://github.com/thinkmorestupidless/ankka-experiment-proposals
+repo_name: thinkmorestupidless/ankka-experiment-proposals
+edit_uri: edit/main/docs/
+docs_dir: docs
+site_dir: target/docs-site
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+
+# Deliberately plain: no admonitions, no snippet syntax. A page must read correctly with no renderer,
+# because that is how a model most often receives it.
+markdown_extensions:
+  - toc:
+      permalink: true
+  - tables
+  - pymdownx.highlight:
+      anchor_linenums: false
+  - pymdownx.superfences
+
+extra:
+  generator: false
+  docs: {}
+
+nav:
+  - Home: index.md
+  - Concepts:
+      - Models inside a deterministic workflow: concepts/motivation.md
+      - How the application is built: concepts/architecture.md
+      - The stages: concepts/stages.md
+      - Proposals, records and rules: concepts/data-types.md
+      - How evidence is verified: concepts/evidence.md
+      - Recorded model replies and the two tiers: concepts/replay.md
+  - Get started:
+      - Run it locally: get-started/run-locally.md
+      - The demonstration walkthrough: get-started/walkthrough.md
+  - Build:
+      - Add a model-backed stage: build/add-a-stage.md
+      - Test the application: build/test.md
+  - Deploy:
+      - Deploy on ankka: deploy/deploy-on-ankka.md
+  - Reference:
+      - HTTP API: reference/http-api.md
+      - Configuration: reference/configuration.md
+      - Limitations: reference/limitations.md
+  - Contributing:
+      - Writing documentation: contributing/documentation.md

@@ -1,0 +1,45 @@
+# The documentation: checked on every pull request, published to GitHub Pages from main, at
+# https://thinkmorestupidless.github.io/ankka-experiment-proposals/. Pages must be enabled once, in the
+# repository's settings, with "GitHub Actions" as its source.
+name: docs
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
+      - 'tools/docs/**'
+      - 'mkdocs.yml'
+      - 'README.md'
+      # Included samples are read from the code.
+      - 'src/main/**'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: "3.12"
+      - run: uv run --project tools/docs docs build
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: target/docs-site
+
+  deploy:
+    # Only from main: a pull request's build is the check, and its site is the artifact above.
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v5

@@ -1,0 +1,41 @@
+flowchart TD
+  subgraph ING["Ingestion workflow, per source"]
+    FE["Fetch<br/>Europe PMC · PubMed · Crossref<br/>local files · internal CSVs"] --> RC{"New content hash?"}
+    RC -- duplicate --> DUP(["No new version"])
+    RC -- new --> PA["Parse into sections<br/>with stable offsets"]
+    PA -- "corrupt or no text" --> QU(["Version quarantined<br/>content kept, reason recorded"])
+    PA --> CH["Chunk and embed"]
+    CH --> ME["Record measurements<br/>units validated, never converted"]
+    ME --> EG{"Source eligibility<br/>status · parse · quarantine"}
+    EG --> XT["Extract findings and claims<br/>each citing exact quotations<br/>model: evidence-agent"]
+  end
+
+  XT --> V
+
+  subgraph VER["Verification workflow, per record and attempt"]
+    V{"Deterministic gate<br/>every span resolves to its text<br/>required fields present"}
+    V -- fails --> QV(["Quarantined<br/>no model call"])
+    V -- passes --> VA["Verify against the source passage<br/>negation · scope · species<br/>treatment · endpoint<br/>model: evidence-agent"]
+    VA --> DEC{"Decide"}
+    DEC -- "entailed, every check passes" --> OK(["Verified"])
+    DEC -- "critical defect" --> RJ(["Rejected"])
+    DEC -- "ambiguous or thin" --> HR[/"Reviewer queue<br/>record beside its passage"/]
+    DEC -- "retryable defect, budget left" --> RE["Re-extract from the source,<br/>never from a summary"] --> V
+  end
+
+  OK --> USE["Eligible for assessment"]
+  USE -. "if its source or record changes later" .-> CHG
+
+  subgraph IMP["Impact, when anything changes"]
+    CHG["A source's status changes,<br/>or a record is rejected or reproposed"] --> WALK["Walk everything built on it<br/>assessments · packages · approaches · designs"]
+    WALK --> FLAG(["Each dependent flagged for review<br/>approved versions never rewritten"])
+  end
+
+  classDef agent fill:#dbeafe,stroke:#1d4ed8,color:#0f172a
+  classDef gate fill:#fef3c7,stroke:#b45309,color:#0f172a
+  classDef human fill:#dcfce7,stroke:#15803d,color:#0f172a
+  classDef stop fill:#f1f5f9,stroke:#475569,color:#0f172a
+  class XT,VA agent
+  class RC,EG,V,DEC gate
+  class HR human
+  class DUP,QU,QV,OK,RJ,FLAG stop

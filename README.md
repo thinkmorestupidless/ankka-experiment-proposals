@@ -12,7 +12,9 @@ and a typed experimental design that a named scientific reviewer approves or rej
   `specs/001-evidence-experiment-design/`
 - How to run and validate it: `specs/001-evidence-experiment-design/quickstart.md`
 - The acceptance scenarios, in Gherkin: `features/`, in the vocabulary of `GLOSSARY.md`
-- What it does not do: `docs/limitations.md`
+- The documentation, with the motivation, the architecture and how to run and deploy it:
+  https://thinkmorestupidless.github.io/ankka-experiment-proposals/ (source under `docs/`)
+- What it does not do: `docs/reference/limitations.md`
 
 ## How it works
 

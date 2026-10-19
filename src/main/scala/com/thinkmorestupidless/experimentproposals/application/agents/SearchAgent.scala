@@ -24,6 +24,7 @@ given JsonValueCodec[SearchPlanProposal] = Codecs.make[SearchPlanProposal]
  */
 final class SearchAgent extends Agent:
 
+  // docs:start plan-handler
   def plan(request: PlanRequest): Effect[SearchPlanProposal] =
     val prompt = SearchAgent.planPrompt
     effects
@@ -42,6 +43,7 @@ final class SearchAgent extends Agent:
       )
       .memory(MemoryProvider.none)
       .thenReplyAs[SearchPlanProposal]
+  // docs:end plan-handler
 
 object SearchAgent extends Agent.Companion[SearchAgent](ComponentId("search-agent")):
 

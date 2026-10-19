@@ -66,6 +66,7 @@ object ApplicabilityRules:
       val endpoint      = dims.getOrElse("endpoint", DimensionMatch.unknown)
       val results       = Vector.newBuilder[RuleOutcomeRecord]
       var applicability = proposed
+      // docs:start species-rule
       if species == DimensionMatch.mismatch && applicability == Applicability.direct then
         applicability = Applicability.indirect
         results += RuleOutcomeRecord(
@@ -74,6 +75,7 @@ object ApplicabilityRules:
           "direct rewritten to indirect: the species does not match"
         )
       else results += RuleOutcomeRecord(speciesRule.key, "passed", s"species ${species}")
+      // docs:end species-rule
       if endpoint == DimensionMatch.mismatch && applicability == Applicability.direct then
         applicability = Applicability.indirect
         results += RuleOutcomeRecord(

@@ -1,0 +1,50 @@
+flowchart TD
+  R(["Customer request<br/>kept byte for byte"]) --> F["Extract facets<br/>model: request-agent"]
+  F --> FG{"Facet gate<br/>explicit facets cite the request"}
+  FG -- "defect, retry ≤ 2" --> F
+  FG -- passes --> RT["Round-trip check<br/>a separate prompt rebuilds the request<br/>and lists omissions and additions"]
+  RT --> H1[/"Reviewer confirms, amends<br/>or leaves each facet unresolved"/]
+  H1 -- "mandatory facets settled" --> Q["Derive scientific questions<br/>model: request-agent"]
+  Q --> QG{"Coverage gate<br/>every mandatory facet investigated"}
+  QG -- "coverage gap, retry ≤ 2" --> Q
+  QG -- passes --> P
+
+  subgraph PQ["For each question, in parallel"]
+    P["Plan the search<br/>model: search-agent"] --> PG{"Plan gate<br/>≥ 1 lexical and ≥ 1 semantic query"}
+    PG -- passes --> X["Execute: lexical and semantic<br/>over the chunk store, plus external indexes"]
+    X --> FU["Fuse ranks with RRF<br/>source snapshot recorded"]
+    FU --> EL{"Eligibility, applied after ranking<br/>retracted · superseded · quarantined"}
+    EL -- "removed, reason recorded" --> EXC[("Exclusions")]
+    EL -- "nothing eligible" --> CG["Coverage gap<br/>not evidence of absence"]
+    CG --> SS["Supplemental search<br/>bounded at 2 per gap"] --> X
+    EL -- eligible --> CTX["Resolve context<br/>section · neighbours · tables"]
+    CTX --> A["Assess each verified record<br/>model: evidence-agent"]
+    A --> AR{"Applicability rules<br/>species or endpoint mismatch is never direct"}
+    AR --> S["Judge sufficiency for each decision<br/>model: evidence-agent"]
+    S --> SR{"Sole affirmative evidence?"}
+    SR -- yes --> HQ[/"Reviewer checks the record"/]
+  end
+
+  SR -- "no · operator asks to package" --> PK["One evidence package per question"]
+  PK --> PKG{"Package rules<br/>spans resolve · contradictions kept<br/>only verified, eligible records · no critical trim"}
+  PKG --> C["Propose ≥ 2 candidate approaches<br/>compared on 8 criteria<br/>model: design-agent"]
+  C --> CG2{"Gate and guardrail<br/>every assumption labelled<br/>no probability of success"}
+  CG2 -- "fewer than two, retry ≤ 2" --> C
+  CG2 -- "probability asserted" --> STOP(["Refused and recorded<br/>paused for the operator"])
+  CG2 -- passes --> H2[/"Reviewer selects one approach<br/>with reasons for the others"/]
+  H2 --> D["Write the twelve-section design<br/>model: design-agent"]
+  D --> DG{"Design rules<br/>every claim verified · every span resolves<br/>mandatory facets accounted for"}
+  DG -- "unverified claim, retry ≤ 2" --> D
+  DG -- passes --> H3[/"Reviewer approves, rejects<br/>or requests changes"/]
+  H3 -- "changes requested" --> D
+  H3 -- approved --> DONE(["Approved design"])
+  H3 -- rejected --> REJ(["Rejection kept with its reason"])
+
+  classDef agent fill:#dbeafe,stroke:#1d4ed8,color:#0f172a
+  classDef gate fill:#fef3c7,stroke:#b45309,color:#0f172a
+  classDef human fill:#dcfce7,stroke:#15803d,color:#0f172a
+  classDef stop fill:#f1f5f9,stroke:#475569,color:#0f172a
+  class F,Q,P,A,S,C,D agent
+  class FG,QG,PG,EL,AR,SR,PKG,CG2,DG gate
+  class H1,HQ,H2,H3 human
+  class R,STOP,DONE,REJ,EXC stop

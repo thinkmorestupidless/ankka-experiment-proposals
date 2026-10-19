@@ -12,11 +12,13 @@ import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 import scala.util.control.NonFatal
 
+// docs:start stage-outcome
 /** What a stage's model call came to. The caller records the outcome's records, then completes. */
 enum StageOutcome[+O]:
   case Skipped(outputRef: Option[Ref])
   case Done(attempt: Int, value: O, modelCall: ModelCall)
   case Failed(attempt: Int, defect: Defect, modelCall: Option[ModelCall])
+// docs:end stage-outcome
 
 /**
  * The helper every stage uses (plan: "every step goes through `stage-run`"): start the stage on the
