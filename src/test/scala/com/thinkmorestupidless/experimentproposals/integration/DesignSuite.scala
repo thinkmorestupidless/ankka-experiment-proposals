@@ -194,10 +194,12 @@ class DesignSuite extends ServiceFixture:
       v1
     )
     assert(get(api(s"/designs/$id:design?format=md&version=2"))._2.contains("**Approved** by ada"))
-    val rows = eventually("the design rows") {
-      val r = get(api("/designs"))._2; Option.when(r.contains(s"$id:design"))(r)
+    // The view projects the design's events in order: wait for the approval, not just the row.
+    eventually("the design rows show version 2 approved") {
+      val r   = get(api("/designs"))._2
+      val row = objectsOf(r).find(_.contains(s""""id":"$id:design""""))
+      row.filter(_.contains("\"approvedVersion\":2"))
     }
-    assert(rows.contains("\"approvedVersion\":2"), rows)
   }
 
   test(
