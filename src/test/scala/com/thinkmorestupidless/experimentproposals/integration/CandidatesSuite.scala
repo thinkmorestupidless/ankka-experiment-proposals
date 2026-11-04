@@ -78,7 +78,7 @@ class CandidatesSuite extends ServiceFixture:
     )
     assertEquals(post(api(s"/requests/$id/facets:confirmed"), """{"reviewer":"ada"}""")._1, 200)
     eventually("the lipid question is retrieved", within = 120.seconds) {
-      val q = question(s"$id:q4"); Option.when(q.contains("\"status\":\"retrieved\""))(q)
+      val q = question(s"$id:q4"); Option.when(rests(q))(q)
     }
     assertEquals(
       post(api(s"/questions/$id:q4/assess"), s"""{"recordIds":["$A","$B","$C"]}""")._1,
@@ -118,7 +118,9 @@ class CandidatesSuite extends ServiceFixture:
     assert(pkg.contains("\"ruleSetVersion\":\"package@v1\""), pkg)
     val empty = get(api(s"/packages/$id:q6:pk1"))._2
     assert(
-      empty.contains(s""""gapIds":["$id:q6:g1"""") && !empty.contains("\"assessmentRefs\":[{"),
+      // The automation judges every configured decision, so the empty question may hold one gap per
+      // decision; the first is always g1.
+      empty.contains(s""""$id:q6:g1"""") && !empty.contains("\"assessmentRefs\":[{"),
       empty
     )
     val (_, run) = get(api(s"/runs/run-$id"))

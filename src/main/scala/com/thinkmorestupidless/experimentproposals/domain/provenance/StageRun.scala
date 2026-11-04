@@ -29,7 +29,9 @@ enum StageRunEvent:
       attempt: Int,
       inputRefs: Vector[Ref],
       inputHash: String,
-      at: Instant
+      at: Instant,
+      // Who asked for the stage: a reviewer, the operator, or `system:investigation` (feature 002).
+      actor: Option[String] = None
   )
   case StageCompleted(
       stage: String,
@@ -59,7 +61,8 @@ final case class StartStage(
     stage: String,
     stageVersion: Int,
     inputRefs: Vector[Ref],
-    inputHash: String
+    inputHash: String,
+    actor: Option[String] = None
 )
 
 final case class CompleteStage(

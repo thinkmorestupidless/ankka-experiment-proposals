@@ -21,6 +21,13 @@ import com.thinkmorestupidless.experimentproposals.domain.request.*
 import com.thinkmorestupidless.experimentproposals.domain.search.{SearchExecution, SearchPlan}
 import com.thinkmorestupidless.experimentproposals.domain.design.*
 import com.thinkmorestupidless.experimentproposals.domain.sources.*
+import com.thinkmorestupidless.experimentproposals.domain.conversation.{Prefill, Reference}
+import com.thinkmorestupidless.experimentproposals.domain.journey.{
+  Journey,
+  QuestionLane,
+  StageNode,
+  StageRunRef
+}
 import com.thinkmorestupidless.ankka.core.Codecs
 
 /** The API's request and response shapes beside the records themselves, with their codecs. */
@@ -190,3 +197,6 @@ object Json:
   given ingestedCodec: JsonValueCodec[Vector[IngestStarted]] = Codecs.make[Vector[IngestStarted]]
   given measurementRowsCodec: JsonValueCodec[Vector[MeasurementRow]] =
     Codecs.make[Vector[MeasurementRow]]
+  given JsonValueCodec[Journey]   = Codecs.make[Journey]
+  given JsonValueCodec[Reference] = Codecs.make[Reference]
+  given JsonValueCodec[Prefill]   = Codecs.make[Prefill]

@@ -36,6 +36,10 @@ What the application does not do. Each is a deliberate boundary of a proof of co
 - **Twenty-one of the twenty-two evaluation cases await recorded model replies.** Only the reference
   request has cassettes; the others are labelled and reported as not run until the live tier records
   them. Every label is the stand-in's until a customer reviewer reads it (`evals/README.md`).
+- **A source ingested after a question's search is not searched for that question by itself.** The
+  investigation searches what is in the store when it runs. To include a source ingested later, run the
+  question's search again with `POST /search-plans/{id}/execute`; assessment and sufficiency follow on
+  their own.
 - **The mutant run is not part of CI.** `just mutants` copies the tree three times and builds each;
   its result file is committed and read by the living features.
 - **Experimental runs and observations are not recorded.** An observation enters as an internal

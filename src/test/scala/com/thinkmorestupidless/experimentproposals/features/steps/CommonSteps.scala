@@ -104,6 +104,13 @@ trait CommonSteps extends GherkinSuite:
     out.result()
 
   /** A JSON string literal. */
+  /**
+   * Whether a question's search is done and it rests: `retrieved` while the automation has not run
+   * past it, or `reported` once it has assessed, judged and reported (feature 002).
+   */
+  protected def rests(question: String): Boolean =
+    question.contains("\"status\":\"retrieved\"") || question.contains("\"status\":\"reported\"")
+
   protected def quote(s: String): String =
     "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 

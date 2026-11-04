@@ -76,6 +76,7 @@ Feature: The conversation
     Then the answer names both customer requests that are waiting
     And the card of each customer request is shown
 
+  @no-model
   Scenario: without a model the assistant says so and everything else works
     Given no model is configured for the assistant
     When the conversation is opened

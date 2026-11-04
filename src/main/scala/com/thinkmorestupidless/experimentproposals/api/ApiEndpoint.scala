@@ -69,6 +69,11 @@ import com.thinkmorestupidless.ankka.core.{CommandError, EntityId, ErrorCode}
 import com.thinkmorestupidless.ankka.http.*
 import com.thinkmorestupidless.ankka.runtime.ViewClient
 import com.thinkmorestupidless.ankka.sdk.ComponentClient
+import com.thinkmorestupidless.experimentproposals.application.journey.JourneyReader
+import com.thinkmorestupidless.experimentproposals.domain.journey.Journey
+
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.*
 
 /**
  * The operator's and the tests' API (contracts/http-api.md). Thin: every rule lives in an entity.
@@ -78,6 +83,8 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
 
   val acl: Acl = Auth.acl(settings.apiToken)
 
+  private given ExecutionContext        = ExecutionContext.global
+  private val journeys                  = JourneyReader(client, views)
   private def source(id: String)        = client.forEventSourcedEntity(EntityId(id))
   private def requestEntity(id: String) = client.forEventSourcedEntity(EntityId(id))
   private def facetEntity(id: String)   = client.forEventSourcedEntity(EntityId(id))
@@ -190,6 +197,23 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
     val req = requestEntity(id).call(RequestEntity.get).invoke()
     if !req.registered then throw HttpProblem.notFound(s"no request '$id'")
     RequestView(req, facetsOf(req), questionsOf(req), investigation(id))
+  }
+
+  // ── the journey (feature 002, contracts/journey.md) ──────────────────────────
+
+  private def journeyOrRefuse(id: String): Journey =
+    ComponentClient
+      .await(journeys.journey(id), 30.seconds)
+      .getOrElse(throw HttpProblem.notFound(s"no request '$id'"))
+
+  get("/requests/{id}/journey") { (id: String) =>
+    journeyOrRefuse(id)
+  }
+
+  /** The journey now, then each time it differs; an unknown request is refused before it starts. */
+  sseEvents("/requests/{id}/journey:watch") { (id: String) =>
+    journeyOrRefuse(id)
+    journeys.watch(id).map(j => SseEvent.json("journey", j))
   }
 
   get("/requests/{id}/facets") { (id: String) =>

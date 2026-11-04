@@ -7,7 +7,7 @@ import com.thinkmorestupidless.experimentproposals.application.entities.*
 import com.thinkmorestupidless.experimentproposals.config.Configured
 import com.thinkmorestupidless.experimentproposals.domain.Enumerations.*
 import com.thinkmorestupidless.experimentproposals.domain.evidence.*
-import com.thinkmorestupidless.experimentproposals.domain.provenance.{Defect, Ref}
+import com.thinkmorestupidless.experimentproposals.domain.provenance.{Defect, Ref, StartOutcome}
 import com.thinkmorestupidless.experimentproposals.domain.request.AdvanceQuestion
 import com.thinkmorestupidless.experimentproposals.domain.search.*
 import com.thinkmorestupidless.experimentproposals.domain.sources.{
@@ -62,7 +62,10 @@ final case class QuestionInvestigationState(
   def started: Boolean = status != "not-started"
 
   /** Where the investigation rests between the stages a command or the API moves it through. */
-  def resting: String = if retrieved then "retrieved" else "awaiting-retrieval"
+  def resting: String =
+    if reportedToInvestigation then "reported"
+    else if retrieved then "retrieved"
+    else "awaiting-retrieval"
 
 final case class StartQuestionInvestigation(questionId: String, requestId: String)
 final case class AssessRecords(recordIds: Vector[String])
@@ -92,9 +95,23 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
         QuestionInvestigationWorkflow.executeStep,
         RecoverStrategy.maxRetries(2).failoverTo(QuestionInvestigationWorkflow.executeFailed)
       )
+      .stepTimeout(
+        QuestionInvestigationWorkflow.awaitVerificationStep,
+        Configured.verificationBound + 30.seconds
+      )
+      .stepRecovery(
+        QuestionInvestigationWorkflow.awaitVerificationStep,
+        RecoverStrategy
+          .maxRetries(Configured.retryBudget)
+          .failoverTo(QuestionInvestigationWorkflow.verificationFailed)
+      )
       .build
 
   private def stages = StageCall(client, currentState.runId, "question-investigation")
+
+  /** The automatic stages' runs name their actor. */
+  private def autoStages =
+    StageCall(client, currentState.runId, "question-investigation", Some(SystemActor))
   private def question = client
     .forEventSourcedEntity(EntityId(currentState.questionId))
     .call(QuestionEntity.get)
@@ -562,19 +579,179 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
         d.version(version).toVector.flatMap(_.extractions.flatMap(_.recordIds))
       }
       .distinct
-      .filter(id => recordOf(id).exists(_.status == RecordStatus.verified))
+      .flatMap(id => recordOf(id).map(id -> _.status))
+    val verified  = records.collect { case (id, RecordStatus.verified) => id }
+    val unsettled = records.collect { case (id, RecordStatus.proposed) => id }
+    val settled   = records.collect { case (id, st) if st != RecordStatus.proposed => id }
+    // The automation (feature 002): the retrieved records' verification settles before assessment.
     stepEffects
       .updateState(
         currentState.copy(
-          status = "retrieved",
+          status = "awaiting-verification",
           retrieved = true,
           resolvedChunkIds = resolved,
-          recordIds = (currentState.recordIds ++ records).distinct,
+          recordIds = (currentState.recordIds ++ verified).distinct,
+          settled = settled,
+          unsettled = unsettled,
           supplementalFor = None,
           sourcesOverride = Vector.empty
         )
       )
+      .thenTransitionTo(QuestionInvestigationWorkflow.awaitVerificationStep.ref)
+
+  // ── the automation (feature 002) ────────────────────────────────────────────
+
+  /**
+   * Waits, within `Configured.verificationBound`, for the verification of every retrieved record
+   * still proposed; then assesses the verified ones, or judges at once when none is. A record still
+   * proposed at the bound fails the stage `verification` with the defect `verification_unsettled`.
+   */
+  def awaitVerificationStepRun: StepEffect =
+    val stage                     = "verification"
+    val waitFor                   = currentState.unsettled
+    val deadline                  = System.nanoTime() + Configured.verificationBound.toNanos
+    def remaining: FiniteDuration = math.max(0L, deadline - System.nanoTime()).nanos
+    def proposed(ids: Vector[String]): Vector[String] =
+      ids.filter(id => recordOf(id).exists(_.status == RecordStatus.proposed))
+    val started = autoStages.start(
+      stage,
+      1,
+      currentState.recordIds.map(Ref(RecordKind.finding, _, 1)) ++ waitFor.map(
+        Ref(RecordKind.finding, _, 1)
+      ),
+      StageCall.hash(
+        (currentState.settled ++ waitFor :+ currentState.attempts.getOrElse(stage, 1).toString)*
+      )
+    )
+    var pending = proposed(waitFor)
+    while pending.nonEmpty && remaining > Duration.Zero do
+      val id      = pending.head
+      val attempt = recordOf(id).map(_.attempt).getOrElse(1)
+      val began   = System.nanoTime()
+      try
+        client
+          .forWorkflow(EntityId(VerificationWorkflow.idFor(id, math.max(attempt, 1))))
+          .awaitEnd(VerificationWorkflow, remaining.min(5.seconds).max(1.millis)): Unit
+      catch
+        case _: CommandError =>
+          // A verification not started yet, or one that failed, answers at once: wait a little.
+          if (System.nanoTime() - began).nanos < 100.millis then Thread.sleep(200)
+      pending = proposed(pending)
+    val statuses =
+      (currentState.settled ++ waitFor).distinct.flatMap(id => recordOf(id).map(id -> _.status))
+    val verified  = statuses.collect { case (id, RecordStatus.verified) => id }
+    val unsettled = statuses.collect { case (id, RecordStatus.proposed) => id }
+    val settled   = statuses.collect { case (id, st) if st != RecordStatus.proposed => id }
+    val next = currentState.copy(
+      recordIds = (currentState.recordIds ++ verified).distinct,
+      settled = settled,
+      unsettled = unsettled
+    )
+    if unsettled.nonEmpty then
+      val defect = Rules.defect(
+        DefectKind.verification_unsettled,
+        s"${unsettled.size} of ${statuses.size} retrieved record(s) still being verified after ${Configured.verificationBound}",
+        retryable = true
+      )
+      started match
+        case StartOutcome.Started(attempt)  => autoStages.fail(stage, attempt, defect): Unit
+        case StartOutcome.AlreadyDone(_, _) => ()
+      stepEffects
+        .updateState(next)
+        .thenTransitionTo(QuestionInvestigationWorkflow.verificationRetry.ref)
+    else
+      started match
+        case StartOutcome.Started(attempt) =>
+          autoStages.complete(
+            stage,
+            attempt,
+            verified.headOption.map(Ref(RecordKind.finding, _, 1))
+          ): Unit
+        case StartOutcome.AlreadyDone(_, _) => ()
+      val assessable =
+        next.recordIds.filter(id => recordOf(id).exists(_.status == RecordStatus.verified))
+      if assessable.isEmpty then toJudging(next)
+      else
+        stepEffects
+          .updateState(next.copy(status = "assessing", failure = None))
+          .thenTransitionTo(QuestionInvestigationWorkflow.assessAllStep.ref)
+
+  /** The unsettled wait is retried within the budget, then the lane rests with the defect. */
+  def verificationRetryStep: StepEffect =
+    val defect = Rules.defect(
+      DefectKind.verification_unsettled,
+      s"${currentState.unsettled.size} retrieved record(s) still being verified after ${Configured.verificationBound}",
+      retryable = true
+    )
+    retryOrGiveUp("verification", defect, QuestionInvestigationWorkflow.awaitVerificationStep.ref)
+
+  /** The failover when the wait itself overruns its step timeout after the retries. */
+  def verificationFailedStep: StepEffect =
+    stepEffects
+      .updateState(
+        currentState.copy(
+          status = currentState.resting,
+          failure =
+            Some(s"verification: ${DefectKind.verification_unsettled} (the wait overran its step)")
+        )
+      )
       .thenTransitionTo(QuestionInvestigationWorkflow.waiting.ref)
+
+  /**
+   * Every verified eligible record the search retrieved, assessed as the `assess` command would.
+   */
+  def assessAllStepRun: StepEffect =
+    assessRun(AssessRecords(currentState.recordIds), auto = true)
+
+  /** The next configured decision's sufficiency, then the next, then the report. */
+  def judgeAllStepRun: StepEffect =
+    currentState.decisionsPending.headOption match
+      case Some(decision) => judgeRun(decision, auto = true)
+      case None =>
+        stepEffects
+          .updateState(currentState.copy(status = "judging"))
+          .thenTransitionTo(QuestionInvestigationWorkflow.reportStep.ref)
+
+  /** Tells the investigation this question is done, then rests, `reported`. */
+  def reportStepRun: StepEffect =
+    client
+      .forWorkflow(EntityId(currentState.requestId))
+      .call(InvestigationWorkflow.questionReported)
+      .invoke(currentState.questionId): Unit
+    stepEffects
+      .updateState(
+        currentState.copy(status = "reported", reportedToInvestigation = true, failure = None)
+      )
+      .thenPause()
+
+  private def toJudging(s: QuestionInvestigationState): StepEffect =
+    stepEffects
+      .updateState(
+        s.copy(status = "judging", failure = None, decisionsPending = Configured.decisions)
+      )
+      .thenTransitionTo(QuestionInvestigationWorkflow.judgeAllStep.ref)
+
+  private def afterAssess(s: QuestionInvestigationState, auto: Boolean): StepEffect =
+    if auto then toJudging(s)
+    else
+      stepEffects
+        .updateState(s.copy(status = s.resting))
+        .thenTransitionTo(QuestionInvestigationWorkflow.waiting.ref)
+
+  /** After a judgement: the next decision when automatic, else rest. */
+  private def afterJudge(s: QuestionInvestigationState, auto: Boolean): StepEffect =
+    if !auto then
+      stepEffects
+        .updateState(s.copy(status = s.resting))
+        .thenTransitionTo(QuestionInvestigationWorkflow.waiting.ref)
+    else
+      val left = s.decisionsPending.drop(1)
+      stepEffects
+        .updateState(s.copy(status = "judging", decisionsPending = left))
+        .thenTransitionTo(
+          if left.nonEmpty then QuestionInvestigationWorkflow.judgeAllStep.ref
+          else QuestionInvestigationWorkflow.reportStep.ref
+        )
 
   /** Between stages the investigation waits for the API or the request's packaging (US7). */
   def awaitStep: StepEffect =
@@ -609,12 +786,19 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
         case _                             => None
     }
 
-  def assessStepRun(cmd: AssessRecords): StepEffect =
+  def assessStepRun(cmd: AssessRecords): StepEffect = assessRun(cmd, auto = false)
+
+  private def assessRun(cmd: AssessRecords, auto: Boolean): StepEffect =
+    val calls = if auto then autoStages else stages
+    val again =
+      if auto then QuestionInvestigationWorkflow.assessAllStep.ref
+      else QuestionInvestigationWorkflow.assessStep.withInput(cmd)
     val stage   = "assess"
     val prompt  = EvidenceAgent.assessPrompt
     val q       = question
     val records = cmd.recordIds.flatMap(recordOf).filter(_.status == RecordStatus.verified)
-    if records.isEmpty then
+    if records.isEmpty && auto then toJudging(currentState)
+    else if records.isEmpty then
       stepEffects
         .updateState(
           currentState.copy(
@@ -633,7 +817,7 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
           passagesOf(r)
         )
       )
-      val outcome = stages.model(
+      val outcome = calls.model(
         stage,
         1,
         records.map(r =>
@@ -655,14 +839,10 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
       outcome match
         case StageOutcome.Skipped(_) =>
           val ids = records.map(r => AssessmentEntity.idFor(currentState.questionId, r.id))
-          stepEffects
-            .updateState(
-              currentState.copy(
-                status = currentState.resting,
-                assessmentIds = (currentState.assessmentIds ++ ids).distinct
-              )
-            )
-            .thenTransitionTo(QuestionInvestigationWorkflow.waiting.ref)
+          afterAssess(
+            currentState.copy(assessmentIds = (currentState.assessmentIds ++ ids).distinct),
+            auto
+          )
         case StageOutcome.Done(attempt, set, modelCall) =>
           val byId = records.map(r => r.id -> r).toMap
           val applied = set.assessments.flatMap(p =>
@@ -670,8 +850,8 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
           )
           applied.collectFirst { case (_, _, Left(defect)) => defect } match
             case Some(defect) =>
-              stages.fail(stage, attempt, defect, modelCalls = Vector(modelCall))
-              retryOrGiveUp(stage, defect, QuestionInvestigationWorkflow.assessStep.withInput(cmd))
+              calls.fail(stage, attempt, defect, modelCalls = Vector(modelCall))
+              retryOrGiveUp(stage, defect, again)
             case None =>
               val ids = applied.collect { case (r, p, Right(a)) =>
                 val id = AssessmentEntity.idFor(currentState.questionId, r.id)
@@ -701,25 +881,30 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
                 catch case e: CommandError if e.code == ErrorCode.Conflict => ()
                 id
               }
-              stages.complete(
+              calls.complete(
                 stage,
                 attempt,
                 ids.headOption.map(Ref(RecordKind.assessment, _, 1)),
                 modelCalls = Vector(modelCall)
               )
-              stepEffects
-                .updateState(
-                  currentState.copy(
-                    status = currentState.resting,
-                    recordIds = (currentState.recordIds ++ records.map(_.id)).distinct,
-                    assessmentIds = (currentState.assessmentIds ++ ids).distinct
-                  )
-                )
-                .thenTransitionTo(QuestionInvestigationWorkflow.waiting.ref)
+              afterAssess(
+                currentState.copy(
+                  recordIds = (currentState.recordIds ++ records.map(_.id)).distinct,
+                  assessmentIds = (currentState.assessmentIds ++ ids).distinct,
+                  failure = None
+                ),
+                auto
+              )
         case StageOutcome.Failed(_, defect, _) =>
-          retryOrGiveUp(stage, defect, QuestionInvestigationWorkflow.assessStep.withInput(cmd))
+          retryOrGiveUp(stage, defect, again)
 
-  def sufficiencyStepRun(decision: String): StepEffect =
+  def sufficiencyStepRun(decision: String): StepEffect = judgeRun(decision, auto = false)
+
+  private def judgeRun(decision: String, auto: Boolean): StepEffect =
+    val calls = if auto then autoStages else stages
+    val again =
+      if auto then QuestionInvestigationWorkflow.judgeAllStep.ref
+      else QuestionInvestigationWorkflow.sufficiencyStep.withInput(decision)
     val stage  = "sufficiency"
     val prompt = EvidenceAgent.sufficiencyPrompt
     val q      = question
@@ -742,7 +927,7 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
       )
     )
     val emptySearch = assessments.isEmpty
-    val outcome = stages.model(
+    val outcome = calls.model(
       stage,
       1,
       assessments.map(a => Ref(RecordKind.assessment, a.id, a.version)) :+ questionRef,
@@ -759,18 +944,18 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
     }
     outcome match
       case StageOutcome.Skipped(_) =>
-        stepEffects
-          .updateState(currentState.copy(status = currentState.resting))
-          .thenTransitionTo(QuestionInvestigationWorkflow.waiting.ref)
+        val sufficiencyId = SufficiencyEntity.idFor(currentState.questionId, decision)
+        afterJudge(
+          currentState.copy(sufficiencyIds =
+            (currentState.sufficiencyIds :+ sufficiencyId).distinct
+          ),
+          auto
+        )
       case StageOutcome.Done(attempt, proposal, modelCall) =>
         ApplicabilityRules.parseSufficiency(proposal) match
           case Left(defect) =>
-            stages.fail(stage, attempt, defect, modelCalls = Vector(modelCall))
-            retryOrGiveUp(
-              stage,
-              defect,
-              QuestionInvestigationWorkflow.sufficiencyStep.withInput(decision)
-            )
+            calls.fail(stage, attempt, defect, modelCalls = Vector(modelCall))
+            retryOrGiveUp(stage, defect, again)
           case Right((status, coverage, escalation, gaps)) =>
             // FR-025 (b): a record that is the only affirmative evidence waits for a reviewer, and so does the judgement.
             val affirmative = assessments.filter(a =>
@@ -844,7 +1029,7 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
                   )
                 )
             catch case _: CommandError => ()
-            stages.complete(
+            calls.complete(
               stage,
               attempt,
               Some(Ref(RecordKind.sufficiency, sufficiencyId, judged.version)),
@@ -867,16 +1052,9 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
                 stepEffects
                   .updateState(next.copy(status = "supplemental", supplementalFor = Some(gapId)))
                   .thenTransitionTo(QuestionInvestigationWorkflow.executeStep.ref)
-              case None =>
-                stepEffects
-                  .updateState(next)
-                  .thenTransitionTo(QuestionInvestigationWorkflow.waiting.ref)
+              case None => afterJudge(next.copy(failure = None), auto)
       case StageOutcome.Failed(_, defect, _) =>
-        retryOrGiveUp(
-          stage,
-          defect,
-          QuestionInvestigationWorkflow.sufficiencyStep.withInput(decision)
-        )
+        retryOrGiveUp(stage, defect, again)
 
   private def withinBudget(gapId: String): Boolean =
     val g = client.forEventSourcedEntity(EntityId(gapId)).call(GapEntity.get).invoke()
@@ -902,6 +1080,9 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
           )
         )
         .thenTransitionTo(QuestionInvestigationWorkflow.waiting.ref)
+
+/** The actor an automatic stage records (feature 002). */
+val SystemActor = "system:investigation"
 
 object QuestionInvestigationWorkflow
     extends Workflow.Companion[QuestionInvestigationWorkflow, QuestionInvestigationState](
@@ -977,6 +1158,13 @@ object QuestionInvestigationWorkflow
   val resolveStep     = step("resolve")(_.resolveStepRun)
   val assessStep      = step("assess")(_.assessStepRun)
   val sufficiencyStep = step("sufficiency")(_.sufficiencyStepRun)
+
+  val awaitVerificationStep = step("await-verification")(_.awaitVerificationStepRun)
+  val verificationRetry     = step("verification-retry")(_.verificationRetryStep)
+  val verificationFailed    = step("verification-failed")(_.verificationFailedStep)
+  val assessAllStep         = step("assess-all")(_.assessAllStepRun)
+  val judgeAllStep          = step("judge-all")(_.judgeAllStepRun)
+  val reportStep            = step("report")(_.reportStepRun)
 
   val start        = command("start")(_.start)
   val replan       = command("plan")(_.replan)

@@ -379,3 +379,59 @@ browser suites in the sbt job (two toolchains in one job).
 ## Found during implementation
 
 (filled as the build goes)
+
+- **R20.1, answered (interface)**: `ankka-console` 0.15.1's index is browser-safe and bundles with
+  Vite 8; its server-only code is under `ankka-console/server`. The interface takes `Shell`,
+  `Backdrop` and `Inspector` and `ankka-console/styles.css` from it; the tokens are not copied. Its
+  `Bar`, `Rail` and `Breadcrumbs` read the console's router data through `useConsole`, so the
+  interface draws its own bar and rail with the same classes (`ac-bar`, `ac-crumbs`, `ac-rail`,
+  `ac-rail-item` with `aria-current`, `ac-mark`). Inter and the mark ship with the stylesheet and are
+  served from the interface's own origin under `assets/`.
+- **R20.6, the event-stream framing (interface)**: the service writes `data:` before `event:` inside
+  an event (`data:{…}` then `event:journey` then a blank line), which the protocol allows. The
+  interface's parser (`web/src/backend/events.ts`) dispatches each event at its blank line, in any
+  field order, joins several `data:` lines with a newline, and holds a line cut anywhere, a CRLF
+  included, until it is whole. A plain `sse` route sends each chunk unnamed, as a JSON string, so the
+  turn stream's reader takes an unnamed event as a `token`.
+- **Absent fields (interface)**: the service's codecs leave out a field equal to its default (no
+  value, an empty list, a zero), so the journey's `detail` and `runs` and most record fields may be
+  missing rather than `null` or `[]`. `web/src/backend/types.ts` makes every defaulted field
+  optional, and an enum with fields (a record's content) carries its case in `type`
+  (`OfFinding`, `OfClaim`).
+- **Refusals (interface)**: a refusal's body is `{"status", "error", "details"}`; `BackendError`
+  carries the `error` text as its message. A `401` on any call sends the admission screen back.
+- **Every field on a card (interface)**: SC-003 is held by the card frame itself: each card lists
+  every scalar leaf of the record it was given under "every field", so a kind whose own card is not
+  written yet still shows everything the service returned.
+- **playwright-bdd 9 (interface)**: `createBdd` needs the `test` extended from `playwright-bdd`, not
+  from `@playwright/test`, and `importTestFrom` is no longer wanted. With `missingSteps:
+  "fail-on-run"` the 45 scenarios generate before their steps exist: 44 in `features`, the one
+  tagged `@no-model` in `no-model`.
+- **Node runs TypeScript by stripping types (interface)**: a parameter property
+  (`constructor(private x)`) is refused at run time by `node --test`, as `erasableSyntaxOnly` in
+  `web/tsconfig.json` says; the interface declares its fields instead.
+
+- **R20.7, the question workflow's stage names and run id.** A question's run is `run-<questionId>`, and
+  a question id is `<requestId>:q<n>`, so every run of a request shares the prefix `run-<requestId>`.
+  The question workflow records the stages `plan`, `execute`, `eligibility`, `assess` and `sufficiency`;
+  `resolve` records none. The automation adds `verification`, the wait for the retrieved records. The
+  journey's watch therefore reads one view query, `row_key = :run OR row_key LIKE :lanes`, with
+  `lanes` = `run-<requestId>:%`, and a two-second tick for workflow changes that record no stage.
+- **R20.8, one service per feature suite.** Each `GherkinSuite` mixes in `CommonSteps`, which binds port
+  0 and starts its own kit, so the seven area suites run one after another without sharing ports. The
+  split surfaced a view race: `features/sources/ingestion.feature`'s duplicate scenario read the
+  sources listing once, and on a freshly started service the view had not projected yet. The step
+  now waits for the source to be listed before counting.
+- **Who asked for a stage.** A stage execution recorded no actor, so `StartStage`, the event
+  `StageStarted` and `StageExecution` gained `actor: Option[String] = None`. An older journal reads as
+  no actor. The automatic stages record `system:investigation`, and packaging and candidates record
+  `packagedBy`.
+- **The journey's JSON omits empty fields.** `Codecs.make` leaves out a `None` and an empty vector, so
+  a node without a detail has no `detail` key and a node without runs no `runs` key, where the contract
+  showed `null` and `[]`. The interface treats both as absent.
+
+## Measurements
+
+| What | Result |
+|---|---|
+| Facets confirmed to the `journey` event showing facet review reached, ten requests (`JourneyStreamSuite`, SC-004) | 335, 2019, 718, 2019, 887, 2013, 778, 2019, 807, 2017 ms; the worst 2019 ms, under the 5 s bound. The two-second cases are the tick: the first change after the confirmation is the investigation's state, which the view does not see. |

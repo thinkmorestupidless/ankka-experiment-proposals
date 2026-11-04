@@ -166,11 +166,12 @@ object JourneyDerivation:
   // ── a question's lane ─────────────────────────────────────────────────────
 
   private val laneRunStage: Map[String, String] = Map(
-    "plan"        -> "search-plan",
-    "execute"     -> "executions",
-    "eligibility" -> "eligibility",
-    "assess"      -> "assessment",
-    "sufficiency" -> "sufficiency"
+    "plan"         -> "search-plan",
+    "execute"      -> "executions",
+    "eligibility"  -> "eligibility",
+    "verification" -> "verification",
+    "assess"       -> "assessment",
+    "sufficiency"  -> "sufficiency"
   )
 
   private val laneStepStage: Map[String, String] = Map(
@@ -281,7 +282,8 @@ object JourneyDerivation:
       if e.endedAt.isEmpty then "running" else e.status.toString,
       e.startedAt.toString,
       e.endedAt.map(_.toString),
-      e.defect.map(d => s"${d.kind}: ${d.detail}")
+      e.defect.map(d => s"${d.kind}: ${d.detail}"),
+      e.actor
     )
 
   private def plural(n: Int, word: String): String =

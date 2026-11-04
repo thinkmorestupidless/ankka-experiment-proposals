@@ -73,6 +73,19 @@ export function createAppServer(options: ServerOptions): http.Server {
   });
 }
 
+/**
+ * Stops the server: no new connection is accepted, idle ones close at once, and a stream left open
+ * (a journey being watched, an answer being written) is closed when `graceMs` has passed. Answers
+ * when every connection is closed.
+ */
+export function stop(server: http.Server, graceMs = 10_000): Promise<void> {
+  return new Promise((resolve) => {
+    server.close(() => resolve());
+    server.closeIdleConnections();
+    setTimeout(() => server.closeAllConnections(), graceMs).unref();
+  });
+}
+
 async function main(): Promise<void> {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const port = Number(process.env.PORT ?? 3000);
@@ -88,14 +101,8 @@ async function main(): Promise<void> {
   server.listen(port, () => console.log(`listening on ${port}`));
   // The platform stops a pod with SIGTERM after it has left the service's address: finish what is in
   // flight, then go.
-  // A stream left open (a journey being watched, an answer being written) is closed after ten seconds.
   process.on("SIGTERM", () => {
-    server.close(() => process.exit(0));
-    server.closeIdleConnections();
-    setTimeout(() => {
-      server.closeAllConnections();
-      process.exit(0);
-    }, 10_000).unref();
+    void stop(server).then(() => process.exit(0));
   });
 }
 

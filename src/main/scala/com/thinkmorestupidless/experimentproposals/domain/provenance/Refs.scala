@@ -76,7 +76,8 @@ final case class StageExecution(
     status: StageStatus,
     defect: Option[Defect],
     startedAt: Instant,
-    endedAt: Option[Instant]
+    endedAt: Option[Instant],
+    actor: Option[String] = None
 )
 
 object Refs:

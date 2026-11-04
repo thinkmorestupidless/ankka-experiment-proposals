@@ -30,7 +30,7 @@ final case class StageRunRef(
     startedAt: String,
     endedAt: Option[String],
     defect: Option[String],
-    // A stage execution does not record who asked for it; the actor is on the record it produced.
+    // Who asked: a reviewer, the operator, or `system:investigation`; absent for older runs.
     actor: Option[String] = None
 )
 

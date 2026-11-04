@@ -59,7 +59,7 @@ class RetrievalSuite extends ServiceFixture:
 
   private def retrieved(id: String): String =
     eventually(s"$id is retrieved", within = 120.seconds) {
-      val j = question(id); Option.when(j.contains("\"status\":\"retrieved\""))(j)
+      val j = question(id); Option.when(rests(j))(j)
     }
 
   private def ids(json: String, field: String): Vector[String] =

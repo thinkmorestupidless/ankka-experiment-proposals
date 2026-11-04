@@ -23,7 +23,7 @@ final class StageRunEntity(context: EventSourcedEntityContext)
 
   def applyEvent(event: StageRunEvent): StageRun = event match
     case RunOpened(workflow, _) => currentState.copy(workflow = workflow)
-    case StageStarted(stage, stageVersion, attempt, inputRefs, inputHash, at) =>
+    case StageStarted(stage, stageVersion, attempt, inputRefs, inputHash, at, actor) =>
       currentState.copy(stages =
         currentState.stages :+ StageExecution(
           stage,
@@ -37,7 +37,8 @@ final class StageRunEntity(context: EventSourcedEntityContext)
           StageStatus.passed,
           None,
           at,
-          None
+          None,
+          actor
         )
       )
     case StageCompleted(stage, attempt, outputRef, validations, modelCalls, status, at) =>
@@ -83,7 +84,8 @@ final class StageRunEntity(context: EventSourcedEntityContext)
               attempt,
               request.inputRefs,
               request.inputHash,
-              now
+              now,
+              request.actor
             )
           )
           .thenReply(_ => StartOutcome.Started(attempt))

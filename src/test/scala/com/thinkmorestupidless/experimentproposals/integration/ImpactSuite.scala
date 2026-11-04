@@ -54,7 +54,7 @@ class ImpactSuite extends ServiceFixture:
     )
     assertEquals(post(api(s"/requests/$id/facets:confirmed"), """{"reviewer":"ada"}""")._1, 200)
     eventually("the lipid question is retrieved", within = 5.minutes)(
-      Option.when(question(s"$id:q4").contains("\"status\":\"retrieved\""))(id)
+      Option.when(rests(question(s"$id:q4")))(id)
     )
     assertEquals(
       post(api(s"/questions/$id:q4/assess"), s"""{"recordIds":["$A","$B","$C"]}""")._1,

@@ -21,7 +21,7 @@ trait SearchSteps extends GherkinSuite with AssessmentSteps:
   private def retrievedView(): String =
     lastQuestionView = eventually(s"$questionId is retrieved") {
       val (_, j) = get(s"/questions/$questionId")
-      Option.when(j.contains("\"status\":\"retrieved\""))(j)
+      Option.when(rests(j))(j)
     }
     lastQuestionView
 
@@ -246,7 +246,7 @@ trait SearchSteps extends GherkinSuite with AssessmentSteps:
       if status == 409 then refusals += 1
       else
         eventually("the supplemental round ends") {
-          val view = retrievedView(); Option.when(view.contains("\"status\":\"retrieved\""))(view)
+          val view = retrievedView(); Option.when(rests(view))(view)
         }
     }
     assert(refusals >= 1, "the third supplemental search was not refused")

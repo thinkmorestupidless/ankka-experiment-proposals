@@ -47,6 +47,8 @@ seconds, so nothing waits for a model inside a request.
 | POST | `/requests` | `{text, submittedBy}` | `{id, version}` 201; starts the `investigation` workflow (id = request id) |
 | GET | `/requests/{id}` | | the request, its facets (from the entities), the latest round-trip check, the workflow status |
 | GET | `/requests/{id}/facets` | | facets, each with its history |
+| GET | `/requests/{id}/journey` | | the request's path through the stages: `{requestId, spine: [{stage, state, detail, runs}], questions: [{questionId, text, nodes}]}`, each state one of `unreached`, `reached`, `current`, `paused`, `failed`; derived from the workflows and the stage runs, never stored; 404 for an unknown request |
+| GET | `/requests/{id}/journey:watch` | | server-sent events: `event: journey` with the journey now, then each time it differs, at once on a stage run and within two seconds of any other change; never the same journey twice; 404 before the stream for an unknown request |
 | POST | `/facets/{id}/review` | `{action: confirm \| amend \| reject \| leave_unresolved \| mark_ambiguous, reviewer, rationale, statement?}` | new facet version 201; 409 on an illegal transition |
 | POST | `/facets/{id}/assume` | `{value, reviewer, rationale}` | new version 201 (mandatory facets) |
 | POST | `/requests/{id}/facets:confirmed` | `{reviewer}` | resumes the workflow; 409 when a mandatory facet is neither confirmed, assumed nor unresolved-and-flagged |

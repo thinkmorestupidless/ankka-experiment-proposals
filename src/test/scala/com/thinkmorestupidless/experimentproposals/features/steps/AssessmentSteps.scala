@@ -34,7 +34,7 @@ trait AssessmentSteps extends GherkinSuite with QuestionSteps with EvidenceSteps
     questionId = """"id":"([^"]+)"""".r.findFirstMatchIn(q).map(_.group(1)).getOrElse(fail(q))
     eventually(s"$questionId waits for retrieval") {
       val (_, j) = get(s"/questions/$questionId")
-      Option.when(j.contains("\"status\":\"retrieved\"") || j.contains("awaiting-retrieval"))(j)
+      Option.when(rests(j) || j.contains("awaiting-retrieval"))(j)
     }
     questionId
 

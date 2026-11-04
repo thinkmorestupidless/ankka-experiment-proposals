@@ -23,7 +23,7 @@ final class StageRowsView extends View[StageRunEvent, StageRow]:
     val current = rowState.getOrElse(StageRow(updateContext.subject, "", 0, 0, 0, "", ""))
     event match
       case RunOpened(workflow, _) => effects.updateRow(current.copy(workflow = workflow))
-      case StageStarted(stage, _, _, _, _, _) =>
+      case StageStarted(stage, _, _, _, _, _, _) =>
         effects.updateRow(
           current.copy(started = current.started + 1, lastStage = stage, lastStatus = "running")
         )
@@ -49,8 +49,18 @@ object StageRows
   val byWorkflow = query("by-workflow")(
     s"SELECT payload FROM $table WHERE payload::jsonb->>'workflow' = :workflow ORDER BY row_key"
   )
+
+  /**
+   * A request's run and its questions' runs (`run-<request>` and `run-<request>:q<n>`), watched so
+   * a journey hears of each stage as it starts and ends.
+   */
+  val byRun = query("by-run")(
+    s"SELECT row_key, payload FROM $table WHERE row_key = :run OR row_key LIKE :lanes"
+  ).watched
   val failed = query("failed")(
     s"SELECT payload FROM $table WHERE (payload::jsonb->>'failed')::int > 0 ORDER BY row_key"
   )
+
+  override def version = Some(2)
 
   def create(ctx: ViewComponentContext) = new StageRowsView

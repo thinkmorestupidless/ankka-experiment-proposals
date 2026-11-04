@@ -1,0 +1,169 @@
+/* The interface's own parts, on the console's tokens. The look itself is the console package's. */
+
+html,
+body {
+  margin: 0;
+  background: var(--ac-color-mesh-base, #111f26);
+}
+
+/* The admission screen sits in the middle of the grid, with nothing beside it. */
+.edp-admission {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 2 * var(--ac-shell-gap, 12px));
+}
+.edp-admission .ac-card {
+  width: min(28rem, 100%);
+}
+
+/* Lists inside a card's facts. */
+.edp-list {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+/* A node's state: the glyph carries it as much as the colour does. */
+.edp-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.edp-glyph {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+.edp-state-reached {
+  color: var(--ac-color-green);
+}
+.edp-state-current,
+.edp-state-paused {
+  color: var(--ac-color-amber);
+}
+.edp-state-failed {
+  color: var(--ac-color-red);
+}
+.edp-state-unreached {
+  color: var(--ac-color-ink-2);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .edp-glyph-ring {
+    animation: edp-pulse 1.6s ease-in-out infinite;
+  }
+}
+@keyframes edp-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.8);
+  }
+}
+
+/* Cards. */
+.edp-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 12px;
+}
+.edp-card-id {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--ac-color-ink-2);
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+.edp-every-field dt code {
+  font-size: 0.75rem;
+}
+
+.edp-passage {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--ac-color-amber);
+  background: var(--ac-color-inset);
+  border-radius: 0 var(--ac-radius-control) var(--ac-radius-control) 0;
+  display: grid;
+  gap: 6px;
+}
+.edp-passage blockquote {
+  margin: 0;
+}
+.edp-passage-unresolved {
+  border-left-color: var(--ac-color-red);
+}
+.edp-passage-text {
+  color: var(--ac-color-ink-2);
+}
+
+.edp-checks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+.edp-check {
+  display: grid;
+  gap: 2px;
+}
+.edp-check-passed .edp-check-result {
+  color: var(--ac-color-green);
+}
+.edp-check-failed .edp-check-result {
+  color: var(--ac-color-red);
+}
+.edp-check-note,
+.edp-check-quote {
+  color: var(--ac-color-ink-2);
+  font-size: 0.8125rem;
+}
+
+.edp-sheet-close {
+  align-self: flex-end;
+}
+
+/* Below 720 px: the rail is a bar along the bottom, the inspector a sheet over the page. */
+@media (max-width: 720px) {
+  .edp-shell {
+    padding-bottom: calc(64px + 2 * var(--ac-shell-gap, 12px));
+  }
+  .edp-rail {
+    position: fixed;
+    inset: auto var(--ac-shell-gap, 12px) var(--ac-shell-gap, 12px);
+    z-index: 20;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: nowrap;
+  }
+  .edp-rail .ac-rail-areas {
+    flex-direction: row;
+    flex-wrap: nowrap;
+  }
+  .edp-rail .ac-mark {
+    display: none;
+  }
+  .edp-rail .ac-rail-foot {
+    margin: 0;
+  }
+  .edp-shell .ac-inspector {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 30;
+    max-height: 75vh;
+    border-radius: var(--ac-radius-panel) var(--ac-radius-panel) 0 0;
+    background: linear-gradient(var(--ac-color-glass-strong), var(--ac-color-glass-strong)), var(--ac-color-mesh-base);
+    margin: 0;
+  }
+}

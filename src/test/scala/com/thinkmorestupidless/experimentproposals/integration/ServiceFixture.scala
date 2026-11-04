@@ -86,6 +86,13 @@ trait ServiceFixture extends munit.FunSuite with LogCapturing:
   def api(path: String): String = s"/api/v1$path"
 
   /**
+   * Whether a question's search is done and it rests: `retrieved` while the automation has not run
+   * past it, or `reported` once it has assessed, judged and reported (feature 002).
+   */
+  def rests(question: String): Boolean =
+    question.contains("\"status\":\"retrieved\"") || question.contains("\"status\":\"reported\"")
+
+  /**
    * Every authored cassette becomes a standing rule of the scripted model, keyed by its case line.
    */
   def scriptFromCassettes(promptVersions: String*): Unit =
