@@ -14,7 +14,7 @@ results=()
 for m in "${MUTANTS[@]}"; do
   copy="$WORK/$m"
   mkdir -p "$copy"
-  rsync -a --exclude target --exclude .bloop --exclude .metals --exclude .git "$ROOT/" "$copy/"
+  rsync -a --exclude target --exclude .bloop --exclude .metals --exclude .git --exclude node_modules --exclude test-results --exclude .features-gen --exclude dist "$ROOT/" "$copy/"
   if ! (cd "$copy" && patch -p1 --silent < "$ROOT/scripts/mutants/$m.patch"); then
     echo "$m: the patch does not apply" >&2
     results+=("{\"mutant\":\"$m\",\"applied\":false,\"killed\":false}")
