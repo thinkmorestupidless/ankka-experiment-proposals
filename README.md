@@ -185,6 +185,19 @@ ankka local console     # http://localhost:9889: components, routes, traces
 Postgres applies its init directory only to an empty volume: after `sbt schema` changes anything,
 `just down` first.
 
+To run the service in Docker as well, with no cluster:
+
+```bash
+just up-app             # sbt schema, sbt Docker/publishLocal, then Postgres and the service in Compose
+just logs-app           # the service's log
+EDP_API_TOKEN=change-me scripts/walkthrough.sh --reviewer demo-reviewer --auto-review
+```
+
+The container reads `.env`, `reviewers.json`, `evals/` and `internal/` from this checkout and runs in
+whatever tier `.env` names. Rebuild with `just up-app` after a code change. A service in a container
+does not appear in `ankka local console`, which finds services through the loopback address each one
+announces in `~/.ankka/running`; for the console, use `just run`.
+
 ## Deploy to an ankka platform
 
 `service.json` is the descriptor `ankka services apply` takes. It names the image, the ankka version,

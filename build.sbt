@@ -59,6 +59,13 @@ lazy val root = project
     // sbt's own process.
     Test / fork := true,
 
+    // The service is what the image runs; the other main classes (the evaluation and the cassette
+    // author) are reached with `runMain`.
+    Compile / mainClass := Some("com.thinkmorestupidless.experimentproposals.run"),
+    // A service publishes no API documentation, and packaging an image would otherwise build it.
+    Compile / packageDoc / publishArtifact := false,
+    Compile / doc / sources                := Seq.empty,
+
     // The version the image is tagged with. Locally sbt's own default; in CI the tag being
     // released, or the commit for a manual run — see .github/workflows/deploy.yml.
     version := sys.env.getOrElse("SERVICE_VERSION", "0.1.0-SNAPSHOT"),

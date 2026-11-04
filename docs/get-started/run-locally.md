@@ -43,6 +43,24 @@ just run    # the service on http://localhost:9000
 when its volume is created. After an ankka upgrade, run `just down` first, because Postgres applies the
 schema only to an empty volume.
 
+## Or run the service in Docker too
+
+With the `app` profile, Compose runs the service itself beside Postgres, from the image
+`sbt Docker/publishLocal` builds, with no cluster:
+
+```bash
+just up-app    # sbt schema, sbt Docker/publishLocal, then docker compose --profile app up -d
+just logs-app  # follow the service's log
+just down      # stop and remove both, with their data
+```
+
+The container reads `.env`, `reviewers.json`, `evals/` and `internal/` from the checkout, so it
+replays the same cassettes, ingests the same fixtures and admits the same reviewers as `just run`, and
+`EDP_RECORD=1` in `.env` writes new cassettes back into `evals/cassettes`. Rebuild with `just up-app`
+after a code change. Only the local console is missing: it finds services through the loopback
+address each one announces in `~/.ankka/running`, which a container cannot write for the host. For
+the console, run the service with `just run`.
+
 ## Check it answers
 
 ```bash
