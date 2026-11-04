@@ -158,13 +158,15 @@ body {
   overflow-x: auto;
   padding: 30px 4px 12px;
 }
+/* The stages wrap onto further rows rather than run on past the column, under the inspector. */
 .edp-lane {
   display: flex;
+  flex-wrap: wrap;
   align-items: stretch;
+  row-gap: 28px;
   margin: 0;
   padding: 0;
   list-style: none;
-  width: max-content;
 }
 .edp-node-item {
   display: flex;
@@ -327,6 +329,187 @@ body {
 }
 
 /* Below 720 px: the rail is a bar along the bottom, the inspector a sheet over the page. */
+
+/* ── the conversation ───────────────────────────────────────────────────── */
+.edp-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.edp-request-head,
+.edp-conversation-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.edp-conversation-head h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+.edp-request-head button svg {
+  width: 16px;
+  height: 16px;
+  vertical-align: -3px;
+}
+.edp-request-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 440px);
+  gap: 16px;
+  align-items: start;
+}
+.edp-request-journey {
+  min-width: 0;
+}
+.edp-chat-panel {
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+}
+.edp-conversation {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.edp-turns {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.edp-turn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.edp-question {
+  align-self: flex-end;
+  max-width: 85%;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: var(--ac-radius-control);
+  background: var(--ac-color-inset);
+  border-right: 3px solid var(--ac-color-amber);
+  white-space: pre-wrap;
+}
+.edp-answer {
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.edp-answer .edp-inline-card,
+.edp-answer .edp-prefill {
+  white-space: normal;
+  margin: 8px 0;
+}
+.edp-turn[data-state="failed"] .edp-answer {
+  opacity: 0.85;
+  border-left: 3px dashed var(--ac-color-red);
+  padding-left: 8px;
+}
+.edp-unresolved {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--ac-radius-control);
+  border: 1px dashed var(--ac-color-red);
+  color: var(--ac-color-red);
+  background: var(--ac-color-red-wash);
+  white-space: normal;
+}
+.edp-reference-pending {
+  opacity: 0.8;
+}
+.edp-prefill {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--ac-color-amber);
+}
+.edp-prefill-note {
+  margin: 0;
+}
+.edp-proposals {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.edp-action-proposal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+.edp-action-proposal h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+.edp-proposal-result {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.edp-unavailable {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--ac-radius-control);
+  background: var(--ac-color-inset);
+  border-left: 3px solid var(--ac-color-amber);
+}
+.edp-composer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: sticky;
+  bottom: 0;
+  padding-top: 8px;
+}
+.edp-composer-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+.edp-composer-row textarea {
+  flex: 1;
+  resize: vertical;
+}
+.edp-spend,
+.edp-composer [data-disabled] {
+  margin: 0;
+}
+
+/* ── the sources ────────────────────────────────────────────────────────── */
+.edp-sources {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.edp-source-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+}
+.edp-source-row button {
+  text-align: left;
+}
+.edp-status-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 @media (max-width: 720px) {
   .edp-shell {
     padding-bottom: calc(64px + 2 * var(--ac-shell-gap, 12px));
@@ -360,5 +543,12 @@ body {
     border-radius: var(--ac-radius-panel) var(--ac-radius-panel) 0 0;
     background: linear-gradient(var(--ac-color-glass-strong), var(--ac-color-glass-strong)), var(--ac-color-mesh-base);
     margin: 0;
+  }
+  .edp-request-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .edp-chat-panel {
+    position: static;
+    max-height: none;
   }
 }

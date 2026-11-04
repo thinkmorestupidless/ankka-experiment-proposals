@@ -23,6 +23,11 @@ export class World {
   readonly request: APIRequestContext;
   /** What a scenario remembers between its steps: ids it made, the record it acts on. */
   readonly remembered = new Map<string, string>();
+  /**
+   * What "nothing is recorded" checks in this scenario, when it is not the facet a decision was
+   * refused on: set by the Given or When that says what must stay as it was.
+   */
+  nothingRecorded?: () => Promise<void>;
 
   constructor(page: Page, request: APIRequestContext) {
     this.page = page;

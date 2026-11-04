@@ -45,7 +45,7 @@ export function Requests() {
       ) : value.length === 0 ? (
         <p className="ac-hint">No request yet. Submit one in the conversation.</p>
       ) : (
-        <div className="edp-table-scroll">
+        <div className="edp-table-scroll" tabIndex={0} role="region" aria-label="The requests">
           <table className="edp-table edp-requests">
             <thead>
               <tr>

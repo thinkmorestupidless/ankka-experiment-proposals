@@ -2,7 +2,10 @@
 // inspector. The selection is kept in the address, so it survives a redraw and a reload; the bar's
 // primary action is the decision the investigation waits for.
 import { useEffect, useRef, useState } from "react";
-import { useParams, useSearchParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
+import { MessagesSquare } from "lucide-react";
+import { Conversation } from "../conversation/Conversation.tsx";
+import { journeyPath } from "./Chat.tsx";
 import { Page } from "../shell/Page.tsx";
 import { usePageSlots } from "../shell/slots.tsx";
 import { Canvas, type Selection } from "../journey/Canvas.tsx";
@@ -13,6 +16,7 @@ import { stageTitle } from "../journey/stages.ts";
 import { Shown } from "../cards/Shown.tsx";
 import { State } from "../cards/State.tsx";
 import type { Journey } from "../backend/types.ts";
+import type { RequestImpact } from "../cards/ImpactCard.tsx";
 
 const pauses: Record<string, string> = {
   "facet-review": "Confirm the facets",
@@ -73,6 +77,8 @@ export function Request() {
   const { id = "" } = useParams();
   const { journey, error } = useJourney(id);
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
+  const discussing = params.get("discuss") === "1";
   const stage = params.get("stage") ?? undefined;
   const question = params.get("question") ?? undefined;
   const selection: Selection | undefined = stage ? { stage, question } : undefined;
@@ -107,6 +113,17 @@ export function Request() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [journey, stage, question, reload]);
 
+  // A retraction flags its dependents one by one, and the journey does not change as they are
+  // flagged: while the impact card still shows a dependent unflagged, read it again.
+  useEffect(() => {
+    const unflagged = shown?.cards.some(
+      (c) => c.kind === "impact" && (c.record as RequestImpact).changes.some((ch) => ch.dependents.some((d) => !d.flagged)),
+    );
+    if (!unflagged) return;
+    const t = setTimeout(() => setReload((r) => r + 1), 3000);
+    return () => clearTimeout(t);
+  }, [shown]);
+
   const select = (s: Selection) => {
     const next = new URLSearchParams(params);
     next.set("stage", s.stage);
@@ -115,6 +132,19 @@ export function Request() {
     setParams(next, { replace: true });
     if (s.question) setLane(s.question);
   };
+
+  // The conversation is a panel beside the canvas; on a narrow screen it is the whole page.
+  const discuss = () => {
+    if (!discussing && typeof window !== "undefined" && window.matchMedia?.("(max-width: 719px)").matches) {
+      navigate(`/requests/${encodeURIComponent(id)}/chat`);
+      return;
+    }
+    const next = new URLSearchParams(params);
+    if (discussing) next.delete("discuss");
+    else next.set("discuss", "1");
+    setParams(next, { replace: true });
+  };
+  const showStage = (requestId: string, s: Selection) => (requestId === id ? select(s) : navigate(journeyPath(requestId, s)));
 
   const waiting = waitingAt(journey);
   usePageSlots(
@@ -147,19 +177,33 @@ export function Request() {
         ) : undefined
       }
     >
-      <h1>
-        The request <code>{id}</code>
-      </h1>
+      <div className="edp-request-head">
+        <h1>
+          The request <code>{id}</code>
+        </h1>
+        <button type="button" className="ac-button ac-button-small" aria-pressed={discussing} onClick={discuss} data-discuss="">
+          <MessagesSquare aria-hidden="true" /> {discussing ? "Close the conversation" : "Discuss this request"}
+        </button>
+      </div>
       {error ? (
         <p role="alert" className="edp-refusal">
           {error}
         </p>
       ) : null}
-      {journey ? (
-        <Canvas journey={journey} selection={selection} question={lane ?? question} onSelect={select} onQuestion={setLane} />
-      ) : error ? null : (
-        <p className="ac-hint">Reading the journey…</p>
-      )}
+      <div className={discussing ? "edp-request-split" : undefined}>
+        <div className="edp-request-journey">
+          {journey ? (
+            <Canvas journey={journey} selection={selection} question={lane ?? question} onSelect={select} onQuestion={setLane} />
+          ) : error ? null : (
+            <p className="ac-hint">Reading the journey…</p>
+          )}
+        </div>
+        {discussing ? (
+          <aside className="edp-chat-panel" aria-label="The request's conversation">
+            <Conversation id={`request:${id}`} subject={id} onShowStage={showStage} />
+          </aside>
+        ) : null}
+      </div>
     </Page>
   );
 }

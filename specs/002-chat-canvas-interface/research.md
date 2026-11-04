@@ -512,8 +512,49 @@ browser suites in the sbt job (two toolchains in one job).
   shows the stage at once and its card when the route answers; the impact scenario waits up to five
   minutes for its own request's dependents.
 
+- **`resolved` is written only when it is true (interface).** A turn's reference that did not resolve
+  comes back with no `resolved` field at all, never `resolved: false`; the interface takes an absent
+  flag as unresolved. A fresh conversation has no `used` either. The conversation's `proposals` are
+  the only place a proposal's arguments come back once the page reloads.
+- **A token drawn per event (interface).** The scripted stream sends a whole answer in under a second,
+  so React batches the `token` events into one render unless each is drawn with `flushSync`; the
+  answer's `data-tokens` counts the drawn events, and the US4 step observes its successive values to
+  hold "the answer appears as it is written".
+- **The fault rule in the script names the original finding.** `evals/assistant/walkthrough.json`'s
+  `inject` rule proposes `endpoint_swap` on `src:file:paper-a:v1:fd1`. In the replay tier that attempt
+  has no verification cassette: the finding is left `requires_review`, never shows `endpoint_mismatch`,
+  and every request submitted afterwards assesses a different record set and misses its `assess`
+  cassette. The walkthrough script faults the copy `src:file:paper-a@endpoint_swap:v1:fd1`, ingested
+  after the design is approved; the rule should name that id. Until it does, the US5 fault scenario and
+  step 5 of `walkthrough.spec.ts` stop before confirming, so the corpus is left as it was.
+- **The copy of Paper A must come after the reference request.** In the store before a request is
+  submitted, `paper-a@endpoint_swap` joins the records its questions assess, and the `assess`
+  cassettes miss. The browser steps ingest it only once a proposal names it.
+- **A request's conversation spends about 300,000 tokens a turn after a few turns.** Each turn sends
+  the history again with the tools' whole records, so the browser stack runs with
+  `EDP_CONVERSATION_BUDGET=5000000` and a scenario takes a new approved request when the last one's
+  conversation is past 60 % of its budget; the budget scenario spends a free-standing conversation
+  through the API first.
+- **`toDecision` confirms only a review already waiting.** It reads the journey once; called straight
+  after a submission it skips the facets and waits for candidates that never come. The conversation's
+  support submits with `submitWaiting` first.
+- **R20.9, answered: `ankka local web` passes `Authorization` through.** Every browser suite reaches the
+  service under `/backend` with a bearer header through it; a call without one is refused `401`.
+- **R20.10, answered: two violations, both fixed.** axe found `label-content-name-mismatch` on every
+  node (an `aria-label` that did not contain the node's visible detail) and
+  `scrollable-region-focusable` on the scrolling tables. A node is now named by its visible text with
+  visually hidden separators ("facet review, paused, the investigation waits here"), and each scrolling
+  table is a focusable labelled region. The pulsing ring and the `ac-part` buttons raise nothing.
+- **"Discuss" opens a panel or a page.** Beside the canvas the conversation is `?discuss=1` on the
+  request's page; below 720 px the same button goes to `/requests/:id/chat`. A card's "show its stage"
+  selects the node on the open canvas, or opens the request's canvas from the free-standing
+  conversation.
+
 ## Measurements
 
 | What | Result |
 |---|---|
 | Facets confirmed to the `journey` event showing facet review reached, ten requests (`JourneyStreamSuite`, SC-004) | 335, 2019, 718, 2019, 887, 2013, 778, 2019, 807, 2017 ms; the worst 2019 ms, under the 5 s bound. The two-second cases are the tick: the first change after the confirmation is the investigation's state, which the view does not see. |
+| A scripted turn's stream, ten trials on one free-standing conversation (`EDP_ASSISTANT_SCRIPT`, replay tier, the 9200 browser stack) | first `token` event 102, 8, 10, 7, 7, 54, 7, 8, 6, 20 ms; `done` 185, 111, 65, 197, 63, 117, 30, 240, 38, 89 ms. The script answers at once, so this is the route and the stream, not a model. |
+| The interface started beside the service with `ankka local web -- npm run dev`, to its first page (admission.feature) | 1452 ms and 1184 ms, against the one-minute bound. |
+| The reference walkthrough in the browser by keyboard alone, submission to approved design (`walkthrough.spec.ts`, fixtures already ingested) | about 10 s for steps 1 to 4, the three decisions included, in the replay tier; step 5 (the fault) stops at the script's fault id, so the whole walkthrough is not yet timed. |

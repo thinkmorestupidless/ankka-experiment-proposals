@@ -244,6 +244,7 @@ Then("the decision is refused", async ({ world }) => {
 });
 
 Then("nothing is recorded", async ({ world }) => {
+  if (world.nothingRecorded) return world.nothingRecorded();
   const before = JSON.parse(world.remembered.get("facet")!) as FacetJson;
   const after = (await facetsOf(world)).find((f) => f.id === before.id)!;
   expect(after.version).toBe(before.version);

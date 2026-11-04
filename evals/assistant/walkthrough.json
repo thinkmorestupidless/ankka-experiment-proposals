@@ -56,8 +56,8 @@
   },
   {
     "when": "inject",
-    "tools": [{ "name": "propose_action", "arguments": { "action": "inject-fault", "arguments": "{\"recordId\":\"src:file:paper-a:v1:fd1\",\"fault\":\"endpoint_swap\"}" } }],
-    "text": "I have proposed injecting the fault endpoint_swap on [[finding:src:file:paper-a:v1:fd1]]. It is injected only when you confirm it."
+    "tools": [{ "name": "propose_action", "arguments": { "action": "inject-fault", "arguments": "{\"recordId\":\"src:file:paper-a@endpoint_swap:v1:fd1\",\"fault\":\"endpoint_swap\"}" } }],
+    "text": "I have proposed injecting the fault endpoint_swap on [[finding:src:file:paper-a@endpoint_swap:v1:fd1]]. It is injected only when you confirm it."
   },
   {
     "when": "mark paper c",

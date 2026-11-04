@@ -4,6 +4,7 @@
 // its JSON must appear in the card's text.
 import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 import { leaves, show } from "../../src/cards/leaves.ts";
+import { approved } from "./helpers.ts";
 
 const token = process.env.EDP_API_TOKEN ?? "";
 const api = "/backend/api/v1";
@@ -152,7 +153,41 @@ test.describe("SC-003: a card is the stored record", () => {
     }
   });
 
-  test.fixme("every card the conversation shows inline is its stored record (with US4)", async () => {
-    // The conversation's inline cards come with the assistant (Phase 6).
+  test("every card the conversation shows inline is its stored record", async ({ page, request }) => {
+    // The reference request at an approved design: the one the first test made, or a new one.
+    const rid = await approved(request);
+    await token0(page);
+    await page.goto(`/requests/${q(rid)}?discuss=1`);
+    const section = page.locator(`section.edp-conversation[data-conversation="request:${rid}"]`);
+    await expect(section.getByLabel("Your question")).toBeEnabled({ timeout: 30_000 });
+    const questions = [
+      "Why is the finding from Paper B indirect?",
+      'What blocked the decision "recommend production feasibility"?',
+      `What was excluded by the search for "${lipid}"?`,
+      "Show me the facets",
+    ];
+    const kinds = new Set<string>();
+    for (const question of questions) {
+      const before = await section.locator("li.edp-turn").count();
+      await section.getByLabel("Your question").fill(question);
+      await section.getByLabel("Your question").press("Enter");
+      const turn = section.locator("li.edp-turn").nth(before);
+      await expect(turn).toHaveAttribute("data-state", "answered", { timeout: 60_000 });
+      await expect(turn.locator(".edp-unresolved")).toHaveCount(0);
+      await expect(turn.locator("[data-reading]")).toHaveCount(0, { timeout: 30_000 });
+      const cards = await turn.locator("section.edp-card").evaluateAll((all) => all.map((c) => [c.getAttribute("data-kind") ?? "", c.getAttribute("data-id") ?? ""]));
+      expect(cards.length, `cards for "${question}"`).toBeGreaterThan(0);
+      for (const [kind, id] of cards) {
+        const record = await stored(request, kind, id);
+        expect(record, `the stored ${kind} ${id}`).toBeDefined();
+        const text = (await turn.locator(`section.edp-card[data-kind="${kind}"][data-id="${id}"]`).first().textContent()) ?? "";
+        const missing = leaves(record)
+          .filter((l) => !text.includes(show(l.value)))
+          .map((l) => `${l.path}=${show(l.value)}`);
+        expect(missing, `${kind} ${id} inline in the answer to "${question}"`).toEqual([]);
+        kinds.add(kind);
+      }
+    }
+    for (const kind of ["assessment", "finding", "sufficiency", "search-execution", "facets"]) expect([...kinds]).toContain(kind);
   });
 });

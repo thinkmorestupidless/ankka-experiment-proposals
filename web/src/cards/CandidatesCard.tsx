@@ -36,7 +36,7 @@ export function CandidatesCard({ id, record, onOpen, onShowStage, onChanged }: C
   const shown = { ...view, approaches };
   return (
     <Card kind="candidates" id={id} record={shown} onOpen={onOpen} onShowStage={onShowStage}>
-      <div className="edp-table-scroll">
+      <div className="edp-table-scroll" tabIndex={0} role="region" aria-label="The candidate approaches compared">
         <table className="edp-table edp-compare">
           <caption className="ac-visually-hidden">The candidate approaches compared on every criterion</caption>
           <thead>

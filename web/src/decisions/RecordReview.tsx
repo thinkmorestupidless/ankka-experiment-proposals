@@ -15,14 +15,16 @@ export function RecordReview({
   recordId,
   open,
   onDone,
+  initial,
 }: {
   kind: "finding" | "claim" | "assessment";
   recordId: string;
   open: boolean;
   onDone?: () => void;
+  initial?: { action?: string; rationale?: string };
 }) {
   const id = useId();
-  const [action, setAction] = useState<string>("verify");
+  const [action, setAction] = useState<string>(initial?.action ?? "verify");
   return (
     <details className="ac-more edp-record-review" open={open}>
       <summary>Review this {kind}</summary>
@@ -30,6 +32,7 @@ export function RecordReview({
         title={`Review the ${kind} ${recordId}`}
         submitLabel="Record the review"
         onDone={onDone}
+        initialRationale={initial?.rationale ?? ""}
         onSubmit={(reviewer, rationale) => reviewRecord(kind, recordId, { action, reviewer, rationale })}
       >
         <div className="ac-field">

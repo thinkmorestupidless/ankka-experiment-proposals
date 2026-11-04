@@ -10,9 +10,31 @@ const decisions = [
   ["changes_requested", "Request changes"],
 ] as const;
 
-export function Approval({ designId, version, onDone }: { designId: string; version: number; onDone?: () => void }) {
+/** A prefill's `outcome` as the decision it names. */
+export const outcomeOf: Record<string, string> = {
+  approve: "approved",
+  approved: "approved",
+  reject: "rejected",
+  rejected: "rejected",
+  "request-changes": "changes_requested",
+  changes: "changes_requested",
+  changes_requested: "changes_requested",
+};
+
+export function Approval({
+  designId,
+  version,
+  onDone,
+  initial,
+}: {
+  designId: string;
+  version: number;
+  onDone?: () => void;
+  /** Fields a prefill sets: the decision and the rationale; the reviewer still chooses and submits. */
+  initial?: { decision?: string; rationale?: string };
+}) {
   const id = useId();
-  const [decision, setDecision] = useState<string>("approved");
+  const [decision, setDecision] = useState<string>(initial?.decision ?? "approved");
   const [v, setV] = useState(String(version));
   const [changes, setChanges] = useState("");
   return (
@@ -20,6 +42,7 @@ export function Approval({ designId, version, onDone }: { designId: string; vers
       title={`Decide on version ${version} of the design`}
       submitLabel="Record the decision on the design"
       onDone={onDone}
+      initialRationale={initial?.rationale ?? ""}
       onSubmit={(reviewer, rationale) =>
         approveDesign(designId, {
           version: Number(v),

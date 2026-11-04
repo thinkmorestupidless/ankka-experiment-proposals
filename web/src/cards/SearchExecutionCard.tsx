@@ -17,7 +17,7 @@ function Results({ title, hits, name }: { title: string; hits: Hit[]; name: stri
       {sorted.length === 0 ? (
         <p className="ac-hint">none</p>
       ) : (
-        <div className="edp-table-scroll">
+        <div className="edp-table-scroll" tabIndex={0} role="region" aria-label={title}>
           <table className="edp-table">
             <thead>
               <tr>
