@@ -1,6 +1,8 @@
 ---
 title: The assistant's script
 description: The file of scripted answers the assistant gives instead of a model, for the browser suites and a demonstration without a key.
+kind: reference
+related: [reference/http-api.md, reference/configuration.md]
 ---
 
 # The assistant's script

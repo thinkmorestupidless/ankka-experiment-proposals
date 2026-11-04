@@ -40,7 +40,7 @@ What the application does not do. Each is a deliberate boundary of a proof of co
   investigation searches what is in the store when it runs. To include a source ingested later, run the
   question's search again with `POST /search-plans/{id}/execute`; assessment and sufficiency follow on
   their own.
-- **The mutant run is not part of CI.** `just mutants` copies the tree three times and builds each;
+- **The mutant run is not part of CI.** `just mutants` copies the tree once for each of its four mutants and builds each;
   its result file is committed and read by the living features.
 - **Experimental runs and observations are not recorded.** An observation enters as an internal
   record through the `internal` adapter.
@@ -49,3 +49,20 @@ What the application does not do. Each is a deliberate boundary of a proof of co
   back to the model, so a request's conversation reaches the default budget of 200,000 tokens after a
   handful of questions about its scientific questions. A request has one conversation; a free-standing
   conversation can be started afresh. `EDP_CONVERSATION_BUDGET` raises the budget.
+- **No sign-in.** The interface asks for the installation's token once per browser and keeps it there.
+  Whoever holds the token may act as any configured reviewer, as with the review pages.
+- **The free-standing conversation belongs to one browser.** Its key is kept in that browser's storage,
+  so another browser, or the same one after its storage is cleared, starts a new one. A request's
+  conversation is the same for everyone who opens it.
+- **Conversations are never forgotten.** Every turn, proposal and its outcome stays in the journal;
+  nothing deletes a conversation or a turn.
+- **The canvas shows one scientific question's lane at a time.** The other questions are listed, and
+  choosing one shows its lane in place of the first.
+- **The assistant needs a model key or a script.** Without `ANTHROPIC_API_KEY` or
+  `EDP_ASSISTANT_SCRIPT` it answers nothing and says why. The journey, the cards and the decisions
+  work without it.
+- **The interface needs JavaScript; the review pages do not.** The review pages under `/review` stay as
+  a server-rendered way to make every decision.
+- **The assistant's prose is not evaluated.** The tests check which tools it ran, which records it cited
+  and that each resolved, and that it recorded no decision. Whether its words are accurate and helpful is
+  not measured.

@@ -78,6 +78,7 @@ nav:
       - Deploy on ankka: deploy/deploy-on-ankka.md
   - Reference:
       - HTTP API: reference/http-api.md
+      - The assistant's script: reference/assistant-script.md
       - Configuration: reference/configuration.md
       - Limitations: reference/limitations.md
   - Contributing:
