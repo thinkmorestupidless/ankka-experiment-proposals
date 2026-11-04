@@ -430,6 +430,27 @@ browser suites in the sbt job (two toolchains in one job).
   a node without a detail has no `detail` key and a node without runs no `runs` key, where the contract
   showed `null` and `[]`. The interface treats both as absent.
 
+- **R20.4, the cassettes the automation needed.** `assess-all` assesses every verified eligible record a
+  question retrieved, which for the reference corpus is the three findings and the three claims, not the
+  walkthrough's three findings. The record set's hash is `6afacf9b794a` (three findings only:
+  `1bc6c32958a3`; nothing: `e3b0c44298fc`; Papers B and C only: `ca8f503f0ef2`). Authored with
+  `CassetteAuthor`: `assess` for the five questions that retrieve anything over the six records; `sufficiency`
+  for those five and both configured decisions over the six; `sufficiency` over the empty set for all six
+  questions and both decisions (the empty corpus); the lipid question over B and C (an unverified Paper A).
+  The `candidates` marker hashes the assessed record ids, so it moved, to `candidates:889b0328b6d6:de060bcfbcb0`;
+  its reply is the earlier one, which cites only the three findings. The `design` marker does not depend on
+  the records and did not move. No cassette exists for candidates over the empty set, so an empty corpus
+  pauses at candidates, which the scenario does not require.
+- **A record under verification is not always `proposed`.** While its verification workflow retries a failed
+  model call, a record reads `requires_review`. The automation first counted only `proposed` records as
+  unsettled and assessed past a verification still running. It now asks the latest verification workflow
+  too: a record is unsettled while that workflow is `Running` or `Paused`.
+- **A held model call lasts ten seconds in the tests.** The agent runtime's call timeout is 10 s under
+  `ServiceFixture`, so a test cannot hold a call across an ingestion. The verification tests hold every
+  verification call of Paper A, retries included, so its verification keeps running long enough for the
+  question to meet it, and settles as requiring review. The verification workflow shares
+  `Configured.retryBudget`, so a test that lowers the budget also shortens verification.
+
 ## Measurements
 
 | What | Result |

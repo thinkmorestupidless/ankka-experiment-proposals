@@ -1,0 +1,7 @@
+{
+  "promptVersion": "sufficiency@v1",
+  "case": "sufficiency:2e781313299c:86254df72152:6afacf9b794a",
+  "reply": "{\n  \"proposition\": \"Measurements of expansion and of lipid loading exist in the assessed material, none against the target's properties.\",\n  \"status\": \"insufficient_for_recommendation\",\n  \"assumptions\": [],\n  \"supportingAssessments\": [],\n  \"criticalGaps\": [\n    {\n      \"description\": \"no measurement tied to the target product's properties\",\n      \"kind\": \"absence\",\n      \"escalation\": \"exploratory_question\"\n    }\n  ],\n  \"coverageJudgement\": \"mixed\",\n  \"rationale\": \"Measurements of culture success do not establish progress toward a product whose properties are not characterised.\",\n  \"escalation\": \"exploratory_question\"\n}",
+  "recorded": false,
+  "authoredBy": "thinkmore"
+}

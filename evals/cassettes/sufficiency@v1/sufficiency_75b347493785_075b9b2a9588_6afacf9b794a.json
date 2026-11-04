@@ -1,0 +1,7 @@
+{
+  "promptVersion": "sufficiency@v1",
+  "case": "sufficiency:75b347493785:075b9b2a9588:6afacf9b794a",
+  "reply": "{\n  \"proposition\": \"Duck hepatocytes can be expanded in adherent culture, which is enough to run a feasibility experiment on them.\",\n  \"status\": \"sufficient_for_proposed_next_step\",\n  \"assumptions\": [\n    \"that the defined serum-free medium reproduces with other donor ducks\",\n    \"that adherent, not suspension, culture is used\"\n  ],\n  \"supportingAssessments\": [\n    \"src:file:paper-a:v1:fd1\",\n    \"src:file:paper-a:v1:cl1\"\n  ],\n  \"criticalGaps\": [\n    {\n      \"description\": \"reproducibility beyond the three donor ducks of one study\",\n      \"kind\": \"absence\",\n      \"escalation\": \"exploratory_question\"\n    }\n  ],\n  \"coverageJudgement\": \"mixed\",\n  \"rationale\": \"The evidence supports the next step, not its outcome: the cells the experiment needs can be grown.\",\n  \"escalation\": \"exploratory_question\"\n}",
+  "recorded": false,
+  "authoredBy": "thinkmore"
+}

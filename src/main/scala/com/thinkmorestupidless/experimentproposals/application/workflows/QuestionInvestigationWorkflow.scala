@@ -579,10 +579,10 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
         d.version(version).toVector.flatMap(_.extractions.flatMap(_.recordIds))
       }
       .distinct
-      .flatMap(id => recordOf(id).map(id -> _.status))
-    val verified  = records.collect { case (id, RecordStatus.verified) => id }
-    val unsettled = records.collect { case (id, RecordStatus.proposed) => id }
-    val settled   = records.collect { case (id, st) if st != RecordStatus.proposed => id }
+      .flatMap(id => recordOf(id).map(r => (id, r.status, settling(id))))
+    val unsettled = records.collect { case (id, _, true) => id }
+    val verified  = records.collect { case (id, RecordStatus.verified, false) => id }
+    val settled   = records.collect { case (id, _, false) => id }
     // The automation (feature 002): the retrieved records' verification settles before assessment.
     stepEffects
       .updateState(
@@ -611,8 +611,7 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
     val waitFor                   = currentState.unsettled
     val deadline                  = System.nanoTime() + Configured.verificationBound.toNanos
     def remaining: FiniteDuration = math.max(0L, deadline - System.nanoTime()).nanos
-    def proposed(ids: Vector[String]): Vector[String] =
-      ids.filter(id => recordOf(id).exists(_.status == RecordStatus.proposed))
+    def proposed(ids: Vector[String]): Vector[String] = ids.filter(settling)
     val started = autoStages.start(
       stage,
       1,
@@ -638,10 +637,12 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
           if (System.nanoTime() - began).nanos < 100.millis then Thread.sleep(200)
       pending = proposed(pending)
     val statuses =
-      (currentState.settled ++ waitFor).distinct.flatMap(id => recordOf(id).map(id -> _.status))
-    val verified  = statuses.collect { case (id, RecordStatus.verified) => id }
-    val unsettled = statuses.collect { case (id, RecordStatus.proposed) => id }
-    val settled   = statuses.collect { case (id, st) if st != RecordStatus.proposed => id }
+      (currentState.settled ++ waitFor).distinct.flatMap(id =>
+        recordOf(id).map(r => (id, r.status, waitFor.contains(id) && settling(id)))
+      )
+    val verified  = statuses.collect { case (id, RecordStatus.verified, false) => id }
+    val unsettled = statuses.collect { case (id, _, true) => id }
+    val settled   = statuses.collect { case (id, _, false) => id }
     val next = currentState.copy(
       recordIds = (currentState.recordIds ++ verified).distinct,
       settled = settled,
@@ -769,6 +770,26 @@ final class QuestionInvestigationWorkflow(context: WorkflowContext)
       .map(f =>
         client.forEventSourcedEntity(EntityId(f.id)).call(FacetEntity.get).invoke().statement
       )
+
+  /**
+   * Whether a record's verification has not settled: it is still proposed, or its latest
+   * verification workflow has not ended (a record may read `requires_review` while the workflow
+   * retries its model call).
+   */
+  private def settling(id: String): Boolean =
+    recordOf(id).exists { r =>
+      r.status == RecordStatus.proposed || {
+        val status =
+          try
+            client
+              .forWorkflow(EntityId(VerificationWorkflow.idFor(id, math.max(r.attempt, 1))))
+              .lifecycle(VerificationWorkflow)
+              .invoke()
+              .status
+          catch case _: CommandError => "Unknown"
+        status == "Running" || status == "Paused"
+      }
+    }
 
   private def recordOf(id: String): Option[EvidenceRecord] =
     Records

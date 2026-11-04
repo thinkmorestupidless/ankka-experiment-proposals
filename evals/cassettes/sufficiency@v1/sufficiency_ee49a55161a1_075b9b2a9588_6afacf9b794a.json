@@ -1,0 +1,7 @@
+{
+  "promptVersion": "sufficiency@v1",
+  "case": "sufficiency:ee49a55161a1:075b9b2a9588:6afacf9b794a",
+  "reply": "{\n  \"proposition\": \"The target's properties are not characterised, but a lipid accumulation experiment does not depend on them.\",\n  \"status\": \"requires_expert_review\",\n  \"assumptions\": [],\n  \"supportingAssessments\": [],\n  \"criticalGaps\": [\n    {\n      \"description\": \"no record characterises the target product's properties\",\n      \"kind\": \"coverage\",\n      \"escalation\": \"supplemental_search\"\n    }\n  ],\n  \"coverageJudgement\": \"search_inadequate\",\n  \"rationale\": \"The experiment can proceed without the target's properties, but whether its endpoint is the right one is for an expert to judge.\",\n  \"escalation\": \"exploratory_question\"\n}",
+  "recorded": false,
+  "authoredBy": "thinkmore"
+}
