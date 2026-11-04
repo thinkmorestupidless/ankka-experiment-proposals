@@ -54,7 +54,7 @@ pause_for_reviewer "/review/requests/$RID/facets" confirm_facets
 wait_for "the facets are confirmed" "$API/workflows/investigation/$RID" "confirmedBy" 60
 echo "4. Scientific questions and their searches, the retracted paper excluded"
 echo "  From here the investigation runs itself until the reviewer chooses an approach."
-wait_for "six questions are derived and their searches running" "$API/workflows/investigation/$RID" "questions-investigating"
+wait_for "six questions are derived and their searches running" "$API/workflows/investigation/$RID" "$RID:q6"
 Q4="$RID:q4"; echo "  lipid question $Q4: $(api "$API/questions/$Q4" | field question)"
 wait_for "the lipid question's search is done" "$API/questions/$Q4" '"retrieved":true' 120
 plan="$Q4:plan"; echo "  plan: $(api "$API/search-plans/$plan" | head -c 200)"

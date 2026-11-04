@@ -89,6 +89,11 @@ seconds, so nothing waits for a model inside a request.
 | GET | `/review-queue` | `?kind=finding \| claim \| assessment \| design` | records in `requires_review`, with the source passage beside each |
 
 ## Assessment and sufficiency
+
+The investigation runs assessment, sufficiency, packaging and the candidates by itself once the facets are
+confirmed, recording each stage with the actor `system:investigation`
+([what runs by itself](../concepts/stages.md#what-runs-by-itself)). The routes below still work at any
+time, for a script or to resume a question that rests with a defect, and each records a further stage run.
 | Method | Path | Body | Returns |
 |---|---|---|---|
 | GET | `/assessments/{id}` | | the assessment with rule results |
