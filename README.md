@@ -17,7 +17,8 @@ and a typed experimental design that a named scientific reviewer approves or rej
 - What it does not do: `docs/reference/limitations.md`
 - The interface: a web application in `web/`, with the request's journey drawn on a canvas, each stage's
   record as a card, the reviewer's decisions on their cards, and a conversation with an assistant that
-  answers from the records. Its specification is `specs/002-chat-canvas-interface/`.
+  answers from the records. Its specification is `specs/002-chat-canvas-interface/`; how to run it:
+  `docs/get-started/interface.md`, and how to deploy it: `docs/deploy/interface.md`.
 
 ## How it works
 
