@@ -3,11 +3,11 @@
 # must fail there ("killed"). The working tree is never changed. Results go to
 # scripts/mutants/last-run.json, which the living features read.
 #
-#   scripts/mutants.sh [bypass-eligibility|remove-species-rule|accept-mismatched-span ...]
+#   scripts/mutants.sh [bypass-eligibility|remove-species-rule|accept-mismatched-span|give-assistant-a-decision ...]
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 MUTANTS=("$@")
-if [ ${#MUTANTS[@]} -eq 0 ]; then MUTANTS=(bypass-eligibility remove-species-rule accept-mismatched-span); fi
+if [ ${#MUTANTS[@]} -eq 0 ]; then MUTANTS=(bypass-eligibility remove-species-rule accept-mismatched-span give-assistant-a-decision); fi
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/edp-mutants.XXXXXX")"
 trap 'rm -rf "$WORK"' EXIT
 results=()
