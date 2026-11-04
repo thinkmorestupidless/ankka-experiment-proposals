@@ -35,7 +35,6 @@ import com.thinkmorestupidless.experimentproposals.application.workflows.{
 }
 import com.thinkmorestupidless.experimentproposals.domain.conversation.{CardKind, Reference}
 import com.thinkmorestupidless.experimentproposals.domain.design.*
-import com.thinkmorestupidless.experimentproposals.domain.evidence.*
 import com.thinkmorestupidless.experimentproposals.domain.request.*
 import com.thinkmorestupidless.experimentproposals.domain.search.*
 import com.thinkmorestupidless.experimentproposals.domain.sources.*

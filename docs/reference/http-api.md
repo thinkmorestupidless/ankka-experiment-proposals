@@ -137,6 +137,12 @@ action it proposes runs only when a person confirms it.
 | POST | `/conversations/{id}` | `{}` or `{subject}` | opens the conversation, or answers it if open; `400` for an id of neither form, an unknown request or a subject that does not match |
 | GET | `/conversations/{id}` | | `subject`, `budget`, `used`, the `turns` and the `proposals`; `404` when never opened |
 | POST | `/conversations/{id}/turns` | `{question}` | server-sent events: `token` with each chunk of the answer as a JSON string, `proposal` for each action proposed, then `done` with the turn's number, its `references` and whether each resolved, any `prefill`, `used` and `budget`; or `error` with a `reason`, and nothing recorded. `503` with no model, `409` at the budget or while the conversation answers another question |
+| POST | `/conversations/{id}/proposals/{n}:confirm` | `{}` | performs the proposed action exactly as its own route does, as the operator, and answers `n`, `status: performed` and the `result` reference; the action's own refusal passes through with its status; `409` when the proposal is already performed or declined |
+| POST | `/conversations/{id}/proposals/{n}:decline` | `{}` | records the decline and answers `n` and `status: declined`; `409` as above |
+
+The actions a conversation can propose are `submit-request` (`text`, kept exactly as typed),
+`ingest-source` (`adapter`, `identifier`; extraction included), `inject-fault` (`recordId`, `fault`) and
+`set-source-status` (`sourceId`, `status`, optionally `reason`).
 
 The assistant answers from the file `EDP_ASSISTANT_SCRIPT` names when one is named, and otherwise from
 the live model `EDP_ASSISTANT_MODEL` names when `ANTHROPIC_API_KEY` is set. With neither it is unavailable and says so; the

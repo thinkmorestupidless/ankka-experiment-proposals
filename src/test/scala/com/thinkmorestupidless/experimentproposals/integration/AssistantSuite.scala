@@ -224,8 +224,96 @@ class AssistantSuite extends AutomationFixture with ConversationClient:
       val (_, cut, _) = turn(id, "an answer cut short")
       assert(cut.exists(_.name == "token") && cut.last.name == "error", cut)
       assertEquals(open("free:walkthrough-script")._1, 200)
+      eventually(s"$rid is listed", within = 90.seconds)(
+        Option.when(get(api("/requests"))._2.contains(rid))(())
+      )
       val waiting =
         done(turn("free:walkthrough-script", "Which requests are waiting for a reviewer?")._2)
-      assert(waiting.contains(s""""id":"$rid"""") && waiting.contains("\"resolved\":true"), waiting)
+      assert(
+        waiting.contains(s""""id":"$rid"""") && waiting.contains("\"resolved\":true"),
+        s"$waiting; the requests are ${get(api("/requests"))._2.take(400)}"
+      )
     finally Configured.assistantModel = Some(assistant)
+  }
+
+  // ── acting from the conversation (US5) ───────────────────────────────────────
+
+  private val ops = "free:operations"
+
+  /** Proposes through the scripted model and answers the proposal's number. */
+  private def propose(action: String, arguments: String): Int =
+    asked("propose_action", "action" -> action, "arguments" -> arguments).expectText("Confirm it.")
+    val (status, events, body) = turn(ops, s"please do $action")
+    assertEquals(status, 200, body)
+    val proposal =
+      events.find(_.name == "proposal").map(_.data).getOrElse(fail(s"no proposal: $events"))
+    assert(toolsCalled.last._2.startsWith("proposed as #"), toolsCalled.last._2)
+    """"n":(\d+)""".r.findFirstMatchIn(proposal).map(_.group(1).toInt).get
+
+  private def settle(n: Int, verb: String): (Int, String) =
+    post(api(s"/conversations/$ops/proposals/$n:$verb"), "{}")
+
+  test("a confirmed request is submitted as typed, and a second confirmation is refused") {
+    assertEquals(open(ops)._1, 200)
+    // The reference text, so the new investigation's facets replay from the cassettes.
+    val typed  = "Can you make foie gras?"
+    val before = """"id":"rq-""".r.findAllIn(get(api("/requests"))._2).size
+    val n      = propose("submit-request", s"""{"text":${quoteJson(typed)}}""")
+    assertEquals(""""id":"rq-""".r.findAllIn(get(api("/requests"))._2).size, before)
+    val (status, body) = settle(n, "confirm")
+    assertEquals(status, 200, body)
+    assert(body.contains("\"status\":\"performed\"") && body.contains("\"resolved\":true"), body)
+    val id = """"id":"(rq-[^"]+)"""".r.findFirstMatchIn(body).map(_.group(1)).get
+    assert(get(api(s"/requests/$id"))._2.contains(quoteJson(typed)), "the text is not as typed")
+    eventually(s"$id's investigation starts")(
+      Option.when(investigation(id).contains("awaiting-facet-review"))(())
+    )
+    val (again, refused) = settle(n, "confirm")
+    assertEquals(again, 409, refused)
+    assert(refused.contains(s"proposal #$n is already performed"), refused)
+  }
+
+  test("a declined proposal records the decline and performs nothing") {
+    val n = propose("set-source-status", """{"sourceId":"src:file:paper-c","status":"retracted"}""")
+    val (status, body) = settle(n, "decline")
+    assertEquals(status, 200, body)
+    assert(body.contains("\"status\":\"declined\""), body)
+    assert(!get(api("/sources/src:file:paper-c"))._2.contains("\"retracted\""))
+    assertEquals(settle(n, "confirm")._1, 409)
+  }
+
+  test("an action the assistant is not given reaches the model as the validation message") {
+    asked("propose_action", "action" -> "approve-design", "arguments" -> "{}").expectText("No.")
+    turn(ops, "approve the design")
+    assert(toolsCalled.head._2.startsWith("unknown action 'approve-design'"), toolsCalled.head._2)
+    assert(!get(api(s"/conversations/$ops"))._2.contains("approve-design"))
+  }
+
+  test("an ingestion and a fault confirmed in the conversation do what their routes do") {
+    val n =
+      propose("ingest-source", """{"adapter":"file","identifier":"paper-a.xml@endpoint_swap"}""")
+    val (status, body) = settle(n, "confirm")
+    assertEquals(status, 200, body)
+    assert(body.contains(""""kind":"source","id":"src:file:paper-a@endpoint_swap""""), body)
+    recordsSettled("src:file:paper-a@endpoint_swap")
+    val finding  = "src:file:paper-a@endpoint_swap:v1:fd1"
+    val m        = propose("inject-fault", s"""{"recordId":"$finding","fault":"endpoint_swap"}""")
+    val (s2, b2) = settle(m, "confirm")
+    assertEquals(s2, 200, b2)
+    assert(b2.contains(s""""kind":"finding","id":"$finding""""), b2)
+    eventually("the verification catches the swapped endpoint", within = 120.seconds) {
+      Option.when(get(api(s"/findings/$finding"))._2.contains("endpoint_mismatch"))(())
+    }
+  }
+
+  test("a status confirmed in the conversation is changed as the route changes it") {
+    val n = propose("set-source-status", """{"sourceId":"src:file:paper-c","status":"retracted"}""")
+    val (status, body) = settle(n, "confirm")
+    assertEquals(status, 200, body)
+    assert(body.contains(""""kind":"source","id":"src:file:paper-c""""), body)
+    assert(get(api("/sources/src:file:paper-c"))._2.contains("\"status\":{\"type\":\"retracted\"}"))
+    post(
+      api("/sources/src:file:paper-c/status"),
+      """{"status":"active","reason":"restored","by":"operator"}"""
+    ): Unit
   }

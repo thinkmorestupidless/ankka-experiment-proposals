@@ -6,7 +6,6 @@ import com.thinkmorestupidless.experimentproposals.application.{Approvals, Decis
 import com.thinkmorestupidless.experimentproposals.evaluation.Report
 import com.thinkmorestupidless.experimentproposals.application.entities.{
   ApproachEntity,
-  DecisionEntity,
   DesignEntity,
   PackageEntity,
   SearchExecutionEntity,
@@ -42,10 +41,8 @@ import com.thinkmorestupidless.experimentproposals.application.workflows.{
   ExtractFromSource,
   IngestionWorkflow,
   InvestigationWorkflow,
-  QuestionInvestigationState,
   QuestionInvestigationWorkflow,
   StartIngestion,
-  StartInvestigation,
   VerificationWorkflow
 }
 import com.thinkmorestupidless.experimentproposals.config.{Configured, Settings}
@@ -53,8 +50,7 @@ import com.thinkmorestupidless.experimentproposals.domain.Enumerations.{
   ClaimKind,
   FacetAction,
   RecordStatus,
-  ReviewActionKind,
-  SourceStatus
+  ReviewActionKind
 }
 import com.thinkmorestupidless.experimentproposals.domain.evidence.*
 import com.thinkmorestupidless.experimentproposals.domain.provenance.{Ids, Ref, Reviewer}
@@ -64,7 +60,7 @@ import com.thinkmorestupidless.experimentproposals.domain.sources.*
 import com.thinkmorestupidless.experimentproposals.domain.search.*
 import com.thinkmorestupidless.experimentproposals.domain.design.*
 import com.thinkmorestupidless.experimentproposals.retrieval.{Context, Searcher}
-import com.thinkmorestupidless.experimentproposals.rules.{FacetRules, Rules}
+import com.thinkmorestupidless.experimentproposals.rules.FacetRules
 import com.thinkmorestupidless.ankka.core.{CommandError, EntityId, ErrorCode, SessionId}
 import com.thinkmorestupidless.ankka.http.*
 import com.thinkmorestupidless.ankka.runtime.ViewClient
@@ -75,9 +71,11 @@ import com.thinkmorestupidless.experimentproposals.domain.journey.Journey
 import com.thinkmorestupidless.experimentproposals.application.agents.{AskAssistant, AssistantAgent}
 import com.thinkmorestupidless.experimentproposals.application.entities.ConversationEntity
 import com.thinkmorestupidless.experimentproposals.domain.conversation.{
+  Actions,
   Answered,
   Conversation,
   OpenConversation,
+  Performed,
   ReferenceMarkers
 }
 import com.thinkmorestupidless.experimentproposals.replay.ModelProviders
@@ -97,7 +95,8 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
 
   private given ExecutionContext        = ExecutionContext.global
   private val journeys                  = JourneyReader(client, views)
-  val readers                           = Readers(client, views)
+  private val readers                   = Readers(client, views)
+  private val operations                = Operations(client)
   private def source(id: String)        = client.forEventSourcedEntity(EntityId(id))
   private def requestEntity(id: String) = client.forEventSourcedEntity(EntityId(id))
   private def facetEntity(id: String)   = client.forEventSourcedEntity(EntityId(id))
@@ -177,15 +176,7 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
   // ── requests and facets (US1) ────────────────────────────────────────────────
 
   postBody("/requests") { (body: SubmitRequestBody) =>
-    val id = Ids.mint("rq")
-    val req = requestEntity(id)
-      .call(RequestEntity.submit)
-      .invoke(SubmitRequest(body.text, body.submittedBy))
-    client
-      .forWorkflow(EntityId(id))
-      .call(InvestigationWorkflow.start)
-      .invoke(StartInvestigation(id, req.text))
-    Respond(Created(id, 1, Some(id)), status = 201)
+    Respond(operations.submitRequest(body.text, body.submittedBy), status = 201)
   }
 
   get("/requests/{id}")((id: String) => readers.request(id))
@@ -219,6 +210,37 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
     )
     try conversation(id).call(ConversationEntity.open).invoke(OpenConversation(subject))
     catch case e: CommandError => throw HttpProblem.from(e)
+  }
+
+  /**
+   * A person confirms or declines a proposal: `{n}:confirm` performs it as its route would and
+   * records the result; `{n}:decline` records that it was declined. A settled proposal is refused.
+   */
+  postBody("/conversations/{id}/proposals/{step}") { (id: String, step: String, _: EmptyBody) =>
+    val (n, verb) = step.split(":", 2) match
+      case Array(num, verb) if num.toIntOption.isDefined => (num.toInt, verb)
+      case _ =>
+        throw HttpProblem.notFound(s"no route for proposals/$step; use {n}:confirm or {n}:decline")
+    val c = conversation(id).call(ConversationEntity.get).invoke()
+    if !c.registered then throw HttpProblem.notFound(s"no conversation '$id'")
+    val p = c.proposal(n).getOrElse(throw HttpProblem.notFound(s"no proposal #$n in '$id'"))
+    if p.status != "proposed" then
+      throw HttpProblem.conflict(s"proposal #$n is already ${p.status}")
+    verb match
+      case "confirm" =>
+        val action = Actions
+          .validate(p.action, p.arguments)
+          .fold(problem => throw HttpProblem.badRequest(problem), identity)
+        val result = operations.perform(action)
+        try conversation(id).call(ConversationEntity.performed).invoke(Performed(n, result))
+        catch case e: CommandError => throw HttpProblem.from(e)
+        ProposalOutcome(n, "performed", Some(result.copy(resolved = readers.resolves(result))))
+      case "decline" =>
+        try conversation(id).call(ConversationEntity.declined).invoke(n)
+        catch case e: CommandError => throw HttpProblem.from(e)
+        ProposalOutcome(n, "declined")
+      case other =>
+        throw HttpProblem.notFound(s"no route for proposals/$step; use {n}:confirm or {n}:decline")
   }
 
   /**
@@ -852,55 +874,13 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
    * it (FR-052).
    */
   postBody("/faults:inject") { (body: FaultBody) =>
-    val companion = Records
-      .companionFor(body.target.id)
-      .getOrElse(throw HttpProblem.notFound(s"not a record id: '${body.target.id}'"))
-    val r = client.forEventSourcedEntity(EntityId(body.target.id)).call(companion.get).invoke()
-    if !r.registered then throw HttpProblem.notFound(s"no record '${body.target.id}'")
-    val content = r.content.getOrElse(throw HttpProblem.conflict("the record has no content"))
-    val (mutated, rawSpans) = Mutations(body.mutation, content, r.spans)
-      .fold(problem => throw HttpProblem.badRequest(problem), identity)
-    val spans = rawSpans.map { span =>
-      if span.quotation.nonEmpty then span
-      else
-        // A span the mutation moved: give it the text it now points at, so it resolves and the verifier must notice.
-        val section = source(span.sourceId)
-          .call(SourceEntity.section)
-          .invoke(SectionRef(span.sourceVersion, span.sectionId))
-        val end = math.min(span.endOffset, section.text.length)
-        span.copy(endOffset = end, quotation = section.text.substring(span.startOffset, end))
-    }
-    val defect = Rules.defect(
-      com.thinkmorestupidless.experimentproposals.domain.Enumerations.DefectKind.other,
-      s"fault injected: ${body.mutation}",
-      retryable = false
-    )
-    val after = client
-      .forEventSourcedEntity(EntityId(body.target.id))
-      .call(companion.repropose)
-      .invoke(ReproposeRecord(mutated, spans, defect, s"operator:fault:${body.mutation}"))
-    Respond(
-      FaultStarted(
-        after.id,
-        after.attempt,
-        VerificationWorkflow.idFor(after.id, after.attempt),
-        Mutations.expectedDetection(body.mutation).map(_.toString)
-      ),
-      status = 202
-    )
+    Respond(operations.injectFault(body.target.id, body.mutation), status = 202)
   }
 
   // ── sources (foundation and US5) ─────────────────────────────────────────────
 
   postBody("/sources:ingest") { (request: IngestRequest) =>
-    val workflowId = IngestionWorkflow.idFor(request.adapter, request.identifier)
-    val state = client
-      .forWorkflow(EntityId(workflowId))
-      .call(IngestionWorkflow.start)
-      .invoke(
-        StartIngestion(request.adapter, request.identifier, request.extract, request.questionIds)
-      )
-    Respond(IngestStarted(workflowId, state.sourceId, state.status), status = 202)
+    Respond(operations.ingest(request), status = 202)
   }
 
   get("/sources") { () =>
@@ -942,11 +922,7 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
 
   /** A reviewer or the operator changes a status; eligibility follows in the same command. */
   postBody("/sources/{id}/status") { (id: String, body: StatusBody) =>
-    val status = SourceStatus.values
-      .find(_.toString == body.status)
-      .getOrElse(throw HttpProblem.badRequest(s"unknown status '${body.status}'"))
-    source(id).call(SourceEntity.changeStatus).invoke(ChangeStatus(status, body.reason, body.by))
-    withoutContent(source(id).call(SourceEntity.get).invoke(), None)
+    operations.setStatus(id, body)
   }
 
   get("/measurements") { () =>

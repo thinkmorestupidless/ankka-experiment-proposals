@@ -47,6 +47,8 @@ final case class DoneEvent(
     budget: Long
 )
 final case class ErrorEvent(reason: String)
+final case class ProposalOutcome(n: Int, status: String, result: Option[Reference] = None)
+final case class EmptyBody()
 
 /** The API's request and response shapes beside the records themselves, with their codecs. */
 final case class IngestRequest(
@@ -226,3 +228,5 @@ object Json:
   given JsonValueCodec[DoneEvent]          = Codecs.make[DoneEvent]
   given JsonValueCodec[ErrorEvent]         = Codecs.make[ErrorEvent]
   given tokenCodec: JsonValueCodec[String] = Codecs.make[String]
+  given JsonValueCodec[ProposalOutcome]    = Codecs.make[ProposalOutcome]
+  given JsonValueCodec[EmptyBody]          = Codecs.make[EmptyBody]
