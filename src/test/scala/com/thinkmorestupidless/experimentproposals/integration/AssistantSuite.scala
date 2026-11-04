@@ -27,10 +27,17 @@ class AssistantSuite extends AutomationFixture with ConversationClient:
     eventually(s"$rid reaches the choice of approach", within = 240.seconds) {
       Option.when(investigation(rid).contains("awaiting-decision"))(())
     }
+    // Every turn resends the history, tool results included, and the scripted provider counts it as a
+    // model would: the suite's many turns on one request need more than the default budget.
+    budget = Configured.conversationBudget
+    Configured.conversationBudget = 50_000_000L
     assertEquals(open(chat)._1, 200)
+
+  private var budget = 0L
 
   override def afterAll(): Unit =
     Configured.assistantModel = None
+    Configured.conversationBudget = budget
     super.afterAll()
 
   override def beforeEach(context: BeforeEach): Unit =
@@ -192,4 +199,33 @@ class AssistantSuite extends AutomationFixture with ConversationClient:
     assertEquals(open("whatever")._1, 400)
     assertEquals(open(chat, """{"subject":"rq-other"}""")._1, 400)
     assertEquals(open("request:rq-does-not-exist")._1, 400)
+  }
+
+  test("the walkthrough's script answers the reference request with references that all resolve") {
+    val script = com.thinkmorestupidless.experimentproposals.replay.ScriptedModelProvider
+      .fromFile(java.nio.file.Path.of("evals/assistant/walkthrough.json"))
+      .fold(p => fail(p), identity)
+    Configured.assistantModel = Some(script)
+    try
+      val id = s"request:$rid"
+      Seq(
+        "Why is the finding from Paper B indirect?"                   -> 2,
+        "What blocked the decision recommend production feasibility?" -> 1,
+        "What did the search for the lipid question exclude?"         -> 1,
+        "Show me the facets"                                          -> 1,
+        "Who is it for?"                                              -> 1
+      ).foreach { (question, refs) =>
+        val (status, events, body) = turn(id, question)
+        assertEquals(status, 200, body)
+        allResolved(done(events), refs)
+      }
+      val approve = done(turn(id, "approve it")._2)
+      assert(approve.contains(s""""target":"$rid:design""""), approve)
+      val (_, cut, _) = turn(id, "an answer cut short")
+      assert(cut.exists(_.name == "token") && cut.last.name == "error", cut)
+      assertEquals(open("free:walkthrough-script")._1, 200)
+      val waiting =
+        done(turn("free:walkthrough-script", "Which requests are waiting for a reviewer?")._2)
+      assert(waiting.contains(s""""id":"$rid"""") && waiting.contains("\"resolved\":true"), waiting)
+    finally Configured.assistantModel = Some(assistant)
   }

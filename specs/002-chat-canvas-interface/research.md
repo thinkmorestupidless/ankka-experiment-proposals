@@ -476,6 +476,11 @@ browser suites in the sbt job (two toolchains in one job).
   field as its default.
 - **A named script wins over a key.** R12 lists the key first; `EDP_ASSISTANT_SCRIPT` is the more
   deliberate setting, so when both are present the assistant answers from the script.
+- **A request's conversation spends its budget quickly.** The read tools return the API's whole record,
+  and the lipid question's is about 38 kB, some 9,500 tokens. The history goes back to the model on
+  every call, so each later call counts it again. With the default budget of 200,000 tokens, a request's
+  conversation lasts a handful of questions that read the question. A request has one conversation, so
+  it cannot start a fresh one; the free-standing conversation can. Recorded in the limitations.
 - **Proposals are sent when the answer ends.** The `proposal` events go just before `done`, read from
   the conversation's new proposals, rather than as the tool records each one. A failed turn sends none.
 

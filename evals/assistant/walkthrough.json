@@ -1,0 +1,72 @@
+[
+  {
+    "when": "from paper b indirect",
+    "tools": [{ "name": "get_question", "arguments": { "questionId": "{subject}:q4" } }],
+    "text": "The finding from Paper B is indirect by the species rule. Its assessment [[assessment:{subject}:q4:src:file:paper-b:v1:fd1]] records the species as a mismatch: the finding [[finding:src:file:paper-b:v1:fd1]] shows lipid accumulation in human HepG2 cells, not in avian cells."
+  },
+  {
+    "when": "what blocked",
+    "tools": [{ "name": "get_question", "arguments": { "questionId": "{subject}:q4" } }],
+    "text": "Insufficient evidence. The sufficiency judgement [[sufficiency:{subject}:q4:recommend-production-feasibility]] names the critical gap: no direct evidence of lipid accumulation in avian hepatic cells."
+  },
+  {
+    "when": "excluded",
+    "tools": [{ "name": "get_question", "arguments": { "questionId": "{subject}:q4" } }],
+    "text": "The search excluded the retracted source after ranking, by the eligibility rule eligibility.retracted: [[search-execution:{subject}:q4:plan:e4]]."
+  },
+  {
+    "when": "show me the facets",
+    "tools": [{ "name": "get_request", "arguments": {} }],
+    "text": "The facets: [[facets:{subject}]]"
+  },
+  {
+    "when": "edit the record",
+    "text": "I cannot do that. A reviewer approves a design on the design's card, and no record is edited by hand: a finding or a claim is reviewed on its card in the review queue."
+  },
+  {
+    "when": "approve it",
+    "text": "A reviewer must approve the design on its card; I have filled the form in for you. [[prefill:approval:{subject}:design|outcome=approve|version=1|rationale=]]"
+  },
+  {
+    "when": "price",
+    "text": "That is not established: no record holds a price or a cost, so the records do not answer it."
+  },
+  {
+    "when": "does not exist",
+    "text": "The record is cited here: [[finding:src:file:nowhere:v1:fd9]]."
+  },
+  {
+    "when": "waiting for a reviewer",
+    "tools": [{ "name": "list_requests", "arguments": {} }],
+    "text": "Waiting for a reviewer: {requests}."
+  },
+  {
+    "when": "cut short",
+    "text": "The answer begins and then {fail}"
+  },
+  {
+    "when": "submit the request",
+    "tools": [{ "name": "propose_action", "arguments": { "action": "submit-request", "arguments": "{\"text\":\"Can you make foie gras?\"}" } }],
+    "text": "I have proposed submitting the request \"Can you make foie gras?\". It is submitted only when you confirm it."
+  },
+  {
+    "when": "ingest",
+    "tools": [{ "name": "propose_action", "arguments": { "action": "ingest-source", "arguments": "{\"adapter\":\"file\",\"identifier\":\"paper-a.xml\"}" } }],
+    "text": "I have proposed ingesting paper-a.xml with the file adapter. It is ingested only when you confirm it."
+  },
+  {
+    "when": "inject",
+    "tools": [{ "name": "propose_action", "arguments": { "action": "inject-fault", "arguments": "{\"recordId\":\"src:file:paper-a:v1:fd1\",\"fault\":\"endpoint_swap\"}" } }],
+    "text": "I have proposed injecting the fault endpoint_swap on [[finding:src:file:paper-a:v1:fd1]]. It is injected only when you confirm it."
+  },
+  {
+    "when": "mark paper c",
+    "tools": [{ "name": "propose_action", "arguments": { "action": "set-source-status", "arguments": "{\"sourceId\":\"src:file:paper-c\",\"status\":\"retracted\"}" } }],
+    "text": "I have proposed marking Paper C retracted. Nothing changes until you confirm it."
+  },
+  {
+    "when": "?",
+    "tools": [{ "name": "get_request", "arguments": {} }],
+    "text": "The request is [[request:{subject}]]; its journey shows where it is."
+  }
+]

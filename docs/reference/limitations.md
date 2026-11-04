@@ -44,3 +44,8 @@ What the application does not do. Each is a deliberate boundary of a proof of co
   its result file is committed and read by the living features.
 - **Experimental runs and observations are not recorded.** An observation enters as an internal
   record through the `internal` adapter.
+- **A conversation's budget goes quickly.** The assistant's read tools return each record whole, and a
+  scientific question's record runs to about 9,500 tokens. Each answer sends the conversation so far
+  back to the model, so a request's conversation reaches the default budget of 200,000 tokens after a
+  handful of questions about its scientific questions. A request has one conversation; a free-standing
+  conversation can be started afresh. `EDP_CONVERSATION_BUDGET` raises the budget.
