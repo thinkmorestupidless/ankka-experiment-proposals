@@ -3,6 +3,7 @@ package com.thinkmorestupidless.experimentproposals.features
 import com.thinkmorestupidless.experimentproposals.features.steps.{
   AssessmentSteps,
   AssuranceSteps,
+  AutomationSteps,
   CommonSteps,
   DesignSteps,
   EvidenceSteps,
@@ -32,6 +33,7 @@ trait AllSteps
     with DesignSteps
     with AssuranceSteps
     with ImpactSteps
+    with AutomationSteps
 
 /** `features/request/`. */
 class RequestFeatures extends GherkinSuite("features/request") with AllSteps

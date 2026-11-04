@@ -250,8 +250,10 @@ trait SearchSteps extends GherkinSuite with AssessmentSteps:
         }
     }
     assert(refusals >= 1, "the third supplemental search was not refused")
+    // Only the gap searched: the automation's sufficiency judgements open gaps of their own.
     val gaps = get(s"/questions/$questionId/gaps")._2
-    assert("""q6:plan:e\d+""".r.findAllIn(gaps).size <= 2, gaps)
+    val gap  = objectsOf(gaps).find(_.contains(s""""id":"$gapId"""")).getOrElse(fail(gaps))
+    assert("""q6:plan:e\d+""".r.findAllIn(gap).size <= 2, gap)
   }
 
   Given("a search plan whose execution returns nothing") { () =>

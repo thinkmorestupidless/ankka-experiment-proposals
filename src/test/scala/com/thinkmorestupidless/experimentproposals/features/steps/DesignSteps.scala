@@ -34,9 +34,12 @@ trait DesignSteps extends GherkinSuite with SearchSteps:
     }
 
   protected def candidatesGenerated(): String =
+    // The investigation proposes candidates by itself (feature 002); a manual packaging proposes
+    // them again, so wait for the pause and for the approaches to be there.
     approachesJson = eventually("the candidates are compared") {
       val w = investigationView()
-      Option.when(w.contains("awaiting-decision"))(get(s"/requests/$requestId/approaches")._2)
+      val a = get(s"/requests/$requestId/approaches")._2
+      Option.when(w.contains("awaiting-decision") && a.contains("\"hypothesis\":"))(a)
     }
     approachesJson
 

@@ -299,6 +299,9 @@ class AutomationUnsettledSuite extends AutomationFixture:
         }
       val journey = get(api(s"/requests/$id/journey"))._2
       assert(journey.contains("\"stage\":\"verification\",\"state\":\"failed\""), journey)
+      assert(!failed.contains("overran its step"), failed)
+      val run = get(api(s"/runs/run-$id:q4"))._2
+      assert(run.contains("verification_unsettled"), s"the stage run records no defect: $run")
       // The manual assessment resumes the lane over the verified records, once, with no duplicate.
       assertEquals(post(api(s"/questions/$id:q4/assess"), idsJson(BC))._1, 202)
       val q = eventually("the verified records are assessed", within = 120.seconds) {

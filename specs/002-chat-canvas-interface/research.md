@@ -451,6 +451,15 @@ browser suites in the sbt job (two toolchains in one job).
   question to meet it, and settles as requiring review. The verification workflow shares
   `Configured.retryBudget`, so a test that lowers the budget also shortens verification.
 
+- **A defect kind needs a severity.** `Rules.defect` matches on the defect kinds without an exhaustiveness
+  warning, so the new `verification_unsettled` threw a `MatchError` inside the wait step. The workflow's step
+  recovery retried it and failed over, and the lane rested with "the wait overran its step" and no defect on
+  the stage run. It is now `major`, and the unsettled tests assert the stage run's defect.
+- **The automation feature has no shared Background ingestion.** "An empty corpus" cannot follow a
+  Background that ingests the sources, and one service serves the whole directory. Each scenario that needs the
+  sources ingests them, the empty-corpus scenario runs first, and its Given asserts the store is empty, so a
+  reordering fails loudly rather than passing on a full store.
+
 ## Measurements
 
 | What | Result |

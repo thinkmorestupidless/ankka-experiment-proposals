@@ -45,7 +45,7 @@ object Rules:
         Severity.critical
       case DefectKind.schema_invalid | DefectKind.unit_invalid | DefectKind.status_invalid |
           DefectKind.scope_loss | DefectKind.context_mismatch | DefectKind.model_refused |
-          DefectKind.coverage_gap | DefectKind.fewer_than_two =>
+          DefectKind.coverage_gap | DefectKind.fewer_than_two | DefectKind.verification_unsettled =>
         Severity.major
       case DefectKind.other => Severity.minor
     Defect(kind, severity, detail, retryable)

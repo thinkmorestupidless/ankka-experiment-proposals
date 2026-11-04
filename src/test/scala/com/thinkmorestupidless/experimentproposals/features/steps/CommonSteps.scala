@@ -39,6 +39,10 @@ trait CommonSteps extends GherkinSuite:
   protected var server: HttpServer    = null
   private val http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build()
 
+  /** The model the service talks to: the tier's; a step trait may wrap it. */
+  protected def modelProvider: com.thinkmorestupidless.ankka.agent.ModelProvider =
+    ModelProviders.forTier(settings)
+
   override def beforeAll(): Unit =
     Main.configure(settings, reviewers, env)
     server = HttpServer.at("127.0.0.1", 0)(Main.endpoints(settings)*)
@@ -46,7 +50,7 @@ trait CommonSteps extends GherkinSuite:
       Main.descriptors,
       Seq(
         ProjectionRuntime(),
-        Main.agentRuntime(settings, ModelProviders.forTier(settings)),
+        Main.agentRuntime(settings, modelProvider),
         server
       )
     )
