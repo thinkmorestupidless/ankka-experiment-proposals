@@ -39,6 +39,21 @@ class InvestigationFacetsSuite extends ServiceFixture:
     )
     model.whenUserSays("# case: questions:")(cassettes.list("questions@v1").head.reply)
 
+  test("every request is listed, newest first, through the API and on the review page") {
+    val id = submit()
+    paused(id)
+    val listed = eventually(s"the listing shows $id with its facets") {
+      val (_, body) = get(api("/requests"))
+      Option.when(body.contains(s"\"id\":\"$id\"") && body.contains("\"facets\":8"))(body)
+    }
+    assert(listed.contains(s"\"text\":\"$text\""), listed)
+    assert(listed.contains("\"status\":\"facets_proposed\""), listed)
+    val (status, page) = get("/review/requests")
+    assertEquals(status, 200, page)
+    assert(page.contains(s"""href="/review/requests/$id/facets""""), page)
+    assert(page.contains(text), page)
+  }
+
   test(
     "facets are extracted with their origins, the round-trip check runs, and the workflow pauses; all of it survives a restart"
   ) {

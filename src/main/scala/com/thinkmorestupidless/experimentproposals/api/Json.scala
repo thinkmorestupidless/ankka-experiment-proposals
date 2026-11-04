@@ -3,6 +3,7 @@ package com.thinkmorestupidless.experimentproposals.api
 import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
 import com.thinkmorestupidless.experimentproposals.application.views.{
   DesignRow,
+  RequestRow,
   ExecutionRow,
   MeasurementRow,
   RecordRow,
@@ -176,6 +177,7 @@ object Json:
   given JsonValueCodec[SubmitBody]                               = Codecs.make[SubmitBody]
   given JsonValueCodec[ApprovalBody]                             = Codecs.make[ApprovalBody]
   given designRowsCodec: JsonValueCodec[Vector[DesignRow]]       = Codecs.make[Vector[DesignRow]]
+  given requestRowsCodec: JsonValueCodec[Vector[RequestRow]]     = Codecs.make[Vector[RequestRow]]
   given JsonValueCodec[ApproachesView]                           = Codecs.make[ApproachesView]
   given JsonValueCodec[DecideBody]                               = Codecs.make[DecideBody]
   given JsonValueCodec[DecisionRecord]                           = Codecs.make[DecisionRecord]

@@ -31,6 +31,8 @@ import com.thinkmorestupidless.experimentproposals.application.views.{
   ExecutionRows,
   FindingRows,
   MeasurementRows,
+  RequestRow,
+  RequestRows,
   SourceRows
 }
 import com.thinkmorestupidless.experimentproposals.application.workflows.{
@@ -82,6 +84,10 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
 
   get("/reviewers") { () =>
     Configured.reviewers.all: Vector[Reviewer]
+  }
+
+  get("/requests") { () =>
+    views.forView(RequestRows).ask(RequestRows.newestFirst): Vector[RequestRow]
   }
 
   get("/runs/{runId}") { (runId: String) =>

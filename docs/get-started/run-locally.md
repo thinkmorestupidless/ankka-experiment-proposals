@@ -76,7 +76,7 @@ The first needs no token and answers with the tier and the model in use. The sec
 
 The review pages are under `/review`. Open
 `http://localhost:9000/review/session?token=<your token>` once in a browser; it sets a session cookie and
-takes you to the review queue.
+takes you to the list of requests, from which every reviewer page is a link away.
 
 ## Watch it
 
