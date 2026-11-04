@@ -124,6 +124,24 @@ time, for a script or to resume a question that rests with a defect, and each re
 Named mutations (glossary: fault): `endpoint_swap`, `negation_flip`, `species_drop`,
 `failure_to_success`, `span_break`, `citation_mismatch`.
 
+## The assistant and conversations
+
+A conversation is `request:<requestId>`, whose subject is that request, or `free:<key>` with a key of 8 to
+64 letters, digits, `-` or `_`. The assistant answers from the records and cites each one it relies on with
+a marker the interface shows as the record's card. It never records a reviewer's decision; an operator's
+action it proposes runs only when a person confirms it.
+
+| Method | Path | Body | Returns |
+|---|---|---|---|
+| GET | `/assistant` | | `available`, the `reason` when it is not, and the `budget` in tokens |
+| POST | `/conversations/{id}` | `{}` or `{subject}` | opens the conversation, or answers it if open; `400` for an id of neither form, an unknown request or a subject that does not match |
+| GET | `/conversations/{id}` | | `subject`, `budget`, `used`, the `turns` and the `proposals`; `404` when never opened |
+| POST | `/conversations/{id}/turns` | `{question}` | server-sent events: `token` with each chunk of the answer as a JSON string, `proposal` for each action proposed, then `done` with the turn's number, its `references` and whether each resolved, any `prefill`, `used` and `budget`; or `error` with a `reason`, and nothing recorded. `503` with no model, `409` at the budget or while the conversation answers another question |
+
+The assistant answers from the file `EDP_ASSISTANT_SCRIPT` names when one is named, and otherwise from
+the live model `EDP_ASSISTANT_MODEL` names when `ANTHROPIC_API_KEY` is set. With neither it is unavailable and says so; the
+rest of the service works as before. `EDP_CONVERSATION_BUDGET` sets each conversation's budget.
+
 ## Review pages (`/review`)
 
 | Path | Shows | Posts to |

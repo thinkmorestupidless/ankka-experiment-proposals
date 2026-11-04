@@ -65,13 +65,25 @@ import com.thinkmorestupidless.experimentproposals.domain.search.*
 import com.thinkmorestupidless.experimentproposals.domain.design.*
 import com.thinkmorestupidless.experimentproposals.retrieval.{Context, Searcher}
 import com.thinkmorestupidless.experimentproposals.rules.{FacetRules, Rules}
-import com.thinkmorestupidless.ankka.core.{CommandError, EntityId, ErrorCode}
+import com.thinkmorestupidless.ankka.core.{CommandError, EntityId, ErrorCode, SessionId}
 import com.thinkmorestupidless.ankka.http.*
 import com.thinkmorestupidless.ankka.runtime.ViewClient
 import com.thinkmorestupidless.ankka.sdk.ComponentClient
 import com.thinkmorestupidless.experimentproposals.application.journey.JourneyReader
 import com.thinkmorestupidless.experimentproposals.domain.journey.Journey
 
+import com.thinkmorestupidless.experimentproposals.application.agents.{AskAssistant, AssistantAgent}
+import com.thinkmorestupidless.experimentproposals.application.entities.ConversationEntity
+import com.thinkmorestupidless.experimentproposals.domain.conversation.{
+  Answered,
+  Conversation,
+  OpenConversation,
+  ReferenceMarkers
+}
+import com.thinkmorestupidless.experimentproposals.replay.ModelProviders
+import com.thinkmorestupidless.ankka.agent.{forAgent, forSessionMemory, SessionMemoryEntity}
+import org.apache.pekko.stream.scaladsl.Source
+import scala.util.control.NonFatal
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.*
 
@@ -85,6 +97,7 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
 
   private given ExecutionContext        = ExecutionContext.global
   private val journeys                  = JourneyReader(client, views)
+  val readers                           = Readers(client, views)
   private def source(id: String)        = client.forEventSourcedEntity(EntityId(id))
   private def requestEntity(id: String) = client.forEventSourcedEntity(EntityId(id))
   private def facetEntity(id: String)   = client.forEventSourcedEntity(EntityId(id))
@@ -148,27 +161,9 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
       case other => throw HttpProblem.notFound(s"no workflow kind '$other'")
   }
 
-  private def investigation(id: String): WorkflowView =
-    val lifecycle = client.forWorkflow(EntityId(id)).lifecycle(InvestigationWorkflow).invoke()
-    val state     = client.forWorkflow(EntityId(id)).call(InvestigationWorkflow.status).invoke()
-    WorkflowView(
-      "investigation",
-      id,
-      lifecycle.status,
-      lifecycle.pendingStep,
-      lifecycle.failure,
-      lifecycle.isTerminal,
-      None,
-      writeToString(state)
-    )
-
-  private def facetsOf(req: CustomerRequest): Vector[Facet] =
-    req.facets.map(f => facetEntity(f.id).call(FacetEntity.get).invoke())
-
-  private def questionsOf(req: CustomerRequest): Vector[ScientificQuestion] =
-    req.questionIds.map(q =>
-      client.forEventSourcedEntity(EntityId(q)).call(QuestionEntity.get).invoke()
-    )
+  private def investigation(id: String): WorkflowView = readers.investigation(id)
+  private def facetsOf(req: CustomerRequest)          = readers.facetsOf(req)
+  private def questionsOf(req: CustomerRequest)       = readers.questionsOf(req)
 
   /**
    * The endpoint refuses an unlisted reviewer early; the entity refuses it again before persisting.
@@ -193,10 +188,90 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
     Respond(Created(id, 1, Some(id)), status = 201)
   }
 
-  get("/requests/{id}") { (id: String) =>
-    val req = requestEntity(id).call(RequestEntity.get).invoke()
-    if !req.registered then throw HttpProblem.notFound(s"no request '$id'")
-    RequestView(req, facetsOf(req), questionsOf(req), investigation(id))
+  get("/requests/{id}")((id: String) => readers.request(id))
+
+  // ── the assistant and conversations (feature 002, contracts/http-api.md) ─────
+
+  private val busy                     = java.util.concurrent.ConcurrentHashMap.newKeySet[String]()
+  private def conversation(id: String) = client.forEventSourcedEntity(EntityId(id))
+
+  get("/assistant") { () =>
+    AssistantStatus(
+      Configured.assistantModel.isDefined,
+      Option.when(Configured.assistantModel.isEmpty)(ModelProviders.NoAssistant),
+      Configured.conversationBudget
+    )
+  }
+
+  get("/conversations/{id}") { (id: String) =>
+    val c = conversation(id).call(ConversationEntity.get).invoke()
+    if !c.registered then throw HttpProblem.notFound(s"no conversation '$id'")
+    c
+  }
+
+  postBody("/conversations/{id}") { (id: String, body: OpenBody) =>
+    val subject = Conversation.subjectOf(id).fold(p => throw HttpProblem.badRequest(p), identity)
+    if body.subject.exists(s => !subject.contains(s)) then
+      throw HttpProblem.badRequest(s"the subject '${body.subject.get}' does not match '$id'")
+    subject.foreach(r =>
+      try readers.requestOf(r)
+      catch case _: HttpProblem => throw HttpProblem.badRequest(s"no request '$r'")
+    )
+    try conversation(id).call(ConversationEntity.open).invoke(OpenConversation(subject))
+    catch case e: CommandError => throw HttpProblem.from(e)
+  }
+
+  /**
+   * One question, answered as events: each token as the model writes it, the proposals it recorded,
+   * then `done` once the turn is recorded, or `error` with nothing recorded.
+   */
+  sseEventsBody("/conversations/{id}/turns") { (id: String, body: QuestionBody) =>
+    if Configured.assistantModel.isEmpty then throw HttpProblem(503, ModelProviders.NoAssistant)
+    if body.question.isBlank then throw HttpProblem.badRequest("the question is empty")
+    val before =
+      try conversation(id).call(ConversationEntity.ask).invoke()
+      catch case e: CommandError => throw HttpProblem.from(e)
+    if !busy.add(id) then
+      throw HttpProblem.conflict(s"the conversation '$id' is answering a question; one at a time")
+    val subject = before.subject.flatMap(r =>
+      try
+        Some(
+          s"This conversation's subject is the customer request $r, submitted as: " +
+            readers.requestOf(r).text
+        )
+      catch case NonFatal(_) => None
+    )
+    val answer = new java.lang.StringBuilder
+    val tokens = client
+      .forAgent(SessionId(id))
+      .stream(AssistantAgent.answer)(AskAssistant(body.question, subject))
+      .map { chunk =>
+        answer.append(chunk)
+        SseEvent.json("token", chunk)(using Json.tokenCodec)
+      }
+    def finish(): Vector[SseEvent] =
+      val text            = answer.toString
+      val (refs, prefill) = ReferenceMarkers.parse(text)
+      val references      = refs.map(r => r.copy(resolved = readers.resolves(r)))
+      val history =
+        client.forSessionMemory(SessionId(id)).call(SessionMemoryEntity.history).invoke()
+      val used = math.max(before.used, history.usage.total.toLong)
+      val after = conversation(id)
+        .call(ConversationEntity.answered)
+        .invoke(Answered(body.question, text, references, prefill, used))
+      val proposals = after.proposals
+        .filter(p => !before.proposals.exists(_.n == p.n))
+        .map(p => SseEvent.json("proposal", ProposalEvent(p.n, p.action, p.arguments)))
+      proposals :+ SseEvent.json(
+        "done",
+        DoneEvent(after.turns.size, references, prefill, after.used, after.budget)
+      )
+    tokens
+      .concatLazy(Source.lazySource(() => Source(finish())))
+      .recover { case NonFatal(e) =>
+        SseEvent.json("error", ErrorEvent(Option(e.getMessage).getOrElse(e.toString)))
+      }
+      .watchTermination()((_, done) => done.onComplete(_ => busy.remove(id)))
   }
 
   // ── the journey (feature 002, contracts/journey.md) ──────────────────────────
@@ -266,9 +341,7 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
 
   // ── questions (US2) ──────────────────────────────────────────────────────────
 
-  private def questionInvestigation(id: String): Option[QuestionInvestigationState] =
-    val st = client.forWorkflow(EntityId(id)).call(QuestionInvestigationWorkflow.status).invoke()
-    Option.when(st.started)(st)
+  private def questionInvestigation(id: String) = readers.questionInvestigation(id)
 
   private def investigationOfQuestion(id: String): WorkflowView =
     val lifecycle =
@@ -285,24 +358,7 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
       writeToString(state)
     )
 
-  get("/questions/{id}") { (id: String) =>
-    val q = client.forEventSourcedEntity(EntityId(id)).call(QuestionEntity.get).invoke()
-    if !q.registered then throw HttpProblem.notFound(s"no question '$id'")
-    val inv = questionInvestigation(id)
-    val assessments = inv.toVector
-      .flatMap(_.assessmentIds)
-      .map(a => client.forEventSourcedEntity(EntityId(a)).call(AssessmentEntity.get).invoke())
-    val sufficiency = inv.toVector
-      .flatMap(_.sufficiencyIds)
-      .map(sid => client.forEventSourcedEntity(EntityId(sid)).call(SufficiencyEntity.get).invoke())
-    val gaps = inv.toVector
-      .flatMap(s => s.gapIds ++ s.coverageGapIds)
-      .distinct
-      .map(g => client.forEventSourcedEntity(EntityId(g)).call(GapEntity.get).invoke())
-    val plan       = inv.flatMap(_.planId).map(planOf).filter(_.registered)
-    val executions = inv.toVector.flatMap(_.executionIds).map(executionOf)
-    QuestionView(q, inv, plan, executions, assessments, sufficiency, gaps)
-  }
+  get("/questions/{id}")((id: String) => readers.question(id))
 
   // ── packages, candidates and the decision (US7) ──────────────────────────────
 
@@ -313,27 +369,9 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
     Respond(investigation(id), status = 202)
   }
 
-  get("/packages/{id}") { (id: String) =>
-    val p = client.forEventSourcedEntity(EntityId(id)).call(PackageEntity.get).invoke()
-    if !p.registered then throw HttpProblem.notFound(s"no package '$id'")
-    val passages = p.includedSpans.map { span =>
-      source(span.sourceId).call(SourceEntity.resolveSpan).invoke(span) match
-        case SpanResolution.Resolved(text) => SpanView(span, true, Some(text))
-        case SpanResolution.Unresolved(_)  => SpanView(span, false, None)
-    }
-    PackageView(p, passages)
-  }
+  get("/packages/{id}")((id: String) => readers.packageOf(id))
 
-  private def approachesOf(id: String): ApproachesView =
-    val state = client.forWorkflow(EntityId(id)).call(InvestigationWorkflow.status).invoke()
-    val approaches =
-      state.approachIds.map(a =>
-        client.forEventSourcedEntity(EntityId(a)).call(ApproachEntity.get).invoke()
-      )
-    val decision = state.decisionId
-      .map(d => client.forEventSourcedEntity(EntityId(d)).call(DecisionEntity.get).invoke())
-      .filter(_.registered)
-    ApproachesView(approaches, state.comparison, decision)
+  private def approachesOf(id: String): ApproachesView = readers.approachesOf(id)
 
   get("/requests/{id}/approaches")((id: String) => approachesOf(id))
 
@@ -478,10 +516,7 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
 
   // ── the design and its approval (US8) ────────────────────────────────────────
 
-  private def designOf(id: String): DesignState =
-    val d = client.forEventSourcedEntity(EntityId(id)).call(DesignEntity.get).invoke()
-    if !d.registered then throw HttpProblem.notFound(s"no design '$id'")
-    d
+  private def designOf(id: String): DesignState = readers.designOf(id)
 
   /** The design as a record, or one version rendered as Markdown with `format=md`. */
   get("/designs/{id}") { (id: String) =>
@@ -541,10 +576,8 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
 
   // ── search (US6) ─────────────────────────────────────────────────────────────
 
-  private def planOf(id: String): SearchPlan =
-    client.forEventSourcedEntity(EntityId(id)).call(SearchPlanEntity.get).invoke()
-  private def executionOf(id: String): SearchExecution =
-    client.forEventSourcedEntity(EntityId(id)).call(SearchExecutionEntity.get).invoke()
+  private def planOf(id: String)      = readers.planOf(id)
+  private def executionOf(id: String) = readers.executionOf(id)
 
   post("/questions/{id}/plan") { (id: String) =>
     client.forWorkflow(EntityId(id)).call(QuestionInvestigationWorkflow.replan).invoke()
@@ -694,17 +727,7 @@ final class ApiEndpoint(settings: Settings, client: ComponentClient, views: View
 
   // ── findings and claims (US3) ────────────────────────────────────────────────
 
-  private def recordView(id: String): RecordView =
-    val companion =
-      Records.companionFor(id).getOrElse(throw HttpProblem.notFound(s"not a record id: '$id'"))
-    val r = client.forEventSourcedEntity(EntityId(id)).call(companion.get).invoke()
-    if !r.registered then throw HttpProblem.notFound(s"no record '$id'")
-    val spans = r.spans.map { span =>
-      source(span.sourceId).call(SourceEntity.resolveSpan).invoke(span) match
-        case SpanResolution.Resolved(text) => SpanView(span, resolves = true, Some(text))
-        case SpanResolution.Unresolved(_)  => SpanView(span, resolves = false, None)
-    }
-    RecordView(r, spans)
+  private def recordView(id: String): RecordView = readers.record(id)
 
   get("/findings/{id}")((id: String) => recordView(id))
   get("/claims/{id}")((id: String) => recordView(id))

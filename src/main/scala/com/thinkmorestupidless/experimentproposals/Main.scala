@@ -10,6 +10,7 @@ import com.thinkmorestupidless.experimentproposals.adapters.{
 }
 import com.thinkmorestupidless.experimentproposals.api.{ApiEndpoint, HealthEndpoint, ReviewEndpoint}
 import com.thinkmorestupidless.experimentproposals.application.agents.{
+  AssistantAgent,
   DesignAgent,
   EvidenceAgent,
   RequestAgent,
@@ -126,7 +127,8 @@ object Main:
       RequestAgent.descriptor,
       SearchAgent.descriptor,
       EvidenceAgent.descriptor,
-      DesignAgent.descriptor
+      DesignAgent.descriptor,
+      AssistantAgent.descriptor
     ) ++ AgentRuntime.descriptors
 
   def endpoints(settings: Settings): Seq[EndpointClients => HttpEndpoint] =
@@ -167,6 +169,10 @@ object Main:
   val settings  = Settings.fromEnv(env).fold(problem => sys.error(problem), identity)
   val reviewers = Reviewers.load(env).fold(problem => sys.error(problem), identity)
   Main.configure(settings, reviewers, env)
+  Configured.assistantModel = ModelProviders.forAssistant(settings, env) match
+    case Right(provider)                  => Some(provider)
+    case Left(ModelProviders.NoAssistant) => None
+    case Left(problem)                    => sys.error(s"EDP_ASSISTANT_SCRIPT: $problem")
 
   val service = Ankka.service
     .registerAll(Main.descriptors)

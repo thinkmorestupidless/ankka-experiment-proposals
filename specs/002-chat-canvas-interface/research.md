@@ -460,6 +460,25 @@ browser suites in the sbt job (two toolchains in one job).
   sources ingests them, the empty-corpus scenario runs first, and its Given asserts the store is empty, so a
   reordering fails loudly rather than passing on a full store.
 
+- **R20.5, answered: the session's usage is readable as soon as the stream ends.** The turn route reads
+  `forSessionMemory(id).history` once the agent's `Source` completes and the total is there
+  (`ConversationBudgetSuite`: 80 in and 40 out read as 120). The trap was elsewhere: `concat` materializes
+  the source it appends at once, so a `Source.lazySource` of the turn's ending ran before the first
+  token and recorded an empty answer with no usage. The route uses `concatLazy`.
+- **R20.6, answered (service): `sseEventsBody` is the form.** The turn is a `POST` with a JSON body
+  answered with named events, so the route is `sseEventsBody`; each chunk is a `token` event whose data
+  is a JSON string, then `proposal` events, then `done`, or `error`.
+- **An agent has no view client.** `AgentContext` gives a component client only, so the assistant's read
+  tools build `Readers` from it and `Configured.views`, which the service sets once it has started. The
+  API's read routes and the tools share `Readers`, so an answer's ids and JSON are the cards'.
+- **Fields at their defaults are left out on the conversation's wire too.** An unresolved reference has
+  no `resolved`, and a proposal waiting for confirmation has no `status`; the interface reads an absent
+  field as its default.
+- **A named script wins over a key.** R12 lists the key first; `EDP_ASSISTANT_SCRIPT` is the more
+  deliberate setting, so when both are present the assistant answers from the script.
+- **Proposals are sent when the answer ends.** The `proposal` events go just before `done`, read from
+  the conversation's new proposals, rather than as the tool records each one. A failed turn sends none.
+
 ## Measurements
 
 | What | Result |

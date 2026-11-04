@@ -21,7 +21,11 @@ import com.thinkmorestupidless.experimentproposals.domain.request.*
 import com.thinkmorestupidless.experimentproposals.domain.search.{SearchExecution, SearchPlan}
 import com.thinkmorestupidless.experimentproposals.domain.design.*
 import com.thinkmorestupidless.experimentproposals.domain.sources.*
-import com.thinkmorestupidless.experimentproposals.domain.conversation.{Prefill, Reference}
+import com.thinkmorestupidless.experimentproposals.domain.conversation.{
+  Conversation,
+  Prefill,
+  Reference
+}
 import com.thinkmorestupidless.experimentproposals.domain.journey.{
   Journey,
   QuestionLane,
@@ -29,6 +33,20 @@ import com.thinkmorestupidless.experimentproposals.domain.journey.{
   StageRunRef
 }
 import com.thinkmorestupidless.ankka.core.Codecs
+
+/** The assistant's availability (contracts/http-api.md). */
+final case class AssistantStatus(available: Boolean, reason: Option[String], budget: Long)
+final case class OpenBody(subject: Option[String] = None)
+final case class QuestionBody(question: String)
+final case class ProposalEvent(n: Int, action: String, arguments: Map[String, String])
+final case class DoneEvent(
+    n: Int,
+    references: Vector[Reference],
+    prefill: Option[Prefill],
+    used: Long,
+    budget: Long
+)
+final case class ErrorEvent(reason: String)
 
 /** The API's request and response shapes beside the records themselves, with their codecs. */
 final case class IngestRequest(
@@ -197,6 +215,14 @@ object Json:
   given ingestedCodec: JsonValueCodec[Vector[IngestStarted]] = Codecs.make[Vector[IngestStarted]]
   given measurementRowsCodec: JsonValueCodec[Vector[MeasurementRow]] =
     Codecs.make[Vector[MeasurementRow]]
-  given JsonValueCodec[Journey]   = Codecs.make[Journey]
-  given JsonValueCodec[Reference] = Codecs.make[Reference]
-  given JsonValueCodec[Prefill]   = Codecs.make[Prefill]
+  given JsonValueCodec[Journey]            = Codecs.make[Journey]
+  given JsonValueCodec[Reference]          = Codecs.make[Reference]
+  given JsonValueCodec[Prefill]            = Codecs.make[Prefill]
+  given JsonValueCodec[Conversation]       = Codecs.make[Conversation]
+  given JsonValueCodec[AssistantStatus]    = Codecs.make[AssistantStatus]
+  given JsonValueCodec[OpenBody]           = Codecs.make[OpenBody]
+  given JsonValueCodec[QuestionBody]       = Codecs.make[QuestionBody]
+  given JsonValueCodec[ProposalEvent]      = Codecs.make[ProposalEvent]
+  given JsonValueCodec[DoneEvent]          = Codecs.make[DoneEvent]
+  given JsonValueCodec[ErrorEvent]         = Codecs.make[ErrorEvent]
+  given tokenCodec: JsonValueCodec[String] = Codecs.make[String]
