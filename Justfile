@@ -18,6 +18,26 @@ up:
 up-app:
     sbt schema Docker/publishLocal && docker compose --profile app up -d
 
+# The interface beside the service on :9000 (compose profile app, or sbt run); prints its address.
+web:
+    cd web && ankka local web --service ankka-experiment-proposals=http://127.0.0.1:9000 -- npm run dev
+
+# The interface's typecheck and its server and parser tests.
+web-test:
+    cd web && npm run typecheck && npm test
+
+# The interface's living features in the browser, against the service running beside it.
+web-features:
+    cd web && npm run features
+
+# The walkthrough by keyboard, every card against the API, and the accessibility checks.
+web-check:
+    cd web && npm run check
+
+# The interface's image.
+web-image:
+    cd web && npm run build && docker build -t experiment-proposals-web:latest .
+
 # Stops and removes everything the compose file started, with or without the app profile.
 down:
     docker compose --profile app down -v
@@ -48,15 +68,15 @@ faults:
 
 # The living features through HTTP, against the recorded model replies.
 features-replay:
-    EDP_TIER=replay sbt "testOnly {{pkg}}.features.FeatureSuite"
+    EDP_TIER=replay sbt "testOnly {{pkg}}.features.*"
 
 # The same features against the live model; writes evals/reports/drift.json.
 features-live:
-    EDP_TIER=live sbt "testOnly {{pkg}}.features.FeatureSuite"
+    EDP_TIER=live sbt "testOnly {{pkg}}.features.*"
 
 # The live tier, recording a cassette for every model call it makes.
 features-record:
-    EDP_TIER=live EDP_RECORD=1 sbt "testOnly {{pkg}}.features.FeatureSuite"
+    EDP_TIER=live EDP_RECORD=1 sbt "testOnly {{pkg}}.features.*"
 
 # The labelled evaluation run through the service (Docker); writes evals/reports/<timestamp>.json and .md.
 eval:

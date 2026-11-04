@@ -53,6 +53,9 @@ services:
       EDP_EMBEDDING_CACHE: /cache
       # The hash embedder needs no download; set BAAI/bge-small-en-v1.5 for real semantic retrieval.
       EDP_EMBEDDING_MODEL: ${EDP_EMBEDDING_MODEL:-hash}
+      # The assistant from a script when no key is set; the path is inside the evals/ mount.
+      EDP_ASSISTANT_SCRIPT: ${EDP_ASSISTANT_SCRIPT:-}
+      EDP_CONVERSATION_BUDGET: ${EDP_CONVERSATION_BUDGET:-200000}
     volumes:
       # Read-write so that EDP_RECORD=1 can write cassettes and evals/reports back into the checkout.
       - ./evals:/evals

@@ -5,6 +5,9 @@ Filled as implementation finds them (research.md R20); nothing here is a promise
 
 | Date | What | What would remove it |
 |---|---|---|
+| 2026-11-04 | `GherkinSuite` takes a directory or one file, so a directory of features run elsewhere (the interface's, in a browser) cannot be left out; the suite is split into one per area | an exclusion list, or running only scenarios with or without a tag |
+| 2026-11-04 | a workflow's state and lifecycle cannot be watched, so the journey stream re-reads them every two seconds beside its watch on the stage runs | a watch on a workflow's state, or a change source for workflows a view can project |
+| 2026-11-04 | a streamed reply does not say what it cost, so the conversation reads the session's total after the stream ends | the usage of the interaction on the stream's completion |
 
 ## A view client in a workflow step
 

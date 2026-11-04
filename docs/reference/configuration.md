@@ -29,6 +29,10 @@ required one is missing or malformed. No value is ever logged.
 | `EDP_INTERNAL_DIR` | the directory the `internal` adapter reads manifests from; ignored by git | `internal` |
 | `EDP_CONTACT_EMAIL` | the contact sent to Europe PMC, Crossref and NCBI | unset |
 | `EDP_NCBI_API_KEY` | raises PubMed's limit from three to ten requests a second | unset |
+| `EDP_VERIFICATION_BOUND` | how long the automatic assessment waits for the retrieved records' verification to settle, as `90s` or `3m`; past it the stage fails with `verification unsettled` | `3m` |
+| `EDP_CONVERSATION_BUDGET` | the tokens one conversation with the assistant may spend | `200000` |
+| `EDP_ASSISTANT_MODEL` | the assistant's model, used when `ANTHROPIC_API_KEY` is set, in either tier | the value of `EDP_MODEL` |
+| `EDP_ASSISTANT_SCRIPT` | a file of scripted answers the assistant gives when no key is set, for tests and demonstrations | unset |
 
 The database connection is provisioned by the platform when deployed, and set by `docker-compose.yml`
 locally.
