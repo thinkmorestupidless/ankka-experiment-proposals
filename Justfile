@@ -14,8 +14,17 @@ hooks:
 up:
     sbt schema && docker compose up -d
 
+# Postgres and the service, both in Docker, from a freshly built image (no cluster needed).
+up-app:
+    sbt schema Docker/publishLocal && docker compose --profile app up -d
+
+# Stops and removes everything the compose file started, with or without the app profile.
 down:
-    docker compose down -v
+    docker compose --profile app down -v
+
+# The service's log in Docker.
+logs-app:
+    docker compose --profile app logs -f app
 
 # The service on :9000.
 run:

@@ -4,6 +4,13 @@
 # The schema comes from target/ddl, which `sbt schema` fills from the ankka-runtime artifact —
 # run that first. Postgres applies an init directory only when its data volume is empty, so after
 # an ankka upgrade: `docker compose down -v`, `sbt schema`, `docker compose up -d`.
+#
+# The `app` profile adds the service itself, from the image `sbt Docker/publishLocal` builds, so the
+# whole thing runs in Docker with no cluster: `docker compose --profile app up -d`. The service runs
+# in the tier `.env` names (replay by default, so no model key is needed) and reads the cassettes,
+# the fixtures and the reviewer list from this checkout. What it cannot do in a container is appear in
+# `ankka local console`, which finds services through the loopback address they announce in
+# ~/.ankka/running; for the console, run the service with `sbt run` instead.
 services:
   postgres:
     image: postgres:17-alpine
@@ -22,5 +29,42 @@ services:
       timeout: 5s
       retries: 20
 
+  app:
+    profiles: [app]
+    image: ankka-experiment-proposals:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "9000:9000"
+    # The EDP_* settings and, for the live tier, ANTHROPIC_API_KEY. The file is optional so that
+    # `docker compose config` works on a fresh clone; the service refuses to start without a token.
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      ANKKA_DB_HOST: postgres
+      # The paths .env names are relative to the checkout; inside the container they are the mounts
+      # below, so these override whatever .env says.
+      EDP_CASSETTES: /evals/cassettes
+      EDP_FIXTURES_DIR: /evals/fixtures/papers
+      EDP_INTERNAL_DIR: /internal
+      EDP_REVIEWERS_FILE: /config/reviewers.json
+      EDP_EMBEDDING_CACHE: /cache
+      # The hash embedder needs no download; set BAAI/bge-small-en-v1.5 for real semantic retrieval.
+      EDP_EMBEDDING_MODEL: ${EDP_EMBEDDING_MODEL:-hash}
+    volumes:
+      # Read-write so that EDP_RECORD=1 can write cassettes and evals/reports back into the checkout.
+      - ./evals:/evals
+      - ./internal:/internal
+      - ./reviewers.json:/config/reviewers.json:ro
+      - edpcache:/cache
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9000/healthz > /dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
 volumes:
   pgdata:
+  edpcache:

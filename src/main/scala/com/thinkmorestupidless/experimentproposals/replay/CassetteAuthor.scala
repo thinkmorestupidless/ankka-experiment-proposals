@@ -6,13 +6,18 @@ import com.thinkmorestupidless.experimentproposals.domain.sources.SourceSpan
 import java.nio.file.{Files, Path}
 
 /**
- * Writes an authored cassette: `cassetteAuthor <stage@vN> <case marker> <reply file> [author]`.
- * When the case marker names a fixture (`src:file:<name>...`), every `"quotation": "…"` in the
- * reply is checked against the parsed fixture's sections first, whitespace-tolerant; a quotation
- * that is in no section stops the write and names it. Cassettes authored this way say so.
+ * Writes an authored cassette: `runMain ...replay.CassetteAuthor <stage@vN> <case marker> <reply
+ * file> [author]`. When the case marker names a fixture (`src:file:<name>...`), every
+ * `"quotation": "…"` in the reply is checked against the parsed fixture's sections first,
+ * whitespace-tolerant; a quotation that is in no section stops the write and names it. Cassettes
+ * authored this way say so.
+ *
+ * The entry point is a `main` on the object, not a `@main def`: a top-level `cassetteAuthor` and
+ * this object compile to classes that differ only in case, which overwrite each other on a
+ * case-insensitive filesystem and broke `sbt Docker/publishLocal` on macOS (2026-11-04).
  */
-@main def cassetteAuthor(args: String*): Unit =
-  args.toList match
+object CassetteAuthor:
+  def main(args: Array[String]): Unit = args.toList match
     case promptVersion :: caseMarker :: replyFile :: rest =>
       val reply    = Files.readString(Path.of(replyFile))
       val author   = rest.headOption.getOrElse(sys.env.getOrElse("USER", "unknown"))
@@ -35,10 +40,9 @@ import java.nio.file.{Files, Path}
       )
       println(s"wrote $file ($checked quotation(s) checked)")
     case _ =>
-      System.err.println("usage: cassetteAuthor <stage@vN> <case marker> <reply file> [author]")
+      System.err.println("usage: CassetteAuthor <stage@vN> <case marker> <reply file> [author]")
       sys.exit(2)
 
-object CassetteAuthor:
   private val Quotation = """"quotation"\s*:\s*"((?:[^"\\]|\\.)*)"""".r
   private val Fixture   = """^src:file:([A-Za-z0-9._-]+?)(?::v\d+)?(?::.*)?$""".r
 
