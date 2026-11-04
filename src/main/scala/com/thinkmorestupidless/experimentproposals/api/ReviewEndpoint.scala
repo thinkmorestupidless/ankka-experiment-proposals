@@ -4,7 +4,8 @@ import com.thinkmorestupidless.experimentproposals.api.pages.{
   CandidatesPage,
   DesignPage,
   Pages,
-  QueuePage
+  QueuePage,
+  RequestsPage
 }
 import com.thinkmorestupidless.experimentproposals.application.{Approvals, Decisions}
 import com.thinkmorestupidless.experimentproposals.domain.design.{DesignState, Rendering}
@@ -17,7 +18,11 @@ import com.thinkmorestupidless.experimentproposals.application.entities.{
   RequestEntity,
   SourceEntity
 }
-import com.thinkmorestupidless.experimentproposals.application.views.{ClaimRows, FindingRows}
+import com.thinkmorestupidless.experimentproposals.application.views.{
+  ClaimRows,
+  FindingRows,
+  RequestRows
+}
 import com.thinkmorestupidless.experimentproposals.domain.evidence.ReviewRecord
 import com.thinkmorestupidless.experimentproposals.domain.sources.SpanResolution
 import com.thinkmorestupidless.ankka.runtime.ViewClient
@@ -57,10 +62,7 @@ final class ReviewEndpoint(settings: Settings, client: ComponentClient, views: V
   }
 
   get("/requests") { () =>
-    Pages.layout(
-      "Requests",
-      "<p>Open a request's facets at <code>/review/requests/{id}/facets</code>.</p>"
-    )
+    RequestsPage.render(views.forView(RequestRows).ask(RequestRows.newestFirst))
   }
 
   get("/requests/{id}/facets") { (id: String) =>

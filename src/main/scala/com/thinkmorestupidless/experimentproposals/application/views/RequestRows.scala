@@ -13,14 +13,17 @@ final case class RequestRow(
     status: String,
     facets: Int,
     questions: Int,
-    roundTripPassed: Option[Boolean]
+    roundTripPassed: Option[Boolean],
+    text: String = "",
+    submittedBy: String = ""
 )
 
 final class RequestRowsView extends View[RequestEvent, RequestRow]:
   def onChange(event: RequestEvent): Effect =
     val current = rowState.getOrElse(RequestRow(updateContext.subject, "", "submitted", 0, 0, None))
     event match
-      case Submitted(_, _, at, _) => effects.updateRow(current.copy(submittedAt = at.toString))
+      case Submitted(text, by, at, _) =>
+        effects.updateRow(current.copy(submittedAt = at.toString, text = text, submittedBy = by))
       case FacetSetProposed(fs, _) =>
         effects.updateRow(current.copy(facets = fs.size, status = "facets_proposed"))
       case RoundTripChecked(r) => effects.updateRow(current.copy(roundTripPassed = Some(r.passed)))
@@ -35,8 +38,15 @@ object RequestRows
       source = ChangeSource.eventsOf(RequestEntity),
       rowSerializer = Codecs.serializer[RequestRow]("request-row")
     ):
+  // Version 2 added the text and the submitter to the row (2026-11-04); rows written before are rebuilt.
+  override def version = Some(2)
   val byStatus = query("by-status")(
     s"SELECT payload FROM $table WHERE payload::jsonb->>'status' = :status ORDER BY row_key"
+  )
+
+  /** Every request, newest first: the way in for anyone who does not already hold an id. */
+  val newestFirst = query("newest-first")(
+    s"SELECT payload FROM $table ORDER BY payload::jsonb->>'submittedAt' DESC, row_key"
   )
   def create(ctx: ViewComponentContext) = new RequestRowsView
 

@@ -43,6 +43,7 @@ seconds, so nothing waits for a model inside a request.
 ## Requests and facets
 | Method | Path | Body | Returns |
 |---|---|---|---|
+| GET | `/requests` | | every request, newest first: `[{id, text, submittedBy, submittedAt, status, facets, questions, roundTripPassed}]`, from the `request-rows` view |
 | POST | `/requests` | `{text, submittedBy}` | `{id, version}` 201; starts the `investigation` workflow (id = request id) |
 | GET | `/requests/{id}` | | the request, its facets (from the entities), the latest round-trip check, the workflow status |
 | GET | `/requests/{id}/facets` | | facets, each with its history |
@@ -120,7 +121,8 @@ Named mutations (glossary: fault): `endpoint_swap`, `negation_flip`, `species_dr
 
 | Path | Shows | Posts to |
 |---|---|---|
-| `GET /review/session?token=` | sets the cookie and redirects to the queue | |
+| `GET /review/session?token=` | sets the cookie and redirects to the requests page | |
+| `GET /review/requests` | every request, newest first, with where it stands and links to its facets, candidates and design pages | `GET /requests` |
 | `GET /review/requests/{id}/facets` | each facet with origin, importance, status, history; confirm, amend, reject, leave unresolved; the round-trip check's issues | the facet review routes above |
 | `GET /review/queue` | records in `requires_review`, each beside its resolved source passage and verification checks | the finding, claim and assessment review routes |
 | `GET /review/requests/{id}/candidates` | the candidates side by side on the eight criteria, each with its evidence and unknowns; select one with reasons for the rest | `/requests/{id}/decide` |
