@@ -1,11 +1,15 @@
 // One labelled value in a card's facts. A list is written one item a line; nothing is "none".
-import type { ReactNode } from "react";
+import { isValidElement, type ReactNode } from "react";
+import { tag } from "../backend/types.ts";
 
 export function Facts({ children }: { children: ReactNode }) {
   return <dl className="ac-facts">{children}</dl>;
 }
 
-export function Field({ label, children }: { label: string; children: ReactNode }) {
+export function Field({ label, children: given }: { label: string; children: ReactNode }) {
+  // An enumeration the service sent as `{"type": ...}` is written as its value.
+  const children =
+    given && typeof given === "object" && !Array.isArray(given) && !isValidElement(given) && "type" in (given as object) ? tag(given) : given;
   const empty = children === null || children === undefined || children === "" || (Array.isArray(children) && children.length === 0);
   return (
     <div>

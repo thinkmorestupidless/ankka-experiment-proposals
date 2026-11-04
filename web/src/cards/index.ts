@@ -1,29 +1,45 @@
 // Each kind of record and the component that draws its card, and how its record is fetched.
-// Kinds whose own card comes with a later story draw the generic card, which shows every field.
+// A kind without a card of its own draws the generic card, which shows every field.
 import type { ComponentType } from "react";
 import type { CardKind } from "../backend/types.ts";
 import * as api from "../backend/records.ts";
 import { GenericCard, type CardProps } from "./GenericCard.tsx";
+import { RequestCard } from "./RequestCard.tsx";
+import { FacetsCard } from "./FacetsCard.tsx";
+import { QuestionCard } from "./QuestionCard.tsx";
+import { SearchPlanCard } from "./SearchPlanCard.tsx";
+import { SearchExecutionCard } from "./SearchExecutionCard.tsx";
+import { SourceCard } from "./SourceCard.tsx";
+import { RecordCard } from "./RecordCard.tsx";
+import { AssessmentCard } from "./AssessmentCard.tsx";
+import { SufficiencyCard } from "./SufficiencyCard.tsx";
+import { PackageCard } from "./PackageCard.tsx";
+import { CandidatesCard } from "./CandidatesCard.tsx";
+import { DecisionCard } from "./DecisionCard.tsx";
+import { DesignCard } from "./DesignCard.tsx";
+import { ImpactCard, type RequestImpact } from "./ImpactCard.tsx";
+import { StageRunCard } from "./StageRunCard.tsx";
+import { tag } from "../backend/types.ts";
 
 export type { CardProps };
 
 export const cards: Record<CardKind, ComponentType<CardProps>> = {
-  request: GenericCard,
-  facets: GenericCard,
-  question: GenericCard,
-  "search-plan": GenericCard,
-  "search-execution": GenericCard,
-  source: GenericCard,
-  finding: GenericCard,
-  claim: GenericCard,
-  assessment: GenericCard,
-  sufficiency: GenericCard,
-  package: GenericCard,
-  candidates: GenericCard,
-  decision: GenericCard,
-  design: GenericCard,
-  impact: GenericCard,
-  "stage-run": GenericCard,
+  request: RequestCard,
+  facets: FacetsCard,
+  question: QuestionCard,
+  "search-plan": SearchPlanCard,
+  "search-execution": SearchExecutionCard,
+  source: SourceCard,
+  finding: RecordCard,
+  claim: RecordCard,
+  assessment: AssessmentCard,
+  sufficiency: SufficiencyCard,
+  package: PackageCard,
+  candidates: CandidatesCard,
+  decision: DecisionCard,
+  design: DesignCard,
+  impact: ImpactCard,
+  "stage-run": StageRunCard,
 };
 
 export function cardFor(kind: string): ComponentType<CardProps> {
@@ -74,14 +90,36 @@ export async function fetchRecord(kind: string, id: string): Promise<unknown> {
     }
     case "design":
       return api.getDesign(id);
-    case "impact": {
-      // The request's impact: the flags on its design, each naming the changed source and version.
-      const design = await api.getDesign(`${id}:design`);
-      return { requestId: id, flags: design.flags ?? [] };
-    }
+    case "impact":
+      return requestImpact(id);
     case "stage-run":
       return api.getRun(id);
     default:
       throw new Error(`no card for the kind '${kind}'`);
   }
+}
+
+/** Whether a dependent of a change belongs to the request: its own records, or the evidence it used. */
+const ofRequest = (requestId: string, dependentId: string, kind: string) =>
+  dependentId === requestId || dependentId.startsWith(`${requestId}:`) || kind === "finding" || kind === "claim";
+
+/**
+ * The request's impact: the flags on its design, and for each source change they name, every
+ * dependent of that change (`GET /impact`) that is the request's own or the evidence it rests on.
+ */
+export async function requestImpact(requestId: string): Promise<RequestImpact> {
+  let flags: RequestImpact["flags"] = [];
+  try {
+    flags = (await api.getDesign(`${requestId}:design`)).flags ?? [];
+  } catch {
+    // no design yet: nothing of the request is flagged through it
+  }
+  const refs = [...new Set(flags.map((f) => `${tag(f.changedRef.kind)}:${f.changedRef.id}:v${f.changedRef.version}`))];
+  const changes = await Promise.all(
+    refs.map(async (ref) => {
+      const view = await api.getImpact(ref);
+      return { ref, dependents: view.dependents.filter((d) => ofRequest(requestId, d.id, d.kind)) };
+    }),
+  );
+  return { requestId, flags, changes };
 }

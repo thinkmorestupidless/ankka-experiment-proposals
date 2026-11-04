@@ -5,6 +5,12 @@ import { expect, type APIRequestContext, type Page } from "@playwright/test";
 import { createBdd, test as base } from "playwright-bdd";
 
 export const token = process.env.EDP_API_TOKEN ?? "";
+
+/** The service writes an enumeration as `{"type": "<value>"}`; this reads either form. */
+export function tagOf(v: unknown): string {
+  if (v && typeof v === "object" && "type" in (v as Record<string, unknown>)) return String((v as { type: unknown }).type);
+  return v === undefined || v === null ? "" : String(v);
+}
 const api = "/backend/api/v1";
 
 export interface Problem {
@@ -76,10 +82,11 @@ export class World {
   async ingest(...files: string[]): Promise<string[]> {
     const ids: string[] = [];
     for (const file of files) {
+      // The retracted fixture is ingested without extraction, as the walkthrough does.
       const started = await this.post<{ workflowId: string; sourceId?: string }>("/sources:ingest", {
         adapter: "file",
         identifier: file,
-        extract: true,
+        extract: file !== "retracted.xml",
       });
       const ended = await this.eventually(`ingestion of ${file}`, async () => {
         const w = await this.get<{ isTerminal: boolean; sourceId?: string }>(`/workflows/ingestion/${encodeURIComponent(started.workflowId)}`);
@@ -103,8 +110,8 @@ export class World {
   /** Confirms each mandatory facet, then the facets, as `reviewer`. */
   async confirmFacets(requestId: string, reviewer = "demo-reviewer"): Promise<void> {
     await this.stageState(requestId, "facet-review", "paused");
-    const facets = await this.get<{ id: string; importance?: string; status?: string }[]>(`/requests/${encodeURIComponent(requestId)}/facets`);
-    for (const f of facets.filter((f) => (f.importance ?? "preferred") === "mandatory" && f.status !== "confirmed")) {
+    const facets = await this.get<{ id: string; importance?: unknown; status?: unknown }[]>(`/requests/${encodeURIComponent(requestId)}/facets`);
+    for (const f of facets.filter((f) => tagOf(f.importance) === "mandatory" && tagOf(f.status) !== "confirmed")) {
       await this.post(`/facets/${encodeURIComponent(f.id)}/review`, { action: "confirm", reviewer, rationale: "confirmed for the walkthrough" });
     }
     await this.post(`/requests/${encodeURIComponent(requestId)}/facets:confirmed`, { reviewer });
@@ -141,4 +148,4 @@ export const test = base.extend<{ world: World }>({
   },
 });
 
-export const { Given, When, Then } = createBdd(test);
+export const { Given, When, Then, Before, After } = createBdd(test);

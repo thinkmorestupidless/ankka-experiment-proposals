@@ -134,6 +134,198 @@ body {
   align-self: flex-end;
 }
 
+/* The inspector is wider than the console's, since a card carries tables and passages. */
+.edp-shell {
+  --ac-size-inspector: clamp(300px, 36vw, 560px);
+}
+
+/* The canvas: the spine in a row, a question's lane below; each row scrolls sideways when narrow. */
+.edp-canvas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  min-width: 0;
+}
+/* The page's column never grows past its track: a long lane scrolls inside it, not under the inspector. */
+.ac-page > .ac-body {
+  min-width: 0;
+}
+.edp-request-page {
+  overflow-x: hidden;
+}
+.edp-lane-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 30px 4px 12px;
+}
+.edp-lane {
+  display: flex;
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: max-content;
+}
+.edp-node-item {
+  display: flex;
+  align-items: center;
+}
+.edp-node {
+  width: 176px;
+  min-height: 112px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.edp-node:focus-visible {
+  outline: 2px solid var(--ac-color-amber);
+  outline-offset: 3px;
+}
+.edp-node[data-state="unreached"] {
+  opacity: 0.72;
+}
+.edp-node-defect {
+  grid-column: 1 / 3;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: var(--ac-color-red);
+  overflow-wrap: anywhere;
+}
+.edp-waits {
+  color: var(--ac-color-amber);
+  font-size: 0.75rem;
+}
+.edp-edge {
+  width: 32px;
+  flex: none;
+}
+.edp-edge:not(.edp-edge-reached) {
+  opacity: 0.4;
+}
+.edp-lane-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.edp-question-select {
+  max-width: 100%;
+}
+
+/* The inspector's stage, and the parts of cards. */
+.edp-stage {
+  display: grid;
+  gap: 12px;
+}
+.edp-stage-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.edp-stage-head h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+.edp-defect,
+.edp-refusal {
+  color: var(--ac-color-red);
+  background: var(--ac-color-red-wash);
+  border-radius: var(--ac-radius-control);
+  padding: 8px 10px;
+  margin: 0;
+}
+.edp-proposal {
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: var(--ac-radius-control);
+  background: var(--ac-color-inset);
+  color: var(--ac-color-amber);
+  font-weight: 500;
+}
+.edp-approved,
+.edp-recorded {
+  margin: 0;
+  color: var(--ac-color-green);
+}
+.edp-request-text {
+  margin: 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--ac-color-amber);
+  background: var(--ac-color-inset);
+  white-space: pre-wrap;
+}
+.edp-facets,
+.edp-queue,
+.edp-executions {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+.edp-facet {
+  border-top: 1px solid var(--ac-color-tile-line);
+  padding-top: 10px;
+  display: grid;
+  gap: 6px;
+}
+.edp-facet h4,
+.edp-card h4,
+.edp-card h5 {
+  margin: 6px 0 2px;
+}
+.edp-table-scroll {
+  overflow-x: auto;
+}
+.edp-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.8125rem;
+}
+.edp-table th,
+.edp-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--ac-color-tile-line);
+}
+.edp-compare td,
+.edp-compare th[scope="col"] {
+  min-width: 12rem;
+}
+.edp-rationale {
+  color: var(--ac-color-ink-2);
+}
+.edp-decision fieldset {
+  border: 1px solid var(--ac-color-tile-line);
+  border-radius: var(--ac-radius-control);
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  margin: 0;
+}
+.edp-decision legend {
+  font-weight: 500;
+  padding: 0 4px;
+}
+.edp-choices {
+  border: 0 !important;
+  padding: 0 !important;
+}
+.edp-choice {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.edp-decision textarea,
+.edp-decision input:not([type="radio"]),
+.edp-decision select,
+.edp-reviewer select {
+  width: 100%;
+}
+
 /* Below 720 px: the rail is a bar along the bottom, the inspector a sheet over the page. */
 @media (max-width: 720px) {
   .edp-shell {
@@ -156,6 +348,9 @@ body {
   }
   .edp-rail .ac-rail-foot {
     margin: 0;
+  }
+  .edp-node {
+    width: 150px;
   }
   .edp-shell .ac-inspector {
     position: fixed;

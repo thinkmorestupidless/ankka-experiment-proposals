@@ -11,6 +11,7 @@ import { Rail, type Area } from "./Rail.tsx";
 import { SlotsProvider, useSlots, type Crumb } from "./slots.tsx";
 import { forgetToken } from "../token/token.ts";
 import { Admission } from "../token/Admission.tsx";
+import { ReviewerProvider } from "../decisions/Reviewer.tsx";
 
 /** The area a path belongs to and the crumbs it names, before the page adds its own. */
 export function crumbsFor(pathname: string): { area: Area["area"]; crumbs: Crumb[] } {
@@ -53,7 +54,9 @@ export function Shell() {
       <Backdrop />
       <Admission>
         <SlotsProvider>
-          <Frame />
+          <ReviewerProvider>
+            <Frame />
+          </ReviewerProvider>
         </SlotsProvider>
       </Admission>
     </ConsoleShell>

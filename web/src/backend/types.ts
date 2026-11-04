@@ -804,3 +804,13 @@ export interface TurnDone {
   used: number;
   budget: number;
 }
+
+/**
+ * The service writes each enumeration as `{"type": "<value>"}` (a status, an origin, an action, a
+ * decision); the fields above are typed by their value. `tag` reads either form as the value.
+ */
+export function tag(v: unknown): string {
+  if (v === null || v === undefined) return "";
+  if (typeof v === "object" && "type" in (v as Record<string, unknown>)) return String((v as { type: unknown }).type);
+  return String(v);
+}

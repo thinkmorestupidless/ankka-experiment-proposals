@@ -483,6 +483,34 @@ browser suites in the sbt job (two toolchains in one job).
   it cannot start a fresh one; the free-standing conversation can. Recorded in the limitations.
 - **Proposals are sent when the answer ends.** The `proposal` events go just before `done`, read from
   the conversation's new proposals, rather than as the tool records each one. A failed turn sends none.
+- **Every enumeration is an object on the wire.** A status, an origin, an importance, an action, a
+  decision or an escalation arrives as `{"type": "<value>"}`, not as a string; the interface's types
+  name the values and `tag()` reads either form. The review queue's rows are the exception: their
+  `status` is a plain string.
+- **`GET /designs/{id}` answers JSON as `text/plain`.** The route can also render Markdown, so its
+  content type is text in both cases; the interface's client parses a text answer that begins with `{`
+  or `[` as JSON.
+- **A stage that fails after its retries is `paused`, not `failed`.** The journey keeps the investigation
+  waiting at it, and its runs carry the failures; the canvas draws such a node failed, with the last
+  run's classified defect, and says the investigation waits there. In the replay tier a request no
+  cassette answers fails its facets stage this way within a second.
+- **No stage stays running in the replay tier.** Every model call answers at once, so the browser suite
+  shows "a running stage says so" on a failed stage presented as its next attempt (the journey the page
+  reads is rewritten in the test; every record it fetches is the service's). A hold on a model call,
+  like the integration suites', would let the scenario read a real running stage.
+- **The review queue lags a review.** It is a view; right after a review it still lists the record. The
+  queue page reads each record and leaves out those no longer awaiting review, so a reviewed record
+  leaves at once.
+- **Only claims can be authored by a reviewer.** `POST /claims` exists and `POST /findings` does not, so
+  the browser scenario "a finding in the review queue" queues a reviewer's unsupported claim. A
+  proposition with no cassette still settles `requires_review`, so each run names its own.
+- **The facets refusal names facets by name.** `facets:confirmed` refuses with "mandatory facets still
+  proposed: product, production approach; …", listing names, not ids.
+- **A retraction's cost grows with the database.** Every request that used Paper B adds some thirty
+  dependents. With about thirty requests in the browser suites' database `GET /impact` takes 10 to 18
+  seconds over 390 dependents, and flagging them all after a retraction took minutes. The impact card
+  shows the stage at once and its card when the route answers; the impact scenario waits up to five
+  minutes for its own request's dependents.
 
 ## Measurements
 

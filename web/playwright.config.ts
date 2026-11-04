@@ -7,6 +7,7 @@ import { defineBddProject } from "playwright-bdd";
 
 const service = process.env.EDP_SERVICE_URL ?? "http://127.0.0.1:9000";
 const baseURL = process.env.EDP_WEB_URL ?? "http://127.0.0.1:3000";
+const port = new URL(baseURL).port || "3000";
 
 const bdd = {
   features: "../features/interface/*.feature",
@@ -37,7 +38,7 @@ export default defineConfig({
     { name: "accessibility", testDir: "test/specs", testMatch: "accessibility.spec.ts" },
   ],
   webServer: {
-    command: `ankka local web --service ankka-experiment-proposals=${service} -- npm run dev`,
+    command: `ankka local web --port ${port} --service ankka-experiment-proposals=${service} -- npm run dev`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,

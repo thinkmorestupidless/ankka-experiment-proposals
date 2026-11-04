@@ -48,7 +48,18 @@ export async function backend<T>(path: string, init?: RequestInit): Promise<T> {
   if (!response.ok) throw await refusal(response);
   const type = response.headers.get("Content-Type") ?? "";
   if (response.status === 204) return undefined as T;
-  return (type.includes("json") ? await response.json() : await response.text()) as T;
+  if (type.includes("json")) return (await response.json()) as T;
+  // Some routes that can also render Markdown (`/designs/{id}`) send their JSON as text/plain.
+  const text = await response.text();
+  const t = text.trimStart();
+  if (t.startsWith("{") || t.startsWith("[")) {
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      // not JSON after all: the text is the answer
+    }
+  }
+  return text as T;
 }
 
 export const post = <T>(path: string, body: unknown = {}): Promise<T> =>
