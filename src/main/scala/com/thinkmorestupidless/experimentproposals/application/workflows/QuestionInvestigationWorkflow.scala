@@ -51,7 +51,13 @@ final case class QuestionInvestigationState(
     supplementalFor: Option[String] = None,
     resolvedChunkIds: Vector[String] = Vector.empty,
     coverageGapIds: Vector[String] = Vector.empty,
-    retrieved: Boolean = false
+    retrieved: Boolean = false,
+    // The automation (feature 002, data-model.md): the retrieved records found settled or not, the
+    // decisions still to judge, and whether the investigation has been told this question is done.
+    settled: Vector[String] = Vector.empty,
+    unsettled: Vector[String] = Vector.empty,
+    decisionsPending: Vector[String] = Vector.empty,
+    reportedToInvestigation: Boolean = false
 ):
   def started: Boolean = status != "not-started"
 
