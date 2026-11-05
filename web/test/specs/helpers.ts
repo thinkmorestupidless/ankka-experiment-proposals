@@ -52,6 +52,12 @@ export async function ingest(r: APIRequestContext, ...files: string[]): Promise<
       const rows = await get<{ status: string }[]>(r, `/sources/${q(id)}/records`);
       return rows.every((x) => x.status !== "proposed") ? rows : undefined;
     });
+    // A retracted source has no records to wait for; the search sees it once its status is listed.
+    if (file.startsWith("retracted")) {
+      await eventually(`${file} listed as retracted`, async () =>
+        (await get<{ id: string }[]>(r, "/sources?status=retracted")).some((s) => s.id === id),
+      );
+    }
   }
 }
 

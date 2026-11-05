@@ -1,7 +1,7 @@
-// The rail: the four areas with line icons, the current one marked, and "forget the token" at the
-// foot. Below 720 px it is a bar along the bottom of the screen.
+// The rail: the mark and the name, the areas in two groups with their line icons, the current
+// one marked, and "forget the token" at the foot. Below 720 px it is a bar along the bottom.
 import { NavLink } from "react-router";
-import { Inbox, KeyRound, Library, MessagesSquare, Workflow } from "lucide-react";
+import { FlaskConical, Inbox, KeyRound, Library, MessagesSquare, Workflow } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 
 export interface Area {
@@ -9,42 +9,53 @@ export interface Area {
   label: string;
   to: string;
   icon: ComponentType<SVGProps<SVGSVGElement>>;
+  group: string;
 }
 
 export const areas: Area[] = [
-  { area: "requests", label: "Requests", to: "/", icon: Workflow },
-  { area: "queue", label: "Review queue", to: "/queue", icon: Inbox },
-  { area: "sources", label: "Sources", to: "/sources", icon: Library },
-  { area: "conversation", label: "Conversation", to: "/chat", icon: MessagesSquare },
+  { area: "requests", label: "Requests", to: "/", icon: Workflow, group: "Investigate" },
+  { area: "queue", label: "Review queue", to: "/queue", icon: Inbox, group: "Investigate" },
+  { area: "sources", label: "Sources", to: "/sources", icon: Library, group: "Investigate" },
+  { area: "conversation", label: "Conversation", to: "/chat", icon: MessagesSquare, group: "Assistant" },
 ];
+
+const groups = [...new Set(areas.map((a) => a.group))];
 
 export function Rail({ current, onForget }: { current: Area["area"]; onForget: () => void }) {
   return (
-    <nav className="ac-rail edp-rail" aria-label="Areas">
-      <NavLink to="/" className="ac-mark" aria-label="Experiment proposals" title="Experiment proposals">
-        <span className="ac-mark-image" aria-hidden="true" />
+    <nav className="ui-rail" aria-label="Areas">
+      <NavLink to="/" className="ui-mark">
+        <span className="ui-mark-image" aria-hidden="true">
+          <FlaskConical />
+        </span>
+        <span className="ui-wordmark">Experiment proposals</span>
       </NavLink>
-      <ul className="ac-rail-areas">
-        {areas.map((a) => {
-          const Icon = a.icon;
-          return (
-            <li key={a.area} data-area={a.area}>
-              <NavLink
-                to={a.to}
-                className="ac-rail-item"
-                aria-label={a.label}
-                title={a.label}
-                aria-current={current === a.area ? "page" : undefined}
-              >
-                <Icon aria-hidden="true" />
-              </NavLink>
-            </li>
-          );
-        })}
-      </ul>
-      <div className="ac-rail-foot">
-        <button type="button" className="ac-rail-item" aria-label="Forget the token" title="Forget the token" onClick={onForget}>
+      {groups.map((g) => (
+        <div key={g} className="ui-rail-group">
+          <p className="ui-rail-label" aria-hidden="true">
+            {g}
+          </p>
+          <ul className="ui-rail-areas">
+            {areas
+              .filter((a) => a.group === g)
+              .map((a) => {
+                const Icon = a.icon;
+                return (
+                  <li key={a.area} data-area={a.area}>
+                    <NavLink to={a.to} className="ui-rail-item" aria-current={current === a.area ? "page" : undefined}>
+                      <Icon aria-hidden="true" />
+                      <span>{a.label}</span>
+                    </NavLink>
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
+      ))}
+      <div className="ui-rail-foot">
+        <button type="button" className="ui-rail-item" onClick={onForget}>
           <KeyRound aria-hidden="true" />
+          <span>Forget the token</span>
         </button>
       </div>
     </nav>

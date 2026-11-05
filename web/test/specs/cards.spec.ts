@@ -132,7 +132,7 @@ test.describe("SC-003: a card is the stored record", () => {
       if (n.question) await page.getByLabel("Scientific question", { exact: true }).selectOption(n.question);
       const lanes = n.question ? `.edp-lane[data-lane="${n.question}"]` : '.edp-lane[data-lane="spine"]';
       await page.locator(`${lanes} button[data-stage="${n.stage}"]`).click();
-      const stage = page.locator(`.ac-inspector .edp-stage[data-stage="${n.stage}"]`);
+      const stage = page.locator(`.ui-inspector .edp-stage[data-stage="${n.stage}"]`);
       await expect(stage).toBeVisible({ timeout: 30_000 });
       await expect(stage.locator("section.edp-card").first()).toBeVisible({ timeout: 30_000 });
       const cards = await stage.locator("section.edp-card").evaluateAll((all) => all.map((c) => [c.getAttribute("data-kind") ?? "", c.getAttribute("data-id") ?? ""]));

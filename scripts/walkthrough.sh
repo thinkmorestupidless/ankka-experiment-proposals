@@ -89,6 +89,9 @@ api -X POST "$API/sources:ingest" -d '{"adapter":"file","identifier":"paper-a.xm
 wait_for "a copy of Paper A for the fault" "$API/sources/src:file:paper-a@endpoint_swap/records" '"status":"verified"' 180
 api -X POST "$API/faults:inject" -d '{"target":{"kind":"finding","id":"src:file:paper-a@endpoint_swap:v1:fd1"},"mutation":"endpoint_swap"}' > /dev/null
 wait_for "the endpoint fault is caught (SC-005)" "$API/findings/src:file:paper-a@endpoint_swap:v1:fd1" "endpoint_mismatch" 120
+# The copy has served its purpose; superseded, it stays out of every later request's search, whose
+# recorded assessments do not include it.
+api -X POST "$API/sources/src:file:paper-a@endpoint_swap/status" -d "{\"status\":\"superseded\",\"reason\":\"the fault demonstration is done\",\"by\":\"$REVIEWER\"}" > /dev/null
 api -X POST "$API/sources/src:file:paper-b/status" -d "{\"status\":\"retracted\",\"reason\":\"walkthrough\",\"by\":\"$REVIEWER\"}" > /dev/null
 wait_for "every dependent of Paper B is flagged (SC-009)" "$API/impact?ref=source:src:file:paper-b:v1" '"allFlagged":true' 120
 echo "11. The approved version is unchanged and the flag names the source version"

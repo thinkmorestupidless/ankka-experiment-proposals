@@ -47,22 +47,22 @@ export function Admission({ children }: { children: ReactNode }) {
   };
 
   return (
-    <main className="ac-body edp-admission" id="main">
-      <section className="ac-card" aria-labelledby="admission-title">
+    <main className="ui-body edp-admission" id="main">
+      <section className="ui-card" aria-labelledby="admission-title">
         <h1 id="admission-title">Experiment proposals</h1>
-        <p className="ac-lede">Enter the shared token to see the requests and their records.</p>
+        <p className="ui-lede">Enter the shared token to see the requests and their records.</p>
         {refused ? (
-          <p className="ac-refusal" role="alert">
+          <p className="ui-refusal" role="alert">
             The token was refused.
           </p>
         ) : null}
         {problem ? (
-          <p className="ac-refusal" role="alert">
+          <p className="ui-refusal" role="alert">
             The service could not be reached: {problem}
           </p>
         ) : null}
-        <form className="ac-form" onSubmit={submit}>
-          <div className="ac-field">
+        <form className="ui-form" onSubmit={submit}>
+          <div className="ui-field">
             <label htmlFor="token">Shared token</label>
             <input
               id="token"
@@ -74,8 +74,8 @@ export function Admission({ children }: { children: ReactNode }) {
               aria-invalid={refused ? "true" : undefined}
             />
           </div>
-          <div className="ac-actions">
-            <button type="submit" className="ac-button ac-button-primary" disabled={standing === "checking"}>
+          <div className="ui-actions">
+            <button type="submit" className="ui-button ui-button-primary" disabled={standing === "checking"}>
               {standing === "checking" ? "Checking" : "Enter"}
             </button>
           </div>

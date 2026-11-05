@@ -1,8 +1,8 @@
 # Contract: the interface
 
 `web/` is a web-hosted service. This page is what it promises: its descriptor, its layout, its
-cards, its decisions, its admission and its accessibility. The look is the console package's and
-is not restated here; see ankka's `specs/035-console-treatment/spec.md` for the tokens.
+cards, its decisions, its admission and its accessibility. The look is the interface's own; its
+tokens are at the top of `web/src/app.css`.
 
 ## Descriptor
 
@@ -32,19 +32,19 @@ The first screen asks for the shared token. It is kept in `localStorage` as `edp
 
 ## Layout
 
-The console's grid: the bar across the top, the rail at the left, the page, the inspector at the
-right; the backdrop behind everything.
+The rail at the left; to its right the bar across the top, the page, and the inspector at the
+right of the page.
 
 | Part | Holds |
 |---|---|
-| bar | the wordmark and name; a centred breadcrumb (area › request › stage); the page's primary action at the right (submit a request; confirm the facets; decide; approve) |
-| rail | four areas with line icons: requests, review queue, sources, conversation; the current one marked; "forget the token" at the foot |
+| bar | a step back and the breadcrumb (area / request / stage) at the start; the request's own words and its status in the middle; the page's actions at the right (discuss this request; submit a request; confirm the facets; decide; approve) |
+| rail | the mark and name; four areas with line icons and names in two groups (investigate: requests, review queue, sources; assistant: conversation); the current one marked; "forget the token" at the foot |
 | page | the area's content: the requests listing, the canvas of the selected request, the review queue, the sources listing, or the conversation |
 | inspector | the selected stage's card, or the selected record's card in the queue and the sources |
 | conversation panel | beside the canvas on a wide screen (toggled from the bar), the whole page in the conversation area |
 
-Below 720 px the rail is a bottom bar, the inspector is a sheet over the page, and the conversation
-is its own page.
+Below 900 px the inspector is a sheet over the page. Below 720 px the rail is a bar of icons
+along the bottom and the conversation is its own page.
 
 ## The canvas
 

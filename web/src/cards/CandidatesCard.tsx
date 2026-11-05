@@ -38,14 +38,14 @@ export function CandidatesCard({ id, record, onOpen, onShowStage, onChanged }: C
     <Card kind="candidates" id={id} record={shown} onOpen={onOpen} onShowStage={onShowStage}>
       <div className="edp-table-scroll" tabIndex={0} role="region" aria-label="The candidate approaches compared">
         <table className="edp-table edp-compare">
-          <caption className="ac-visually-hidden">The candidate approaches compared on every criterion</caption>
+          <caption className="ui-visually-hidden">The candidate approaches compared on every criterion</caption>
           <thead>
             <tr>
               <th scope="col">Criterion</th>
               {approaches.map((a) => (
                 <th key={a.id} scope="col" data-approach={a.id}>
                   {a.title}
-                  <div className="ac-hint">
+                  <div className="ui-hint">
                     <code>{a.id}</code>
                   </div>
                 </th>
@@ -74,7 +74,7 @@ export function CandidatesCard({ id, record, onOpen, onShowStage, onChanged }: C
                           <div className="edp-rationale">{cell.rationale}</div>
                         </>
                       ) : (
-                        <span className="ac-hint">not rated</span>
+                        <span className="ui-hint">not rated</span>
                       )}
                     </td>
                   );
@@ -95,7 +95,7 @@ export function CandidatesCard({ id, record, onOpen, onShowStage, onChanged }: C
                   return (
                     <td key={a.id}>
                       {list.length === 0 ? (
-                        <span className="ac-hint">none</span>
+                        <span className="ui-hint">none</span>
                       ) : (
                         <ul className="edp-list">
                           {list.map((r) => (
@@ -115,7 +115,7 @@ export function CandidatesCard({ id, record, onOpen, onShowStage, onChanged }: C
               {approaches.map((a) => (
                 <td key={a.id}>
                   {(a.missingEvidence ?? []).length === 0 ? (
-                    <span className="ac-hint">none</span>
+                    <span className="ui-hint">none</span>
                   ) : (
                     <ul className="edp-list">
                       {(a.missingEvidence ?? []).map((m, n) => (
@@ -130,7 +130,7 @@ export function CandidatesCard({ id, record, onOpen, onShowStage, onChanged }: C
         </table>
       </div>
       {view.decision ? (
-        <p className="ac-hint">
+        <p className="ui-hint">
           Decided by {view.decision.decidedBy}: {view.decision.selectedApproachRef?.id} selected.
         </p>
       ) : (

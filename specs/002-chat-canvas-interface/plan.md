@@ -22,7 +22,7 @@ Three pieces of work, all in this repository, each with its own suites:
    of a request is derived on the server from the workflow states and the stage runs and served once
    and as a stream.
 3. **The interface**, `web/`: a web-hosted service made from the platform's web template, hosting
-   the console package's stylesheet and shell in the dark theme, with the backend mounted under
+   its own dark look (research R21), with the backend mounted under
    `/backend`. A rail, a canvas of the journey, an inspector of the selected stage's card and the
    conversation as a panel. One card component per record kind, each showing the record the mounted
    backend returns and nothing else. Decisions are forms on the cards that call the backend's own
@@ -41,12 +41,10 @@ TypeScript 7 and Vite 8 as the platform's web template pins them, on Node 24, Re
 Router 8 (library mode), from `ankka init --language web` (CLI 0.14.2).
 
 **Primary Dependencies**: service: ankka 0.12.0 unchanged (`ankka-sdk`, `-runtime`, `-http`,
-`-agent`, `-testkit`); nothing new. Interface: `ankka-console` 0.15.1 for `styles.css` (tokens,
-backdrop, glass surfaces, rail, inspector, the shape and edge classes, Inter from the package's own
-files) and the `Shell` and `Backdrop` components, with its peers `react`, `react-dom`,
-`react-router`; `lucide-react` for line icons (already the console's); `@playwright/test`,
+`-agent`, `-testkit`); nothing new. Interface: `react`, `react-dom`, `react-router`; Inter served
+from the interface's own files; `lucide-react` for line icons; `@playwright/test`,
 `@axe-core/playwright` and `playwright-bdd` for the browser suites. No chart or graph library: the
-canvas is a fixed layout of nodes drawn with the console's shape classes and SVG edges.
+canvas is a fixed layout of lights and labels with SVG curves (research R21).
 
 **Storage**: the service's Postgres as before. New: one event sourced entity (`conversation`) and the
 agent runtime's session memory per conversation; no new view tables except a watchable query on
@@ -199,7 +197,7 @@ It is not an sbt module: sbt builds nothing of it, and CI runs it as a separate 
 | FR-001, FR-006: the journey and its live changes | `Journey` derived in `domain`; `JourneyReader` reads two workflows and the stage run; a stream merging the `stage-rows` watch with a 2 s re-read while open, emitting on change | workflow state cannot be watched; stage runs can, and a pause is at most 2 s behind | the browser polling: the spec says the update comes from the service's notification |
 | FR-022: admission | the bearer token on every fetch, including the SSE reads done with `fetch` | `EventSource` cannot send a header; the review pages' cookie is scoped to `/review` on the service's origin, not the interface's | a cookie set by the interface's server: the backend is mounted, so the server never sees the mounted requests |
 | FR-023: run beside the service | `web/service.json` with `hosting: web`, mount `/backend`; `ankka local web --service ankka-experiment-proposals=http://127.0.0.1:9000 -- npm run dev` | exactly the platform's shape for a user interface; one command locally | a Vite proxy configured by hand: would differ from deployment |
-| FR-025: the console's treatment | import `ankka-console/styles.css`; render `Shell` and `Backdrop` from the package; the bar, rail and inspector drawn by the interface with the package's classes | the stylesheet is the treatment (tokens, backdrop, glass, Inter, shape and edge classes); `Bar` and `Rail` need the console's page data and its router | copying the tokens: the fallback the spec allows, taken only if the package's index cannot be imported outside the console (research R3) |
+| FR-025: the look | the interface's own stylesheet, tokens at the top of `web/src/app.css`; the journey as a constellation of lights (R21) | chosen by the product owner on 2026-11-05 over the console's treatment | the console package's stylesheet and shell (R3, superseded) |
 | FR-021: testable with a scripted model | `TestModelProvider` as the assistant's provider in suites; `ScriptedModelProvider` from a file for the browser suites and demonstrations without a key | one provider per consumer: the pipeline's and the assistant's are separate | cassettes for the assistant: out of scope by the spec |
 | FR-027: accessibility | axe in Playwright on every view; keyboard-only walkthrough traced | the console's own gate, reused | manual checks: not repeatable |
 

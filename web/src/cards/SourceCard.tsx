@@ -29,9 +29,9 @@ export function SourceCard({ id, record, onOpen, onShowStage, revision }: CardPr
       </Facts>
       <h4>Records</h4>
       {rows === undefined ? (
-        <p className="ac-hint">Reading the records…</p>
+        <p className="ui-hint">Reading the records…</p>
       ) : rows.length === 0 ? (
-        <p className="ac-hint">none</p>
+        <p className="ui-hint">none</p>
       ) : (
         <ul className="edp-list edp-source-records">
           {rows.map((r) => (

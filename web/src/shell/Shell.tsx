@@ -1,10 +1,6 @@
-// The interface inside the console's shell: dark, the backdrop behind everything, the rail, the bar
-// and whichever area the route shows. The console package is used for what it gives a host outside
-// the console (Shell, Backdrop, Inspector and the styles); the bar and the rail are drawn here with
-// its classes (research.md, found during implementation).
-import "ankka-console/styles.css";
+// The interface's frame: the rail, the bar and whichever area the route shows, on the dark
+// ground. The look is the interface's own (app.css).
 import "../app.css";
-import { Shell as ConsoleShell, Backdrop } from "ankka-console";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { Bar } from "./Bar.tsx";
 import { Rail, type Area } from "./Rail.tsx";
@@ -42,16 +38,17 @@ function Frame() {
           window.location.reload();
         }}
       />
-      <Bar crumbs={[...crumbs, ...slots.crumbs]} primary={slots.primary} />
-      <Outlet />
+      <div className="ui-main">
+        <Bar crumbs={[...crumbs, ...slots.crumbs]} primary={slots.primary} title={slots.title} />
+        <Outlet />
+      </div>
     </>
   );
 }
 
 export function Shell() {
   return (
-    <ConsoleShell theme="dark" className="edp-shell">
-      <Backdrop />
+    <div className="ui-shell edp-shell">
       <Admission>
         <SlotsProvider>
           <ReviewerProvider>
@@ -59,6 +56,6 @@ export function Shell() {
           </ReviewerProvider>
         </SlotsProvider>
       </Admission>
-    </ConsoleShell>
+    </div>
   );
 }

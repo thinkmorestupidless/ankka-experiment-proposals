@@ -48,7 +48,7 @@ spec's (FR-008a).
 timer (for things that are not workflows); assessing whatever is verified at the moment (assesses
 too few, non-deterministically).
 
-## R3. The console's treatment is imported, not copied; the shell is hosted, the bar and rail are drawn
+## R3. The console's treatment is imported, not copied (superseded by R21)
 
 **Decision**: `web/` depends on `ankka-console@0.15.1` and imports `ankka-console/styles.css`,
 which carries the tokens, the backdrop, the glass surfaces, the rail and inspector columns, the
@@ -247,7 +247,7 @@ injected; the sidecar's `ANKKA_MODEL_SCRIPT` is the precedent.
 **Alternatives**: driving the browser suites against the live model (non-deterministic, costs);
 mocking `/backend` in the browser (would not test the service).
 
-## R14. The journey's canvas is a fixed layout, not a graph library
+## R14. The journey's canvas is a fixed layout, not a graph library (its drawing superseded by R21)
 
 **Decision**: the canvas draws the request's spine (request, facets, round-trip, facet review,
 questions, packages, candidates, decision, design, approval, impact) as a row of nodes joined by
@@ -558,3 +558,37 @@ browser suites in the sbt job (two toolchains in one job).
 | A scripted turn's stream, ten trials on one free-standing conversation (`EDP_ASSISTANT_SCRIPT`, replay tier, the 9200 browser stack) | first `token` event 102, 8, 10, 7, 7, 54, 7, 8, 6, 20 ms; `done` 185, 111, 65, 197, 63, 117, 30, 240, 38, 89 ms. The script answers at once, so this is the route and the stream, not a model. |
 | The interface started beside the service with `ankka local web -- npm run dev`, to its first page (admission.feature) | 1452 ms and 1184 ms, against the one-minute bound. |
 | The reference walkthrough in the browser by keyboard alone, submission to approved design (`walkthrough.spec.ts`, fixtures already ingested) | about 10 s for steps 1 to 4, the three decisions included, in the replay tier; step 5 (the fault) stops at the script's fault id, so the whole walkthrough is not yet timed. |
+
+## R21. The look is the interface's own, and the journey is a constellation (2026-11-05)
+
+**Decision**: the product owner chose a look of the interface's own over the console's treatment,
+after seeing the first build. `ankka-console` is no longer a dependency; Inter's two files are
+served from `web/src/fonts/` (SIL Open Font License). The tokens are at the top of
+`web/src/app.css`: a near-black ground (`#08080a`), panels a step lighter with hairline edges, ink
+at `#ededf2` and `#a3a3ae`, one violet accent (`#7c3aed` for the primary action with white text,
+`#b9a6ff` for focus and selection on dark), a warm signal (`#e9e46c`) for where the investigation
+waits, and green and red still paired with a tick and a cross. The frame is a rail of named areas in
+two groups, a bar with the breadcrumb at the start and the request's own words as its title, and
+the inspector as a panel at the right. Cards carry their kind as a coloured `#kind` tag by family
+(asking, evidence, judgement, decision, change).
+
+The journey is drawn as a constellation. Each stage is a light whose size and glow are its state
+(unreached dim, reached soft white, running bright white and breathing, waiting signal-yellow,
+failed red), with its title on an opaque pill beside it; the pills alternate above and below along
+a row so neighbours never meet. The spine up to "questions" runs along the top, ending over the
+middle; the six lanes hang from there as columns and gather into the bottom row, which starts at
+"packages". The chosen question's lane is labelled and its stages are buttons; the others are
+faint lights only, and pointing at one chooses it (the selector stays the keyboard's way). The
+canvas is a natively scrolling viewport with zoom (the toolbar, or ctrl or cmd with the wheel), so
+a stage that takes focus, or is clicked by a test, is scrolled into view by the browser. It fits
+the whole journey when that is readable (82% or more); otherwise it keeps that scale and centres on
+the chosen stage, or on where the investigation is.
+
+**Rationale**: the owner's direction, from reference images of a dark flow builder and a
+constellation-style map. Native scrolling over a transformed pan keeps keyboard focus and
+scroll-into-view working without code of our own.
+
+**Alternatives**: keeping the console's shell with new tokens (the owner wanted the frame changed,
+not only the colours); a graph library for the layout (the stages are fixed, as R14 says); panning
+by transform (stages off screen could not be scrolled into view, by a person's focus or by the
+browser suites).

@@ -17,7 +17,7 @@ function Issues({ title, items }: { title: string; items: Issue[] }) {
     <div className="edp-issues" data-issues={title}>
       <h5>{title}</h5>
       {items.length === 0 ? (
-        <p className="ac-hint">none</p>
+        <p className="ui-hint">none</p>
       ) : (
         <ul className="edp-list">
           {items.map((i, n) => (
@@ -42,7 +42,7 @@ export function FacetsCard({ id, record, onOpen, onShowStage, onChanged, revisio
   const open = view !== undefined && !request?.confirmedBy;
   return (
     <Card kind="facets" id={id} record={record} onOpen={onOpen} onShowStage={onShowStage}>
-      <p className="ac-hint">{facets.length} facets</p>
+      <p className="ui-hint">{facets.length} facets</p>
       {open ? <ReviewerSelect /> : null}
       <ol className="edp-facets">
         {facets.map((f) => {
@@ -72,7 +72,7 @@ export function FacetsCard({ id, record, onOpen, onShowStage, onChanged, revisio
                   <blockquote>
                     <p>{s.quotation}</p>
                   </blockquote>
-                  <figcaption className="ac-hint">
+                  <figcaption className="ui-hint">
                     the customer request, characters {s.start} to {s.end}
                     {text && text.slice(s.start, s.end) === s.quotation ? "" : text ? ": does not match the request's text" : ""}
                   </figcaption>
@@ -110,7 +110,7 @@ export function FacetsCard({ id, record, onOpen, onShowStage, onChanged, revisio
             <Issues title="Ambiguities" items={rt.check.ambiguities} />
           </>
         ) : (
-          <p className="ac-hint">The round-trip check has not run.</p>
+          <p className="ui-hint">The round-trip check has not run.</p>
         )}
       </section>
       {open ? <FacetsConfirmed requestId={id} onDone={onChanged} /> : null}

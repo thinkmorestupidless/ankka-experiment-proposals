@@ -41,16 +41,16 @@ export function Proposal({
   };
   const title = actionTitle[proposal.action] ?? proposal.action;
   return (
-    <section className="ac-card edp-action-proposal" aria-label={`Proposed action ${proposal.n}: ${title}`} data-proposal={proposal.n} data-action={proposal.action} data-status={status}>
+    <section className="ui-card edp-action-proposal" aria-label={`Proposed action ${proposal.n}: ${title}`} data-proposal={proposal.n} data-action={proposal.action} data-status={status}>
       <header className="edp-card-head">
         <h3>
-          Proposed: {title} <span className="ac-pill">#{proposal.n}</span>
+          Proposed: {title} <span className="ui-pill">#{proposal.n}</span>
         </h3>
-        <span className="ac-pill" data-proposal-status="">
+        <span className="ui-pill" data-proposal-status="">
           {status === "proposed" ? "awaiting your confirmation" : status}
         </span>
       </header>
-      <dl className="ac-facts">
+      <dl className="ui-facts">
         {Object.entries(proposal.arguments ?? {}).map(([k, v]) => (
           <div key={k}>
             <dt>{k}</dt>
@@ -61,16 +61,16 @@ export function Proposal({
         ))}
       </dl>
       {status === "proposed" ? (
-        <div className="ac-actions">
-          <button type="button" className="ac-button ac-button-primary" disabled={state.busy} onClick={() => settle("confirm")}>
+        <div className="ui-actions">
+          <button type="button" className="ui-button ui-button-primary" disabled={state.busy} onClick={() => settle("confirm")}>
             Confirm: {title.toLowerCase()}
           </button>
-          <button type="button" className="ac-button ac-button-quiet" disabled={state.busy} onClick={() => settle("decline")}>
+          <button type="button" className="ui-button ui-button-quiet" disabled={state.busy} onClick={() => settle("decline")}>
             Decline
           </button>
         </div>
       ) : status === "declined" ? (
-        <p className="ac-hint">Declined; nothing was done.</p>
+        <p className="ui-hint">Declined; nothing was done.</p>
       ) : null}
       {state.refusal ? (
         <p role="alert" className="edp-refusal" data-refusal="">

@@ -15,7 +15,7 @@ export function Check({ name, check }: { name: string; check: VerificationCheck 
 
 export function Checks({ checks }: { checks: Record<string, VerificationCheck> }) {
   const entries = Object.entries(checks);
-  if (entries.length === 0) return <p className="ac-hint">No checks recorded.</p>;
+  if (entries.length === 0) return <p className="ui-hint">No checks recorded.</p>;
   return (
     <ul className="edp-checks">
       {entries.map(([name, c]) => (

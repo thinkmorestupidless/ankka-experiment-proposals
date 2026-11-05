@@ -30,9 +30,9 @@ export function ReviewerSelect({ required = false }: { required?: boolean }) {
   const id = useId();
   const { reviewer, setReviewer, reviewers, error } = useReviewer();
   return (
-    <div className="ac-field edp-reviewer">
+    <div className="ui-field edp-reviewer">
       <label htmlFor={id}>Reviewer</label>
-      <select id={id} className="ac-input" value={reviewer} required={required} onChange={(e) => setReviewer(e.target.value)} data-reviewer-select="">
+      <select id={id} className="ui-input" value={reviewer} required={required} onChange={(e) => setReviewer(e.target.value)} data-reviewer-select="">
         <option value="">Choose a configured reviewer</option>
         {reviewers.map((r) => (
           <option key={r.name} value={r.name}>
@@ -40,7 +40,7 @@ export function ReviewerSelect({ required = false }: { required?: boolean }) {
           </option>
         ))}
       </select>
-      {error ? <p className="ac-hint">The reviewers could not be read: {error}</p> : null}
+      {error ? <p className="ui-hint">The reviewers could not be read: {error}</p> : null}
     </div>
   );
 }

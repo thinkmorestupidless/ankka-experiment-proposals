@@ -60,9 +60,9 @@ export function Approval({
         })
       }
     >
-      <div className="ac-field">
+      <div className="ui-field">
         <label htmlFor={`${id}-version`}>Version</label>
-        <input id={`${id}-version`} className="ac-input" type="number" min={1} value={v} onChange={(e) => setV(e.target.value)} />
+        <input id={`${id}-version`} className="ui-input" type="number" min={1} value={v} onChange={(e) => setV(e.target.value)} />
       </div>
       <fieldset className="edp-choices">
         <legend>Decision</legend>
@@ -74,9 +74,9 @@ export function Approval({
         ))}
       </fieldset>
       {decision === "changes_requested" ? (
-        <div className="ac-field">
+        <div className="ui-field">
           <label htmlFor={`${id}-changes`}>The changes requested, one a line</label>
-          <textarea id={`${id}-changes`} className="ac-input" rows={3} value={changes} onChange={(e) => setChanges(e.target.value)} />
+          <textarea id={`${id}-changes`} className="ui-input" rows={3} value={changes} onChange={(e) => setChanges(e.target.value)} />
         </div>
       ) : null}
     </DecisionForm>

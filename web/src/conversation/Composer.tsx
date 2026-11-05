@@ -29,7 +29,7 @@ export function Composer({
       <div className="edp-composer-row">
         <textarea
           id={`${id}-q`}
-          className="ac-input"
+          className="ui-input"
           rows={2}
           value={text}
           disabled={disabled !== undefined}
@@ -42,16 +42,16 @@ export function Composer({
             }
           }}
         />
-        <button type="submit" className="ac-button ac-button-primary" disabled={disabled !== undefined || text.trim() === ""}>
+        <button type="submit" className="ui-button ui-button-primary" disabled={disabled !== undefined || text.trim() === ""}>
           Ask
         </button>
       </div>
       {disabled ? (
-        <p id={`${id}-why`} className="ac-hint" data-disabled="">
+        <p id={`${id}-why`} className="ui-hint" data-disabled="">
           {disabled}
         </p>
       ) : null}
-      <p id={`${id}-spend`} className="ac-hint edp-spend" data-used={used} data-budget={budget}>
+      <p id={`${id}-spend`} className="ui-hint edp-spend" data-used={used} data-budget={budget}>
         {used.toLocaleString("en-GB")} of {budget.toLocaleString("en-GB")} tokens used
       </p>
     </form>

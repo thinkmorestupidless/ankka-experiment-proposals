@@ -48,34 +48,39 @@ export function Card({
   const title = kindTitle[kind] ?? kind;
   const all = record === undefined ? [] : leaves(record);
   return (
-    <section className="ac-card edp-card" aria-label={`${title} ${id}`} data-kind={kind} data-id={id}>
+    <section className="ui-card edp-card" aria-label={`${title} ${id}`} data-kind={kind} data-id={id}>
       <header className="edp-card-head">
-        <h3>{title}</h3>
+        <div>
+          <span className="edp-card-tag" aria-hidden="true">
+            #{kind}
+          </span>
+          <h3>{title}</h3>
+        </div>
         <span className="edp-card-id">
           <code>{id}</code>
-          {version ? <span className="ac-pill">version {version}</span> : null}
+          {version ? <span className="ui-pill">version {version}</span> : null}
           {time ? <time dateTime={time}>{time}</time> : null}
         </span>
       </header>
       {children}
       {onOpen || onShowStage ? (
-        <div className="ac-actions">
+        <div className="ui-actions">
           {onOpen ? (
-            <button type="button" className="ac-button ac-button-small" onClick={onOpen}>
+            <button type="button" className="ui-button ui-button-small" onClick={onOpen}>
               Open in the inspector
             </button>
           ) : null}
           {onShowStage ? (
-            <button type="button" className="ac-button ac-button-small ac-button-quiet" onClick={onShowStage}>
+            <button type="button" className="ui-button ui-button-small ui-button-quiet" onClick={onShowStage}>
               Show its stage
             </button>
           ) : null}
         </div>
       ) : null}
       {all.length > 0 ? (
-        <details className="ac-more edp-every-field">
+        <details className="ui-more edp-every-field">
           <summary>Every field</summary>
-          <dl className="ac-facts">
+          <dl className="ui-facts">
             {all.map((l) => (
               <div key={l.path}>
                 <dt>

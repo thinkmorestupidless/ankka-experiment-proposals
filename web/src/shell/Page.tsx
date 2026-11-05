@@ -16,8 +16,8 @@ export function Page({
   className?: string;
 }) {
   return (
-    <div className="ac-page">
-      <main className={`ac-body${className ? ` ${className}` : ""}`} id="main">
+    <div className="ui-page">
+      <main className={`ui-body${className ? ` ${className}` : ""}`} id="main">
         {children}
       </main>
       {inspector ? (

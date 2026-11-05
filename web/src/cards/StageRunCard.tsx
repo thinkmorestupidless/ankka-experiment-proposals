@@ -11,7 +11,7 @@ export function StageRunCard({ id, record, onOpen, onShowStage, stages }: CardPr
   const shown = (run.stages ?? []).filter((s) => !stages || stages.includes(s.stage)) as (StageExecution & { actor?: string })[];
   return (
     <Card kind="stage-run" id={id} record={record} onOpen={onOpen} onShowStage={onShowStage}>
-      <p className="ac-hint">
+      <p className="ui-hint">
         {run.workflow}: {shown.length} execution{shown.length === 1 ? "" : "s"}
         {stages ? ` of ${stages.join(", ")}` : ""}
       </p>

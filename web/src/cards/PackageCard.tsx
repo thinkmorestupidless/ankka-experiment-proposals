@@ -38,7 +38,7 @@ export function PackageCard({ id, record, onOpen, onShowStage }: CardProps) {
         <Field label="Built by">{p.builtBy}</Field>
       </Facts>
       {(view.passages ?? []).length > 0 ? (
-        <details className="ac-more">
+        <details className="ui-more">
           <summary>Passages ({view.passages.length})</summary>
           {view.passages.map((s, n) => (
             <Passage key={n} view={s} />

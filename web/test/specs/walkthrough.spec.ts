@@ -9,7 +9,7 @@ import { admitted, at, get, ingest, journey, lipid, post, press, q, tabTo, tagOf
 const reviewer = "demo-reviewer";
 
 const conversation = (page: Page) => page.locator("section.edp-conversation");
-const inspector = (page: Page) => page.locator(".ac-inspector");
+const inspector = (page: Page) => page.locator(".ui-inspector");
 const node = (page: Page, stage: string, lane = "spine") => page.locator(`.edp-lane[data-lane="${lane}"] button[data-stage="${stage}"]`);
 
 async function ask(page: Page, question: string): Promise<Locator> {
@@ -178,6 +178,9 @@ async function walkthrough(page: Page, request: APIRequestContext): Promise<void
   const faulted = await confirmProposal(page, "inject-fault");
   const faultCard = faulted.locator(`section.edp-card[data-kind="finding"][data-id="${copy}"]`);
   await expect(faultCard).toContainText("endpoint_mismatch", { timeout: 120_000 });
+  // The copy has served its purpose; superseded, it stays out of any later request's search, whose
+  // recorded assessments do not include it (as scripts/walkthrough.sh does).
+  await post(request, "/sources/src:file:paper-a@endpoint_swap/status", { status: "superseded", reason: "the fault demonstration is done", by: "operator" });
 
   // 6. Paper B retracted, from the sources, as the operator; SC-009 and SC-010 on the impact.
   try {

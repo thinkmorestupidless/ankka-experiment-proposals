@@ -29,12 +29,12 @@ function StatusForm({ sourceId, current, onDone }: { sourceId: string; current: 
     }
   };
   return (
-    <form className="ac-card edp-status-form" onSubmit={submit} aria-label={`Set the status of ${sourceId}`}>
+    <form className="ui-card edp-status-form" onSubmit={submit} aria-label={`Set the status of ${sourceId}`}>
       <fieldset>
         <legend>Set the status, as the operator</legend>
-        <div className="ac-field">
+        <div className="ui-field">
           <label htmlFor={`${id}-status`}>Status</label>
-          <select id={`${id}-status`} className="ac-input" value={status} onChange={(e) => setStatus(e.target.value)}>
+          <select id={`${id}-status`} className="ui-input" value={status} onChange={(e) => setStatus(e.target.value)}>
             {statuses.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -42,12 +42,12 @@ function StatusForm({ sourceId, current, onDone }: { sourceId: string; current: 
             ))}
           </select>
         </div>
-        <div className="ac-field">
+        <div className="ui-field">
           <label htmlFor={`${id}-reason`}>Reason</label>
-          <input id={`${id}-reason`} className="ac-input" value={reason} onChange={(e) => setReason(e.target.value)} />
+          <input id={`${id}-reason`} className="ui-input" value={reason} onChange={(e) => setReason(e.target.value)} />
         </div>
-        <div className="ac-actions">
-          <button type="submit" className="ac-button ac-button-primary" disabled={state.busy}>
+        <div className="ui-actions">
+          <button type="submit" className="ui-button ui-button-primary" disabled={state.busy}>
             Set the status
           </button>
         </div>
@@ -90,27 +90,27 @@ export function Sources() {
               <StatusForm key={selected} sourceId={selected} current={tag(source.status)} onDone={() => setReload((r) => r + 1)} />
             </>
           ) : (
-            <p className="ac-hint">Reading the source…</p>
+            <p className="ui-hint">Reading the source…</p>
           )
         ) : undefined
       }
     >
       <h1>Sources</h1>
-      <p className="ac-lede">Every source in the store, its latest version and its status. A source is added by ingesting it, from the conversation.</p>
+      <p className="ui-lede">Every source in the store, its latest version and its status. A source is added by ingesting it, from the conversation.</p>
       {error ? (
         <p role="alert" className="edp-refusal">
           {error}
         </p>
       ) : null}
       {rows === undefined ? (
-        <p className="ac-hint">Reading the sources…</p>
+        <p className="ui-hint">Reading the sources…</p>
       ) : rows.length === 0 ? (
-        <p className="ac-hint">No source has been ingested.</p>
+        <p className="ui-hint">No source has been ingested.</p>
       ) : (
         <ul className="edp-sources">
           {rows.map((r) => (
-            <li key={r.id} className="ac-card edp-source-row" data-source={r.id} data-status={tag(r.status)}>
-              <button type="button" className="ac-button ac-button-quiet" aria-pressed={selected === r.id} onClick={() => choose(r.id)}>
+            <li key={r.id} className="ui-card edp-source-row" data-source={r.id} data-status={tag(r.status)}>
+              <button type="button" className="ui-button ui-button-quiet" aria-pressed={selected === r.id} onClick={() => choose(r.id)}>
                 <strong>{r.title || r.id}</strong> <code>{r.id}</code>
               </button>
               <span>

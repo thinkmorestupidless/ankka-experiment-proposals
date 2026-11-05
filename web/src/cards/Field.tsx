@@ -3,7 +3,7 @@ import { isValidElement, type ReactNode } from "react";
 import { tag } from "../backend/types.ts";
 
 export function Facts({ children }: { children: ReactNode }) {
-  return <dl className="ac-facts">{children}</dl>;
+  return <dl className="ui-facts">{children}</dl>;
 }
 
 export function Field({ label, children: given }: { label: string; children: ReactNode }) {
@@ -14,13 +14,13 @@ export function Field({ label, children: given }: { label: string; children: Rea
   return (
     <div>
       <dt>{label}</dt>
-      <dd>{empty ? <span className="ac-hint">none</span> : children}</dd>
+      <dd>{empty ? <span className="ui-hint">none</span> : children}</dd>
     </div>
   );
 }
 
 export function List({ items }: { items?: readonly string[] | null }) {
-  if (!items || items.length === 0) return <span className="ac-hint">none</span>;
+  if (!items || items.length === 0) return <span className="ui-hint">none</span>;
   return (
     <ul className="edp-list">
       {items.map((i, n) => (

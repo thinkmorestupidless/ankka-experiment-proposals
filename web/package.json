@@ -16,7 +16,6 @@
     "check": "playwright test --project walkthrough --project cards --project accessibility"
   },
   "dependencies": {
-    "ankka-console": "0.15.1",
     "lucide-react": "^1.62.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

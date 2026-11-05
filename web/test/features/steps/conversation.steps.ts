@@ -658,6 +658,9 @@ Then("the card of the finding shows the verification detecting {string}", async 
   const c = conversation(world, current(world)).locator(`section.edp-card[data-kind="finding"][data-id="${id}"]`).last();
   await expect(c).toContainText("endpoint_mismatch", { timeout: 30_000 });
   await expect(c).toContainText("contradicted");
+  // The copy has served its purpose; superseded, it stays out of every later scenario's search, whose
+  // recorded assessments do not include it (as scripts/walkthrough.sh does).
+  await world.post(`/sources/${q("src:file:paper-a@endpoint_swap")}/status`, { status: "superseded", reason: "the fault demonstration is done", by: "operator" });
 });
 
 When("the person has the assistant propose an action and does not confirm it", async ({ world }) => {

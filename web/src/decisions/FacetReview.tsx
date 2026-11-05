@@ -20,7 +20,7 @@ export function FacetReview({ facet, onDone }: { facet: Facet; onDone?: () => vo
   const [value, setValue] = useState("");
   const name = facet.name ?? facet.id;
   return (
-    <details className="ac-more edp-facet-review">
+    <details className="ui-more edp-facet-review">
       <summary>Review the facet {name}</summary>
       <DecisionForm
         title={`Review the facet ${name}`}
@@ -33,9 +33,9 @@ export function FacetReview({ facet, onDone }: { facet: Facet; onDone?: () => vo
             : reviewFacet(facet.id, { action, reviewer, rationale, ...(action === "amend" ? { statement: value } : {}) })
         }
       >
-        <div className="ac-field">
+        <div className="ui-field">
           <label htmlFor={`${id}-action`}>Action</label>
-          <select id={`${id}-action`} className="ac-input" value={action} onChange={(e) => setAction(e.target.value)}>
+          <select id={`${id}-action`} className="ui-input" value={action} onChange={(e) => setAction(e.target.value)}>
             {actions.map(([v, label]) => (
               <option key={v} value={v}>
                 {label}
@@ -44,9 +44,9 @@ export function FacetReview({ facet, onDone }: { facet: Facet; onDone?: () => vo
           </select>
         </div>
         {action === "amend" || action === "assume" ? (
-          <div className="ac-field">
+          <div className="ui-field">
             <label htmlFor={`${id}-value`}>{action === "amend" ? "The amended statement" : "The assumed value"}</label>
-            <input id={`${id}-value`} className="ac-input" value={value} onChange={(e) => setValue(e.target.value)} />
+            <input id={`${id}-value`} className="ui-input" value={value} onChange={(e) => setValue(e.target.value)} />
           </div>
         ) : null}
       </DecisionForm>

@@ -35,7 +35,7 @@ export function Turn({ turn, onShowStage }: { turn: ShownTurn; onShowStage?: (re
           const r = resolved.get(k);
           return r && r.resolved === true ? <InlineCard key={i} reference={r} onShowStage={onShowStage} /> : <Unresolved key={i} reference={r ?? s.reference} />;
         })}
-        {writing && turn.answer === "" ? <span className="ac-hint">Writing…</span> : null}
+        {writing && turn.answer === "" ? <span className="ui-hint">Writing…</span> : null}
       </div>
       {turn.state === "failed" ? (
         <p role="alert" className="edp-refusal edp-turn-failed" data-failed="">

@@ -15,7 +15,7 @@ function Results({ title, hits, name }: { title: string; hits: Hit[]; name: stri
     <div className="edp-results" data-results={name}>
       <h4>{title}</h4>
       {sorted.length === 0 ? (
-        <p className="ac-hint">none</p>
+        <p className="ui-hint">none</p>
       ) : (
         <div className="edp-table-scroll" tabIndex={0} role="region" aria-label={title}>
           <table className="edp-table">
@@ -33,7 +33,7 @@ function Results({ title, hits, name }: { title: string; hits: Hit[]; name: stri
                   <td>{h.rank}</td>
                   <td>
                     {h.title ?? h.sourceId}
-                    <div className="ac-hint">
+                    <div className="ui-hint">
                       {h.sourceId} version {h.sourceVersion}
                       {h.identifier ? `, ${h.identifier}` : ""}
                     </div>
@@ -67,7 +67,7 @@ export function SearchExecutionCard({ id, record, onOpen, onShowStage }: CardPro
       <div className="edp-exclusions">
         <h4>Exclusions</h4>
         {exclusions.length === 0 ? (
-          <p className="ac-hint">none</p>
+          <p className="ui-hint">none</p>
         ) : (
           <ul className="edp-list">
             {exclusions.map((x, n) => (
@@ -81,7 +81,7 @@ export function SearchExecutionCard({ id, record, onOpen, onShowStage }: CardPro
       <div className="edp-rerun">
         <button
           type="button"
-          className="ac-button ac-button-small"
+          className="ui-button ui-button-small"
           disabled={rerun.busy}
           onClick={async () => {
             setRerun({ busy: true });

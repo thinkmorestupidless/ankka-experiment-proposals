@@ -52,7 +52,7 @@ export function RecordCard({ kind, id, record, onOpen, onShowStage, onChanged }:
       </Facts>
       <div className="edp-beside">
         <h4>Its spans, beside the source</h4>
-        {(view.spans ?? []).length === 0 ? <p className="ac-hint">none</p> : null}
+        {(view.spans ?? []).length === 0 ? <p className="ui-hint">none</p> : null}
         {(view.spans ?? []).map((s, n) => (
           <Passage key={n} view={s} />
         ))}
@@ -72,7 +72,7 @@ export function RecordCard({ kind, id, record, onOpen, onShowStage, onChanged }:
             <Checks checks={v.checks} />
           </>
         ) : (
-          <p className="ac-hint">Not verified yet.</p>
+          <p className="ui-hint">Not verified yet.</p>
         )}
       </div>
       <div className="edp-attempts">

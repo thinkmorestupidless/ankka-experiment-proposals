@@ -58,6 +58,16 @@ a card at the step that proves it.
 - Q: What does a conversation belong to? → A: Both kinds: one conversation per request, opened from its journey with that request as its subject, and one free-standing conversation from the rail for questions across requests and for submitting a new request. A request's conversation keeps the journey and the chat in step.
 - Q: Is there a bound on what the assistant may spend? → A: A configured budget per conversation, in tokens. When it is reached the assistant declines further questions in that conversation and says so; the cards, the journey and the decisions keep working, and a new conversation starts fresh. No daily cap: that belongs to the installation.
 
+### Session 2026-11-05
+
+- Q: Does the interface keep the platform console's look? → A: No. The product owner chose a look
+  of its own: a near-black ground, quiet panels with hairline edges, a rail of named areas in groups, a bar with
+  the breadcrumb at the start and the request's own words as its title, a single violet accent, and
+  cards tagged by kind. The journey is drawn as a constellation: each stage a light whose
+  brightness is its state, with a label beside it, the spine along the top and the bottom and the
+  questions' lanes hanging between them; the chosen question's lane is labelled and selectable and
+  the others are faint. FR-025 and the Assumptions are changed to match; FR-026 and FR-027 stand.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Follow a request's journey on the canvas and read each stage's card (Priority: P1)
@@ -373,8 +383,8 @@ documented command, open it, enter the token, and perform the reference walkthro
 
 **Look and accessibility**
 
-- **FR-025**: The interface MUST take the platform console's treatment, dark by default: its
-  backdrop, surfaces, type and single accent, so that a person who knows the console recognises it;
+- **FR-025**: The interface MUST be dark, with one accent for selection, focus and the primary
+  action, and MUST draw the journey as lights joined by curves whose brightness is the stage's state;
   green and red states MUST be carried by a shape as well as a colour.
 - **FR-026**: The layout MUST be a rail of areas (requests, review queue, sources, conversation), a
   canvas of the selected request's journey, an inspector for the selected stage's card, and the
@@ -442,9 +452,8 @@ documented command, open it, enter the token, and perform the reference walkthro
 - The interface lives in this repository beside the service, as a separate application in its own
   directory with its own build and descriptor, the way the family keeps a product's interface beside
   its service; it is not a second repository.
-- The treatment is the platform console's published look: its shell, backdrop and tokens are reused
-  as a host of that package rather than reproduced; if the package cannot be hosted without the
-  control plane, its token values are copied and the spec is unchanged.
+- The look is the interface's own (Clarifications, 2026-11-05); it does not depend on the platform
+  console's package.
 - Admission by the shared token is enough for this feature, because the installation already
   identifies nobody; a sign-in with named people is a later feature. The token is entered once and
   kept by the browser.
@@ -470,16 +479,15 @@ documented command, open it, enter the token, and perform the reference walkthro
 - Sign-in, accounts, roles or a customer's own access; editing any record by hand; any change to a
   rule, gate, prompt, stage or adapter of feature 001; the external literature adapters' interfaces;
   native mobile applications; replacing or removing the operator's API or the review pages; a light
-  theme beyond what the console's package provides; recording the assistant's conversations as
-  cassettes; the assistant acting without a person's confirmation; drawing every question's stages
-  on one canvas at once.
+  theme; recording the assistant's conversations as
+  cassettes; the assistant acting without a person's confirmation; labelling every question's stages
+  on one canvas at once (the lanes not chosen are drawn faint, without labels).
 
 ## Dependencies and Risks
 
-- The platform's web-hosted service support and its console package: the shell must be hostable by
-  an application that is not the console; if not, tokens are copied (see Assumptions).
+- The platform's web-hosted service support.
 - A live model for the assistant, and its cost, outside the replay tier's zero-cost demonstration.
 - The reference walkthrough's recorded model replies must cover the stages as the automation orders
   them; a stage whose recorded reply keys on an order the automation changes needs re-recording.
-- Accessibility at the glow's brightest point depends on the console's pinned tokens; raising the
-  glow for taste breaks contrast and is refused.
+- Accessibility where the journey's lights glow: text over a glow keeps 4.5:1 because every label
+  sits on its own opaque pill; a brighter glow is refused if it breaks that.

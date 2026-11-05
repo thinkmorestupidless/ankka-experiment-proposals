@@ -50,13 +50,13 @@ export function DecisionForm({
         {children}
         {ownReviewer ? <ReviewerSelect required /> : null}
         {rationale ? (
-          <div className="ac-field">
+          <div className="ui-field">
             <label htmlFor={`${id}-rationale`}>Rationale</label>
-            <textarea id={`${id}-rationale`} className="ac-input" rows={2} value={text} onChange={(e) => setText(e.target.value)} />
+            <textarea id={`${id}-rationale`} className="ui-input" rows={2} value={text} onChange={(e) => setText(e.target.value)} />
           </div>
         ) : null}
-        <div className="ac-actions">
-          <button type="submit" className="ac-button ac-button-primary" disabled={state.busy}>
+        <div className="ui-actions">
+          <button type="submit" className="ui-button ui-button-primary" disabled={state.busy}>
             {submitLabel}
           </button>
         </div>

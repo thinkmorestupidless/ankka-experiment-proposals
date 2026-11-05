@@ -54,9 +54,9 @@ test.describe("SC-008: no axe violation at WCAG 2.1 AA", () => {
     for (const n of nodes) {
       if (n.question) await page.getByLabel("Scientific question", { exact: true }).selectOption(n.question);
       await page.locator(`.edp-lane[data-lane="${n.question ?? "spine"}"] button[data-stage="${n.stage}"]`).click();
-      const stage = page.locator(`.ac-inspector .edp-stage[data-stage="${n.stage}"]`);
+      const stage = page.locator(`.ui-inspector .edp-stage[data-stage="${n.stage}"]`);
       await expect(stage.locator("section.edp-card").first()).toBeVisible({ timeout: 30_000 });
-      await expect(page.locator(".ac-inspector .ac-hint", { hasText: "Reading" })).toHaveCount(0, { timeout: 30_000 });
+      await expect(page.locator(".ui-inspector .ui-hint", { hasText: "Reading" })).toHaveCount(0, { timeout: 30_000 });
       for (const k of await stage.locator("section.edp-card").evaluateAll((all) => all.map((c) => c.getAttribute("data-kind") ?? ""))) kinds.add(k);
       // Each card's "every field" open as well, since a reader may open it.
       for (const d of await stage.locator("details.edp-every-field").all()) await d.locator("summary").click();
@@ -68,14 +68,14 @@ test.describe("SC-008: no axe violation at WCAG 2.1 AA", () => {
 
     await page.goto("/queue");
     await expect(page.getByRole("heading", { name: "Review queue", level: 1 })).toBeVisible();
-    await expect(page.locator(".ac-hint", { hasText: "Reading the queue" })).toHaveCount(0, { timeout: 30_000 });
+    await expect(page.locator(".ui-hint", { hasText: "Reading the queue" })).toHaveCount(0, { timeout: 30_000 });
     await accessible(page, "the review queue");
 
     await page.goto("/sources");
     await expect(page.locator("li[data-source]").first()).toBeVisible({ timeout: 30_000 });
     await page.locator('li[data-source="src:file:paper-b"] button').click();
-    await expect(page.locator('.ac-inspector section.edp-card[data-kind="source"]')).toBeVisible({ timeout: 30_000 });
-    await expect(page.locator(".ac-inspector li[data-record]").first()).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('.ui-inspector section.edp-card[data-kind="source"]')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator(".ui-inspector li[data-record]").first()).toBeVisible({ timeout: 30_000 });
     await accessible(page, "the sources, with a source in the inspector");
   });
 
@@ -120,7 +120,7 @@ test.describe("SC-008: no axe violation at WCAG 2.1 AA", () => {
     await expect(page.locator("table.edp-requests")).toBeVisible({ timeout: 30_000 });
     await accessible(page, "the requests at 390 px");
     await page.goto(`/requests/${q(rid)}?stage=facet-review`);
-    await expect(page.locator('.ac-inspector section.edp-card[data-kind="facets"]')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('.ui-inspector section.edp-card[data-kind="facets"]')).toBeVisible({ timeout: 30_000 });
     await accessible(page, "the canvas and its inspector at 390 px");
     // At this width "discuss" opens the conversation as the whole page.
     await page.goto(`/requests/${q(rid)}`);

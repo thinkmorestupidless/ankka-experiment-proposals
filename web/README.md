@@ -11,7 +11,7 @@ Needs Node 24 and the `ankka` CLI. The specification is `../specs/002-chat-canva
 
 - `service.json`: the descriptor, which mounts the service at `/backend`.
 - `server/`: listens on `PORT` and serves the built application.
-- `src/shell/`: the console's shell, the rail and the top bar. `src/token/` admits the browser with the
+- `src/shell/`: the frame: the rail, the bar, the page and the inspector. `src/token/` admits the browser with the
   service's token.
 - `src/areas/`: the requests list, a request's journey, the review queue, the sources and the
   conversation.

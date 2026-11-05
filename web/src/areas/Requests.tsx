@@ -26,7 +26,7 @@ async function load(): Promise<{ row: RequestRow; journey?: Journey }[]> {
 export function Requests() {
   usePageSlots(
     [],
-    <Link to="/chat" className="ac-button ac-button-primary">
+    <Link to="/chat" className="ui-button ui-button-primary">
       Submit a request
     </Link>,
   );
@@ -34,16 +34,16 @@ export function Requests() {
   return (
     <Page>
       <h1>Requests</h1>
-      <p className="ac-lede">Every request, newest first, with its status and where it stands.</p>
+      <p className="ui-lede">Every request, newest first, with its status and where it stands.</p>
       {error ? (
         <p role="alert" className="edp-refusal">
           {error}
         </p>
       ) : null}
       {value === undefined ? (
-        <p className="ac-hint">Reading the requests…</p>
+        <p className="ui-hint">Reading the requests…</p>
       ) : value.length === 0 ? (
-        <p className="ac-hint">No request yet. Submit one in the conversation.</p>
+        <p className="ui-hint">No request yet. Submit one in the conversation.</p>
       ) : (
         <div className="edp-table-scroll" tabIndex={0} role="region" aria-label="The requests">
           <table className="edp-table edp-requests">
@@ -63,7 +63,7 @@ export function Requests() {
                   <tr key={row.id} data-request={row.id}>
                     <td>
                       <Link to={`/requests/${encodeURIComponent(row.id)}`}>{row.text ?? row.id}</Link>
-                      <div className="ac-hint">
+                      <div className="ui-hint">
                         <code>{row.id}</code>
                       </div>
                     </td>

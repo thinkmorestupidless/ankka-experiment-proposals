@@ -7,7 +7,9 @@ import { MessagesSquare } from "lucide-react";
 import { Conversation } from "../conversation/Conversation.tsx";
 import { journeyPath } from "./Chat.tsx";
 import { Page } from "../shell/Page.tsx";
-import { usePageSlots } from "../shell/slots.tsx";
+import { useBarTitle, usePageSlots } from "../shell/slots.tsx";
+import { getRequest } from "../backend/records.ts";
+import { tag } from "../backend/types.ts";
 import { Canvas, type Selection } from "../journey/Canvas.tsx";
 import { useJourney } from "../journey/useJourney.ts";
 import { cardsFor, pending, type StageCards } from "../journey/stageCard.ts";
@@ -30,7 +32,7 @@ function waitingAt(journey?: Journey): string | undefined {
 
 function StageInspector({ shown, revision, onChanged }: { shown: StageCards; revision: number; onChanged: () => void }) {
   const node = shown.node;
-  if (!node) return <p className="ac-hint">This stage is not on the journey.</p>;
+  if (!node) return <p className="ui-hint">This stage is not on the journey.</p>;
   const { state, waits, defect } = shownState(node);
   const earlier = shown.runs.filter((r) => r.status !== "running");
   return (
@@ -39,7 +41,7 @@ function StageInspector({ shown, revision, onChanged }: { shown: StageCards; rev
         <h2>{stageTitle(node.stage)}</h2>
         <State state={state} />
       </header>
-      {node.detail ? <p className="ac-hint">{node.detail}</p> : null}
+      {node.detail ? <p className="ui-hint">{node.detail}</p> : null}
       {waits ? <p className="edp-waits-note">The investigation waits here.</p> : null}
       {defect ? (
         <p className="edp-defect" role="note" data-defect="">
@@ -51,7 +53,7 @@ function StageInspector({ shown, revision, onChanged }: { shown: StageCards; rev
           <p role="status">This stage is running; nothing is recorded yet.</p>
           <h3>Earlier attempts</h3>
           {earlier.length === 0 ? (
-            <p className="ac-hint">This is the first attempt.</p>
+            <p className="ui-hint">This is the first attempt.</p>
           ) : (
             <ul className="edp-list">
               {earlier.map((r) => (
@@ -64,8 +66,8 @@ function StageInspector({ shown, revision, onChanged }: { shown: StageCards; rev
           )}
         </div>
       ) : null}
-      {state === "unreached" ? <p className="ac-hint">The investigation has not reached this stage.</p> : null}
-      {shown.loading && state !== "unreached" ? <p className="ac-hint">Reading the card…</p> : null}
+      {state === "unreached" ? <p className="ui-hint">The investigation has not reached this stage.</p> : null}
+      {shown.loading && state !== "unreached" ? <p className="ui-hint">Reading the card…</p> : null}
       {shown.cards.map((c) => (
         <Shown key={`${c.kind}:${c.id}`} kind={c.kind} id={c.id} record={c.record} stages={c.stages} revision={revision} onChanged={onChanged} />
       ))}
@@ -147,14 +149,41 @@ export function Request() {
   const showStage = (requestId: string, s: Selection) => (requestId === id ? select(s) : navigate(journeyPath(requestId, s)));
 
   const waiting = waitingAt(journey);
+  const [asked, setAsked] = useState<{ text: string; status: string }>();
+  useEffect(() => {
+    let live = true;
+    getRequest(id).then(
+      (r) => live && setAsked({ text: r.request.text ?? id, status: tag(r.request.status) }),
+      () => undefined,
+    );
+    return () => {
+      live = false;
+    };
+  }, [id, journey]);
+  useBarTitle(
+    asked ? (
+      <>
+        <span className="ui-bar-title-text" title={asked.text}>
+          {asked.text}
+        </span>
+        <span className="ui-chip">{asked.status}</span>
+      </>
+    ) : null,
+    [asked?.text, asked?.status],
+  );
   usePageSlots(
     stage ? [{ label: stageTitle(stage) }] : [],
-    waiting ? (
-      <button type="button" className="ac-button ac-button-primary" onClick={() => select({ stage: waiting })} data-primary={waiting}>
-        {pauses[waiting]}
+    <>
+      <button type="button" className="ui-button" aria-pressed={discussing} onClick={discuss} data-discuss="">
+        <MessagesSquare aria-hidden="true" /> {discussing ? "Close the conversation" : "Discuss this request"}
       </button>
-    ) : null,
-    [stage, waiting, params.toString()],
+      {waiting ? (
+        <button type="button" className="ui-button ui-button-primary" onClick={() => select({ stage: waiting })} data-primary={waiting}>
+          {pauses[waiting]}
+        </button>
+      ) : null}
+    </>,
+    [stage, waiting, params.toString(), discussing],
   );
 
   return (
@@ -172,30 +201,25 @@ export function Request() {
           shown ? (
             <StageInspector shown={shown} revision={revision} onChanged={() => setReload((r) => r + 1)} />
           ) : (
-            <p className="ac-hint">Reading the card…</p>
+            <p className="ui-hint">Reading the card…</p>
           )
         ) : undefined
       }
     >
-      <div className="edp-request-head">
-        <h1>
-          The request <code>{id}</code>
-        </h1>
-        <button type="button" className="ac-button ac-button-small" aria-pressed={discussing} onClick={discuss} data-discuss="">
-          <MessagesSquare aria-hidden="true" /> {discussing ? "Close the conversation" : "Discuss this request"}
-        </button>
-      </div>
+      <h1 className="ui-visually-hidden">
+        The request <code>{id}</code>
+      </h1>
       {error ? (
         <p role="alert" className="edp-refusal">
           {error}
         </p>
       ) : null}
-      <div className={discussing ? "edp-request-split" : undefined}>
+      <div className={`edp-request-split${discussing ? " edp-discussing" : ""}`}>
         <div className="edp-request-journey">
           {journey ? (
             <Canvas journey={journey} selection={selection} question={lane ?? question} onSelect={select} onQuestion={setLane} />
           ) : error ? null : (
-            <p className="ac-hint">Reading the journey…</p>
+            <p className="ui-hint">Reading the journey…</p>
           )}
         </div>
         {discussing ? (

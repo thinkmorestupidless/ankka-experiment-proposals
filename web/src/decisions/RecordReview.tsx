@@ -26,7 +26,7 @@ export function RecordReview({
   const id = useId();
   const [action, setAction] = useState<string>(initial?.action ?? "verify");
   return (
-    <details className="ac-more edp-record-review" open={open}>
+    <details className="ui-more edp-record-review" open={open}>
       <summary>Review this {kind}</summary>
       <DecisionForm
         title={`Review the ${kind} ${recordId}`}
@@ -35,9 +35,9 @@ export function RecordReview({
         initialRationale={initial?.rationale ?? ""}
         onSubmit={(reviewer, rationale) => reviewRecord(kind, recordId, { action, reviewer, rationale })}
       >
-        <div className="ac-field">
+        <div className="ui-field">
           <label htmlFor={`${id}-action`}>Action</label>
-          <select id={`${id}-action`} className="ac-input" value={action} onChange={(e) => setAction(e.target.value)}>
+          <select id={`${id}-action`} className="ui-input" value={action} onChange={(e) => setAction(e.target.value)}>
             {actions.map(([v, label]) => (
               <option key={v} value={v}>
                 {label}

@@ -37,16 +37,16 @@ export function Queue() {
       inspector={sourceId && source ? <Shown kind="source" id={sourceId} record={source} revision={reload} /> : undefined}
     >
       <h1>Review queue</h1>
-      <p className="ac-lede">The records awaiting a reviewer, beside their passages.</p>
+      <p className="ui-lede">The records awaiting a reviewer, beside their passages.</p>
       {error ? (
         <p role="alert" className="edp-refusal">
           {error}
         </p>
       ) : null}
       {value === undefined ? (
-        <p className="ac-hint">Reading the queue…</p>
+        <p className="ui-hint">Reading the queue…</p>
       ) : value.length === 0 ? (
-        <p className="ac-hint" data-empty-queue="">
+        <p className="ui-hint" data-empty-queue="">
           Nothing awaits a reviewer.
         </p>
       ) : (

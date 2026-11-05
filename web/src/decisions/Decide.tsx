@@ -43,11 +43,11 @@ export function Decide({ requestId, approaches, onDone }: { requestId: string; a
       {approaches
         .filter((a) => selected && a.id !== selected)
         .map((a) => (
-          <div key={a.id} className="ac-field">
+          <div key={a.id} className="ui-field">
             <label htmlFor={`${id}-${a.id}-reason`}>Reason for rejecting {a.title ?? a.id}</label>
             <input
               id={`${id}-${a.id}-reason`}
-              className="ac-input"
+              className="ui-input"
               data-reason-for={a.id}
               value={reasons[a.id] ?? ""}
               onChange={(e) => setReasons({ ...reasons, [a.id]: e.target.value })}

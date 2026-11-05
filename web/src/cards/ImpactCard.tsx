@@ -15,7 +15,7 @@ export function ImpactCard({ id, record, onOpen, onShowStage }: CardProps) {
   const impact = record as RequestImpact;
   return (
     <Card kind="impact" id={id} record={record} onOpen={onOpen} onShowStage={onShowStage}>
-      {impact.changes.length === 0 && impact.flags.length === 0 ? <p className="ac-hint">Nothing this request rests on has changed.</p> : null}
+      {impact.changes.length === 0 && impact.flags.length === 0 ? <p className="ui-hint">Nothing this request rests on has changed.</p> : null}
       {impact.changes.map((c) => (
         <section key={c.ref} className="edp-impact" data-changed={c.ref} aria-label={`The change ${c.ref}`}>
           <h4>

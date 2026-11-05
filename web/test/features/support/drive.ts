@@ -42,7 +42,21 @@ export async function ensureCorpus(w: World): Promise<void> {
   const sources = await w.get<{ id: string }[]>("/sources");
   const have = new Set(sources.map((s) => s.id));
   const missing = ["paper-a.xml", "paper-b.xml", "paper-c.xml", "retracted.xml"].filter((f) => !have.has(`src:file:${f.replace(".xml", "")}`));
-  if (missing.length > 0) await w.ingest(...missing);
+  if (missing.length === 0) return;
+  await w.ingest(...missing);
+  // The search reads the store through views; a request submitted before they hold the new sources
+  // searches without them (the retracted one goes unexcluded). Wait, as scripts/walkthrough.sh does,
+  // for the papers' records to be verified and the retracted source to be listed by its status.
+  for (const id of ["src:file:paper-a", "src:file:paper-b", "src:file:paper-c"]) {
+    await w.eventually(`the records of ${id} verified`, async () => {
+      const rows = await w.get<{ status: unknown }[]>(`/sources/${q(id)}/records`);
+      return rows.some((r) => JSON.stringify(r.status).includes("verified")) ? rows : undefined;
+    }, 240_000);
+  }
+  await w.eventually("the retracted source listed", async () => {
+    const rows = await w.get<{ id: string }[]>("/sources?status=retracted");
+    return rows.some((r) => r.id === "src:file:retracted") ? rows : undefined;
+  }, 60_000);
 }
 
 export async function submitWaiting(w: World, text = "Can you make foie gras?"): Promise<string> {
@@ -90,7 +104,7 @@ export function node(w: World, stage: string, question?: string): Locator {
   return question ? p.locator(`.edp-lane[data-lane="${question}"] button[data-stage="${stage}"]`) : p.locator(`.edp-lane[data-lane="spine"] button[data-stage="${stage}"]`);
 }
 
-export const inspector = (w: World) => w.page.locator(".ac-inspector");
+export const inspector = (w: World) => w.page.locator(".ui-inspector");
 
 /** A card in the inspector, by kind. */
 export const card = (w: World, kind: string) => inspector(w).locator(`section.edp-card[data-kind="${kind}"]`);

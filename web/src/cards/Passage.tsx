@@ -9,13 +9,13 @@ export function Passage({ view }: { view: SpanView }) {
       <blockquote>
         <p>{span.quotation}</p>
       </blockquote>
-      <figcaption className="ac-hint">
+      <figcaption className="ui-hint">
         {span.sourceId} version {span.sourceVersion}, section {span.sectionId}, characters {span.startOffset} to {span.endOffset}
         {view.resolves ? "" : ": does not resolve"}
       </figcaption>
       {view.resolves && view.text && view.text !== span.quotation ? (
         <p className="edp-passage-text">
-          <span className="ac-visually-hidden">The source reads: </span>
+          <span className="ui-visually-hidden">The source reads: </span>
           {view.text}
         </p>
       ) : null}

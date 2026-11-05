@@ -28,7 +28,7 @@ export function Conversation({
       <header className="edp-conversation-head">
         <h2>{subject ? <>Discuss the request <code>{subject}</code></> : "Ask the assistant"}</h2>
         {onNew ? (
-          <button type="button" className="ac-button ac-button-small" onClick={onNew}>
+          <button type="button" className="ui-button ui-button-small" onClick={onNew}>
             New conversation
           </button>
         ) : null}
@@ -43,7 +43,7 @@ export function Conversation({
           {state.refusal}
         </p>
       ) : null}
-      <p className="ac-hint">
+      <p className="ui-hint">
         The assistant answers from the records and shows each one it cites as its card. It proposes what an operator can do and you confirm it; it decides
         nothing a reviewer decides.
       </p>

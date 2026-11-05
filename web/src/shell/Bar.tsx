@@ -1,36 +1,38 @@
-// The bar: the wordmark and name at the start, a centred breadcrumb (area › request › stage), and
-// the page's primary action at the end. Drawn with the console's classes; the console's own Bar
-// reads its router data, which this interface does not have.
+// The bar: a step back and the breadcrumb (area / request / stage) at the start, the page's title
+// in the middle, and the page's actions at the end.
 import type { ReactNode } from "react";
 import { Link } from "react-router";
+import { ArrowLeft } from "lucide-react";
 import type { Crumb } from "./slots.tsx";
 
-export function Bar({ crumbs, primary }: { crumbs: Crumb[]; primary?: ReactNode }) {
+export function Bar({ crumbs, primary, title }: { crumbs: Crumb[]; primary?: ReactNode; title?: ReactNode }) {
+  const back = [...crumbs].slice(0, -1).reverse().find((c) => c.to);
   return (
-    <header className="ac-bar">
-      <div className="ac-bar-start">
-        <Link to="/" className="ac-wordmark">
-          experiment <span>proposals</span>
-        </Link>
+    <header className="ui-bar">
+      <div className="ui-bar-start">
+        {back?.to ? (
+          <Link to={back.to} className="ui-bar-back" aria-label={`Back to ${back.label}`} title={`Back to ${back.label}`}>
+            <ArrowLeft aria-hidden="true" />
+          </Link>
+        ) : null}
+        {crumbs.length > 0 ? (
+          <nav aria-label="Breadcrumb" className="ui-crumbs">
+            <ol>
+              {crumbs.map((c, i) => (
+                <li key={`${i}-${c.label}`}>
+                  {c.to && i < crumbs.length - 1 ? (
+                    <Link to={c.to}>{c.label}</Link>
+                  ) : (
+                    <span aria-current={i === crumbs.length - 1 ? "page" : undefined}>{c.label}</span>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </nav>
+        ) : null}
       </div>
-      {crumbs.length > 0 ? (
-        <nav aria-label="Breadcrumb" className="ac-crumbs">
-          <ol>
-            {crumbs.map((c, i) => (
-              <li key={`${i}-${c.label}`}>
-                {c.to && i < crumbs.length - 1 ? (
-                  <Link to={c.to}>{c.label}</Link>
-                ) : (
-                  <span aria-current={i === crumbs.length - 1 ? "page" : undefined}>{c.label}</span>
-                )}
-              </li>
-            ))}
-          </ol>
-        </nav>
-      ) : (
-        <span />
-      )}
-      <div className="ac-bar-end">{primary}</div>
+      <div className="ui-bar-title">{title}</div>
+      <div className="ui-bar-end">{primary}</div>
     </header>
   );
 }

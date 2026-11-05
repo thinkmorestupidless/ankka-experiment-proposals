@@ -13,7 +13,7 @@ export function Unresolved({ reference, why }: { reference: Reference; why?: str
   return (
     <span className="edp-unresolved" data-unresolved={`${reference.kind}:${reference.id}`} role="note">
       <span aria-hidden="true">⚠ </span>unresolved reference: {kindTitle[reference.kind] ?? reference.kind} <code>{reference.id}</code>
-      {why ? <span className="ac-hint"> ({why})</span> : null}
+      {why ? <span className="ui-hint"> ({why})</span> : null}
     </span>
   );
 }
@@ -56,7 +56,7 @@ export function InlineCard({
   if (state.error) return <Unresolved reference={reference} why={state.error} />;
   if (state.record === undefined)
     return (
-      <p className="ac-hint" data-reading={`${reference.kind}:${reference.id}`}>
+      <p className="ui-hint" data-reading={`${reference.kind}:${reference.id}`}>
         Reading {kindTitle[reference.kind] ?? reference.kind} {reference.id}…
       </p>
     );

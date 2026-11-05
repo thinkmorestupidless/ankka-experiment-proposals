@@ -30,7 +30,7 @@ function Section({ field, sections }: { field: keyof DesignSections; sections: D
         {items.map((g, n) => (
           <li key={n}>
             {g.text}
-            {g.claimRefs.length > 0 ? <span className="ac-hint"> ({g.claimRefs.map((r) => r.id).join(", ")})</span> : null}
+            {g.claimRefs.length > 0 ? <span className="ui-hint"> ({g.claimRefs.map((r) => r.id).join(", ")})</span> : null}
           </li>
         ))}
       </ul>
@@ -72,7 +72,7 @@ export function DesignCard({ id, record, onOpen, onShowStage, onChanged }: CardP
       )}
       {shownVersion ? (
         <div className="edp-sections" data-version={shownVersion.version}>
-          <p className="ac-hint">
+          <p className="ui-hint">
             Version {shownVersion.version}, {tag(shownVersion.status)}
           </p>
           {sectionTitles.map(([field, title], n) => (
@@ -87,7 +87,7 @@ export function DesignCard({ id, record, onOpen, onShowStage, onChanged }: CardP
           <List items={shownVersion.checks.map((c) => `${c.name}: ${c.passed ? "passed" : "failed"}, ${c.detail}`)} />
         </div>
       ) : (
-        <p className="ac-hint">No version is written yet.</p>
+        <p className="ui-hint">No version is written yet.</p>
       )}
       <div className="edp-history" data-history="design">
         <h4>History</h4>

@@ -15,7 +15,7 @@ class Fallback extends Component<{ kind: string; id: string; record: unknown; ch
     if (!this.state.failed) return this.props.children;
     return (
       <div className="edp-card-fallback">
-        <p className="ac-hint">This card could not be drawn ({this.state.failed}); every field of the record is below.</p>
+        <p className="ui-hint">This card could not be drawn ({this.state.failed}); every field of the record is below.</p>
         <GenericCard kind={this.props.kind} id={this.props.id} record={this.props.record} />
       </div>
     );

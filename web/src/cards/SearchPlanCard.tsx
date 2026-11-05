@@ -11,13 +11,13 @@ function Queries({ title, kind, queries }: { title: string; kind: string; querie
     <div className="edp-queries" data-query-kind={kind}>
       <h4>{title}</h4>
       {mine.length === 0 ? (
-        <p className="ac-hint">none</p>
+        <p className="ui-hint">none</p>
       ) : (
         <ul className="edp-list">
           {mine.map((q, n) => (
             <li key={n} data-query={q.text}>
               {q.text}
-              {q.expansionOf ? <span className="ac-hint"> (expands “{q.expansionOf}”)</span> : null}
+              {q.expansionOf ? <span className="ui-hint"> (expands “{q.expansionOf}”)</span> : null}
             </li>
           ))}
         </ul>
