@@ -57,9 +57,10 @@ class CandidatesSuite extends ServiceFixture:
   private def investigation(id: String): String = get(api(s"/workflows/investigation/$id"))._2
 
   /**
-   * The reference request through facets, questions, retrieval and the assessment of A, B and C.
+   * The reference request through facets; from there the investigation runs itself, retrieving and
+   * assessing (A's, B's and C's findings among the records) and packaging, until `expected`.
    */
-  private def assessedRequest(): String =
+  private def investigated(expected: String): String =
     val (status, body) =
       post(api("/requests"), """{"text":"Can you make foie gras?","submittedBy":"customer"}""")
     assertEquals(status, 201, body)
@@ -77,23 +78,12 @@ class CandidatesSuite extends ServiceFixture:
       )
     )
     assertEquals(post(api(s"/requests/$id/facets:confirmed"), """{"reviewer":"ada"}""")._1, 200)
-    eventually("the lipid question is retrieved", within = 120.seconds) {
-      val q = question(s"$id:q4"); Option.when(rests(q))(q)
-    }
-    assertEquals(
-      post(api(s"/questions/$id:q4/assess"), s"""{"recordIds":["$A","$B","$C"]}""")._1,
-      202
-    )
-    eventually("three assessments") {
-      val j = question(s"$id:q4"); Option.when("\"relationship\":".r.findAllIn(j).size == 3)(j)
-    }
-    id
-
-  private def packaged(id: String, expected: String): String =
-    assertEquals(post(api(s"/requests/$id/packages"), """{"reviewer":"ada"}""")._1, 202)
-    eventually(s"the investigation reaches $expected", within = 120.seconds) {
+    eventually(s"the investigation reaches $expected", within = 240.seconds) {
       val w = investigation(id); Option.when(w.contains(expected))(w)
     }
+    val q = question(s"$id:q4")
+    Seq(A, B, C).foreach(r => assert(q.contains(s""""$id:q4:$r""""), s"$r not assessed in $q"))
+    id
 
   test(
     "packages are built and validated: the lipid package passes every check; a probability in the candidates reply is refused and recorded"
@@ -101,9 +91,7 @@ class CandidatesSuite extends ServiceFixture:
     Seq("paper-a.xml", "paper-b.xml", "paper-c.xml").foreach(f =>
       recordsSettled(ingestFixture(f, extract = true))
     )
-    val id = assessedRequest()
-    val w  = packaged(id, "candidates: model_refused")
-    assert(w.contains("candidates: model_refused"), w)
+    val id        = investigated("candidates: model_refused")
     val (ps, pkg) = get(api(s"/packages/$id:q4:pk1"))
     assertEquals(ps, 200, pkg)
     assert(pkg.contains("\"qualityStatus\":{\"type\":\"valid\"}"), pkg)
@@ -131,8 +119,7 @@ class CandidatesSuite extends ServiceFixture:
   test(
     "two candidates with their evidence and unknowns; a reviewer's decision keeps the rejected alternative, across a restart"
   ) {
-    val id = assessedRequest()
-    packaged(id, "awaiting-decision")
+    val id               = investigated("awaiting-decision")
     val (as, approaches) = get(api(s"/requests/$id/approaches"))
     assertEquals(as, 200, approaches)
     assertEquals("\"hypothesis\":".r.findAllIn(approaches).size, 2, approaches)

@@ -20,6 +20,8 @@ class DesignSuite extends ServiceFixture:
   private val B       = "src:file:paper-b:v1:fd1"
   private val C       = "src:file:paper-c:v1:fd1"
   private val Changes = "State the inconclusive criterion with a numeric threshold"
+  // The investigation runs every stage itself before the design, as in ImpactSuite.
+  override val munitTimeout = 15.minutes
 
   override def beforeAll(): Unit =
     super.beforeAll()
@@ -60,20 +62,12 @@ class DesignSuite extends ServiceFixture:
       )
     )
     assertEquals(post(api(s"/requests/$id/facets:confirmed"), """{"reviewer":"ada"}""")._1, 200)
-    eventually("the lipid question is retrieved", within = 120.seconds)(
-      Option.when(rests(question(s"$id:q4")))(id)
-    )
-    assertEquals(
-      post(api(s"/questions/$id:q4/assess"), s"""{"recordIds":["$A","$B","$C"]}""")._1,
-      202
-    )
-    eventually("three assessments")(
-      Option.when("\"relationship\":".r.findAllIn(question(s"$id:q4")).size == 3)(id)
-    )
-    assertEquals(post(api(s"/requests/$id/packages"), """{"reviewer":"ada"}""")._1, 202)
-    eventually("awaiting the decision", within = 120.seconds)(
+    // From the confirmed facets the investigation runs itself to the choice of approach.
+    eventually("awaiting the decision", within = 5.minutes)(
       Option.when(investigation(id).contains("awaiting-decision"))(id)
     )
+    val q = question(s"$id:q4")
+    Seq(A, B, C).foreach(r => assert(q.contains(s""""$id:q4:$r""""), s"$r not assessed in $q"))
     val (ds, decision) = post(
       api(s"/requests/$id/decide"),
       s"""{"selectedApproachId":"$id:c1","rejected":[{"approachId":"$id:c2","reason":"not the target species"}],"decidedBy":"ada","rationale":"the target species comes first"}"""

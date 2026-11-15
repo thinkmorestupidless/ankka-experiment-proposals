@@ -44,6 +44,9 @@ services:
         required: false
     environment:
       ANKKA_DB_HOST: postgres
+      # From the shell or from .env (compose reads both); CI sets them on the job, where there is no .env.
+      EDP_API_TOKEN: ${EDP_API_TOKEN:-}
+      EDP_TIER: ${EDP_TIER:-replay}
       # The paths .env names are relative to the checkout; inside the container they are the mounts
       # below, so these override whatever .env says.
       EDP_CASSETTES: /evals/cassettes
