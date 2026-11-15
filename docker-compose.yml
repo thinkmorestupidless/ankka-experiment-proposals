@@ -19,7 +19,7 @@ services:
       POSTGRES_PASSWORD: ankka
       POSTGRES_DB: ankka
     ports:
-      - "5432:5432"
+      - "${EDP_PG_PORT:-5432}:5432"
     volumes:
       - ./target/ddl:/docker-entrypoint-initdb.d:ro
       - pgdata:/var/lib/postgresql/data
@@ -36,7 +36,7 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "9000:9000"
+      - "${EDP_PORT:-9000}:9000"
     # The EDP_* settings and, for the live tier, ANTHROPIC_API_KEY. The file is optional so that
     # `docker compose config` works on a fresh clone; the service refuses to start without a token.
     env_file:
