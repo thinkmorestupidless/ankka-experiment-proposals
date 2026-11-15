@@ -102,6 +102,9 @@ jobs:
       - run: EDP_ASSISTANT_SCRIPT=/evals/assistant/walkthrough.json docker compose --profile app up -d --wait
         working-directory: .
       - run: npm run features
+      # The features spend the reference request's conversation; the specs start from a fresh store.
+      - run: docker compose --profile app down -v && EDP_ASSISTANT_SCRIPT=/evals/assistant/walkthrough.json docker compose --profile app up -d --wait
+        working-directory: .
       - run: npm run check
       - run: docker compose --profile app down -v && docker compose --profile app up -d --wait
         working-directory: .

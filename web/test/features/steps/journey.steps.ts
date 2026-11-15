@@ -484,11 +484,19 @@ Given("the source {string} has been marked {string}", async ({ world, $testInfo 
   // Flagging walks every dependent of the paper in the database, every earlier scenario's included,
   // and `GET /impact` walks them again; late in a full run that takes minutes, not seconds.
   $testInfo.setTimeout(480_000);
+  const r = rid(world);
+  // The walk reads the dependents view when the change arrives, and the view is eventually
+  // consistent; a dependent not yet projected is never flagged. Change the paper once this request's
+  // design, lipid package and chosen approach are among its dependents, as ImpactSuite does.
+  await world.eventually("the dependents of Paper B in this request are projected", async () => {
+    const i = await world.get<ImpactJson>(`/impact?ref=${q(`source:${paperB}:v1`)}`);
+    const ids = new Set(i.dependents.map((d) => d.id));
+    return [`${r}:design`, `${r}:q4:pk1`, `${r}:c1`].every((x) => ids.has(x)) ? i : undefined;
+  }, 180_000);
   await world.post(`/sources/${q(paperB)}/status`, { status, reason: "the journey feature", by: "demo-reviewer" });
   world.remembered.set("restore", paperB);
   // Other requests in the database depend on Paper B too, some at stages that are never flagged; the
   // scenario waits for this request's dependents and the paper's own records.
-  const r = rid(world);
   let waiting = "nothing read yet";
   await world
     .eventually("every dependent of Paper B in this request is flagged", async () => {
