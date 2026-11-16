@@ -93,6 +93,12 @@ trait AutomationFixture extends ServiceFixture:
 
   protected def hasArrived(key: String): Boolean = arrived.contains(key)
 
+  /** From now on every call whose case line contains the key fails, as an outage would. */
+  private val failing = java.util.concurrent.ConcurrentHashMap.newKeySet[String]()
+  protected def failEvery(key: String): Unit =
+    failing.add(key)
+    Option(held.remove(key)).foreach(_.tryFailure(RuntimeException(s"the model is down: $key")))
+
   private def caseLine(request: ModelRequest): String =
     request.messages
       .collect { case ChatMessage.User(content) =>
@@ -106,12 +112,15 @@ trait AutomationFixture extends ServiceFixture:
     def modelName: String = model.modelName
     def complete(request: ModelRequest): Future[ModelResponse] =
       val text = caseLine(request)
-      held.asScala.collectFirst { case (k, p) if text.contains(k) => k -> p } match
-        case Some((k, p)) =>
-          if !holdAll.contains(k) then held.remove(k)
-          arrived.add(k)
-          p.future.flatMap(_ => model.complete(request))(using ExecutionContext.global)
-        case None => model.complete(request)
+      if failing.asScala.exists(text.contains) then
+        Future.failed(RuntimeException("the model is down"))
+      else
+        held.asScala.collectFirst { case (k, p) if text.contains(k) => k -> p } match
+          case Some((k, p)) =>
+            if !holdAll.contains(k) then held.remove(k)
+            arrived.add(k)
+            p.future.flatMap(_ => model.complete(request))(using ExecutionContext.global)
+          case None => model.complete(request)
 
   /**
    * On failure, what the lipid question's workflow last said and which cases no cassette answers.
@@ -127,6 +136,9 @@ trait AutomationFixture extends ServiceFixture:
         )
         println(
           s"DIAG verify: ${get(api("/workflows/verification/src:file:paper-a:v1:fd1:a1"))._2.take(800)}"
+        )
+        println(
+          s"DIAG verify run: ${get(api("/runs/run-src:file:paper-a:v1:fd1:a1"))._2.take(1500)}"
         )
         println(
           s"DIAG run: ${get(api(s"/runs/run-$q"))._2.replaceAll("\"(inputs|outputs|checks)\":\\[[^]]*]", "").take(3000)}"
@@ -146,10 +158,24 @@ trait AutomationFixture extends ServiceFixture:
    * The reference sources ingested with every verification call of Paper A's records held, so they
    * are still being verified when the lipid question resolves; then the request confirmed.
    */
+  protected val PaperAVerify =
+    Vector("fd1", "cl1").map(k => s"# case: verify:src:file:paper-a:v1:$k")
+
+  /**
+   * Paper A's ingestion waits for its records' verification, which is held, so the request is
+   * confirmed once both verification calls have arrived rather than when the ingestion ends.
+   */
   protected def confirmWhilePaperAIsVerified(): (String, Vector[Promise[Unit]]) =
-    val gates = Vector("fd1", "cl1").map(k => holdEvery(s"# case: verify:src:file:paper-a:v1:$k"))
+    val gates = PaperAVerify.map(holdEvery)
     Seq("paper-b.xml", "paper-c.xml").foreach(f => recordsSettled(ingestFixture(f, extract = true)))
-    ingestFixture("paper-a.xml", extract = true)
+    val (status, body) = post(
+      api("/sources:ingest"),
+      """{"adapter":"file","identifier":"paper-a.xml","extract":true}"""
+    )
+    assertEquals(status, 202, body)
+    eventually("Paper A's verification is asked for and held", within = 120.seconds)(
+      Option.when(PaperAVerify.forall(hasArrived))(())
+    )
     (submitAndConfirm(), gates)
 
   protected def questionOf(id: String): String = get(api(s"/questions/$id"))._2
@@ -251,15 +277,13 @@ class AutomationVerificationWaitSuite extends AutomationFixture:
       eventually("the lipid question waits for verification", within = 120.seconds) {
         val w = questionWorkflow(s"$id:q4"); Option.when(w.contains("awaiting-verification"))(w)
       }
-      eventually("the held verification has been asked for")(
-        Option.when(hasArrived("# case: verify:src:file:paper-a:v1:fd1"))(())
-      )
       assert(
         !stageNames(get(api(s"/runs/run-$id:q4"))._2).contains("assess"),
         "assessed before verification settled"
       )
-      // Every verification call of Paper A stays held, so its records settle as requiring review;
-      // the question waits for that and assesses only the verified records of B and C.
+      // Paper A's verifier then fails, so its records settle as requiring review; the question
+      // waits for that and assesses only the verified records of B and C.
+      PaperAVerify.foreach(failEvery)
       val q = eventually("the lipid question reports", within = 180.seconds) {
         val q = questionOf(s"$id:q4")
         Option.when(q.contains("\"status\":\"reported\""))(q)
