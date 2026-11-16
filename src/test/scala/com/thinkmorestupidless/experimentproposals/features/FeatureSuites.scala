@@ -50,8 +50,20 @@ class EvidenceFeatures extends GherkinSuite("features/evidence") with AllSteps
 /** `features/design/`. */
 class DesignFeatures extends GherkinSuite("features/design") with AllSteps
 
-/** `features/assurance/`. */
-class AssuranceFeatures extends GherkinSuite("features/assurance") with AllSteps
+// `features/assurance/`, one suite per feature, each with a store of its own: the fault feature
+// leaves copies of the papers whose chunks still rank in a search after they are excluded, and
+// the impact feature's investigation assesses whatever its searches retrieve.
+
+/** `features/assurance/evaluation.feature`. */
+class EvaluationFeatures extends GherkinSuite("features/assurance/evaluation.feature") with AllSteps
+
+/** `features/assurance/fault-injection.feature`. */
+class FaultInjectionFeatures
+    extends GherkinSuite("features/assurance/fault-injection.feature")
+    with AllSteps
+
+/** `features/assurance/impact.feature`. */
+class ImpactFeatures extends GherkinSuite("features/assurance/impact.feature") with AllSteps
 
 /** `features/investigation/`. */
 class InvestigationFeatures extends GherkinSuite("features/investigation") with AllSteps:

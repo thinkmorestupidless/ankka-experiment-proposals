@@ -34,8 +34,15 @@ trait AutomationSteps extends GherkinSuite with CommonSteps with RequestSteps:
   private def failEvery(key: String): Unit =
     failing.add(key)
     Option(held.remove(key)).foreach(_.tryFailure(ModelCallFailed("held", s"failed: $key")))
+
+  /**
+   * Ends every hold by failing it, so a held copy's records settle as requiring review, as a
+   * verification cut short does, and stay out of later scenarios' assessments; no cassette assesses
+   * a copy.
+   */
   private def releaseAll(): Unit =
-    held.values.asScala.foreach(_.trySuccess(())); held.clear(); failing.clear(); arrived.clear()
+    held.values.asScala.foreach(_.tryFailure(ModelCallFailed("held", "the scenario is over")))
+    held.clear(); failing.clear(); arrived.clear()
 
   private def caseLine(request: ModelRequest): String =
     request.messages

@@ -19,30 +19,39 @@ trait DesignSteps extends GherkinSuite with SearchSteps:
       .flatMap(a => """"id":"([^"]+)"""".r.findFirstMatchIn(a).map(_.group(1)))
 
   /**
-   * The package is built; the candidates follow in the same chain, so the Given waits only for the
-   * package.
+   * The investigation assesses, packages and proposes the candidates by itself once the facets are
+   * confirmed (feature 002), so the Given waits for its package. Assessing or packaging by hand as
+   * well would race it, and candidates proposed over the second package have no cassette.
    */
   protected def packageFor(questionText: String): Unit =
     Seq("Paper A", "Paper B", "Paper C").foreach(ingestPaper)
     referenceQuestion(questionText)
-    assessRecords(
-      Seq("src:file:paper-a:v1:fd1", "src:file:paper-b:v1:fd1", "src:file:paper-c:v1:fd1")
-    )
-    val (status, body) = post(s"/requests/$requestId/packages", """{"reviewer":"demo-reviewer"}""")
-    assertEquals(status, 202, body)
-    eventually("the lipid package is valid") {
-      val (s, p) = get(s"/packages/$questionId:pk1")
-      Option.when(s == 200 && p.contains("\"qualityStatus\":{\"type\":\"valid\"}"))(p)
-    }
+    try
+      testKit.eventually("the lipid package is valid", investigationPatience) {
+        val (s, p) = get(s"/packages/$questionId:pk1")
+        Option.when(s == 200 && p.contains("\"qualityStatus\":{\"type\":\"valid\"}"))(p)
+      }
+    catch
+      case e: Throwable =>
+        fail(
+          s"${e.getMessage}; the package: ${get(s"/packages/$questionId:pk1")._2.take(2000)}; " +
+            s"the request: ${investigationView().take(1500)}; the lanes: " +
+            (1 to 6)
+              .map(n => get(s"/workflows/question-investigation/$requestId:q$n")._2)
+              .map(l => l.substring(math.max(0, l.indexOf("recordIds"))).take(700))
+              .mkString(" | ")
+        )
+
+  /** The whole investigation runs before its pause, longer than one workflow's patience. */
+  private def investigationPatience: FiniteDuration =
+    if patience > 45.seconds then patience else 4.minutes
 
   protected def candidatesGenerated(): String =
-    // The investigation proposes candidates by itself (feature 002); a manual packaging proposes
-    // them again, so wait for the pause and for the approaches to be there. The whole investigation
-    // runs before that pause, longer than one workflow's patience.
-    val within = if patience > 45.seconds then patience else 4.minutes
+    // The investigation proposes candidates by itself (feature 002): wait for the pause and for
+    // the approaches to be there.
     approachesJson =
       try
-        testKit.eventually("the candidates are compared", within) {
+        testKit.eventually("the candidates are compared", investigationPatience) {
           val w = investigationView()
           val a = get(s"/requests/$requestId/approaches")._2
           Option.when(w.contains("awaiting-decision") && a.contains("\"hypothesis\":"))(a)
