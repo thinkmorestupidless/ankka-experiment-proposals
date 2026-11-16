@@ -41,7 +41,9 @@ npm run features                # the living features, against the service on po
 npm run check                   # the walkthrough, the cards and the accessibility checks
 ```
 
-Both browser runs need the service in the replay tier with `EDP_ASSISTANT_SCRIPT` set. The fault
+Both browser runs need the service in the replay tier with `EDP_ASSISTANT_SCRIPT` set. `npm run check`
+also needs `EDP_CONVERSATION_BUDGET=5000000`: the cards and the accessibility checks discuss the same
+approved request, and its one conversation outgrows the default budget of 200,000 tokens. The fault
 scenario and the walkthrough each fault the copy of Paper A, and only its first fault replays from
 the cassettes, so run each of them against a database where that copy has not been faulted yet.
 

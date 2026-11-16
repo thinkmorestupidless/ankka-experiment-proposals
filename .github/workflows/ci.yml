@@ -102,8 +102,9 @@ jobs:
       - run: EDP_ASSISTANT_SCRIPT=/evals/assistant/walkthrough.json docker compose --profile app up -d --wait
         working-directory: .
       - run: npm run features
-      # The features spend the reference request's conversation; the specs start from a fresh store.
-      - run: docker compose --profile app down -v && EDP_ASSISTANT_SCRIPT=/evals/assistant/walkthrough.json docker compose --profile app up -d --wait
+      # The specs start from a fresh store. The cards and the accessibility checks discuss the same
+      # approved request, whose one conversation outgrows the default budget, so it is raised here.
+      - run: docker compose --profile app down -v && EDP_CONVERSATION_BUDGET=5000000 EDP_ASSISTANT_SCRIPT=/evals/assistant/walkthrough.json docker compose --profile app up -d --wait
         working-directory: .
       - run: npm run check
       - run: docker compose --profile app down -v && docker compose --profile app up -d --wait
