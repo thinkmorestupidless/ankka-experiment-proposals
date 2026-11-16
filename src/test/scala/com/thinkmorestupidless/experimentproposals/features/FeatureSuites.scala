@@ -54,4 +54,9 @@ class DesignFeatures extends GherkinSuite("features/design") with AllSteps
 class AssuranceFeatures extends GherkinSuite("features/assurance") with AllSteps
 
 /** `features/investigation/`. */
-class InvestigationFeatures extends GherkinSuite("features/investigation") with AllSteps
+class InvestigationFeatures extends GherkinSuite("features/investigation") with AllSteps:
+  // A held model call ends at ankka.ask-timeout, 10 seconds by default, and a verification that
+  // ends so is settled. The automation scenarios hold a source's verification until the question
+  // has met it, so here a held call waits longer.
+  override protected def serviceSettings: com.typesafe.config.Config =
+    com.typesafe.config.ConfigFactory.parseString("ankka.ask-timeout = 200s")

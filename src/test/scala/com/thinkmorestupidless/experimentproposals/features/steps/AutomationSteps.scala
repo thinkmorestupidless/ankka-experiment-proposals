@@ -27,12 +27,15 @@ trait AutomationSteps extends GherkinSuite with CommonSteps with RequestSteps:
 
   private val held    = java.util.concurrent.ConcurrentHashMap[String, Promise[Unit]]()
   private val failing = java.util.concurrent.ConcurrentHashMap.newKeySet[String]()
+  private val arrived = java.util.concurrent.ConcurrentHashMap.newKeySet[String]()
 
   /** Holds every call whose case line contains the key, retries included, until released. */
   private def holdEvery(key: String): Unit = held.put(key, Promise[Unit]()): Unit
-  private def failEvery(key: String): Unit = failing.add(key): Unit
+  private def failEvery(key: String): Unit =
+    failing.add(key)
+    Option(held.remove(key)).foreach(_.tryFailure(ModelCallFailed("held", s"failed: $key")))
   private def releaseAll(): Unit =
-    held.values.asScala.foreach(_.trySuccess(())); held.clear(); failing.clear()
+    held.values.asScala.foreach(_.trySuccess(())); held.clear(); failing.clear(); arrived.clear()
 
   private def caseLine(request: ModelRequest): String =
     request.messages
@@ -52,8 +55,9 @@ trait AutomationSteps extends GherkinSuite with CommonSteps with RequestSteps:
         if failing.asScala.exists(text.contains) then
           Future.failed(ModelCallFailed(name, "the step fails this stage's model call"))
         else
-          held.asScala.collectFirst { case (k, p) if text.contains(k) => p } match
-            case Some(p) =>
+          held.asScala.collectFirst { case (k, p) if text.contains(k) => k -> p } match
+            case Some((k, p)) =>
+              arrived.add(k)
               p.future.flatMap(_ => underlying.complete(request))(using ExecutionContext.global)
             case None => underlying.complete(request)
 
@@ -73,6 +77,7 @@ trait AutomationSteps extends GherkinSuite with CommonSteps with RequestSteps:
   private var sourcesBefore: Int       = 0
   private var assessRunsBefore: Int    = 0
   private var sawWaiting: Boolean      = false
+  private var settleOnceWaiting        = false
   private var assessedEarly: Boolean   = false
   private var savedBound               = Configured.verificationBound
 
@@ -90,7 +95,14 @@ trait AutomationSteps extends GherkinSuite with CommonSteps with RequestSteps:
       .toVector
   private def sourceCount: Int = """"id":"src:""".r.findAllIn(get("/sources")._2).size
   private def longly[A](what: String)(check: => Option[A]): A =
-    testKit.eventually(what, if patience > 45.seconds then patience else 4.minutes)(check)
+    try testKit.eventually(what, if patience > 45.seconds then patience else 4.minutes)(check)
+    catch
+      case e: Throwable =>
+        val quiet = "(execution|chunk)[A-Za-z]*\\\\\":\\[[^]]*]"
+        fail(
+          s"${e.getMessage}; the lipid lane: ${lane(lipidId).replaceAll(quiet, "").take(2500)}; " +
+            s"the request: ${get(s"/workflows/investigation/$requestId")._2.take(1500)}"
+        )
 
   /** Whether a lane rests: reported, or paused with a failure recorded. */
   private def laneRests(qid: String): Boolean =
@@ -120,11 +132,22 @@ trait AutomationSteps extends GherkinSuite with CommonSteps with RequestSteps:
   private def settledVerification(recordId: String): Boolean =
     get(s"/workflows/verification/$recordId:a1")._2.contains("\"isTerminal\":true")
 
-  /** A copy of a reference paper whose every verification call is held. */
+  private def heldKeys: Seq[String] = heldRecords.map(r => s"# case: verify:$r:")
+
+  /**
+   * A copy of a reference paper whose every verification call is held. Its ingestion waits for that
+   * verification, so the step waits only until both calls have arrived and its chunks are there.
+   */
   private def ingestHeld(file: String, sourceId: String): Unit =
     heldRecords = Seq("fd1", "cl1").map(k => s"$sourceId:v1:$k")
-    heldRecords.foreach(r => holdEvery(s"# case: verify:$r:"))
-    ingest(file, extract = true): Unit
+    heldKeys.foreach(holdEvery)
+    val (status, body) =
+      post("/sources:ingest", s"""{"adapter":"file","identifier":"$file","extract":true}""")
+    assertEquals(status, 202, body)
+    longly(s"the verification of $sourceId is asked for and held")(
+      Option.when(heldKeys.forall(arrived.contains))(())
+    )
+    chunksProjected(sourceId)
 
   // ── sources and the facets ──────────────────────────────────────────────────
 
@@ -169,6 +192,10 @@ trait AutomationSteps extends GherkinSuite with CommonSteps with RequestSteps:
           if heldRecords.nonEmpty && heldRecords.exists(r => !settledVerification(r)) then
             if w.contains("awaiting-verification") then sawWaiting = true
             if stages(runOf(lipidId)).contains("assess") then assessedEarly = true
+          // Once the question is seen waiting, the held verifier fails, so the records settle as
+          // requiring review; under the unsettled bound the stage has failed by itself.
+          if sawWaiting && settleOnceWaiting then
+            settleOnceWaiting = false; heldKeys.foreach(failEvery)
           Option.when(laneRests(lipidId))(())
         }
   }
@@ -191,6 +218,7 @@ trait AutomationSteps extends GherkinSuite with CommonSteps with RequestSteps:
     "the search for a scientific question retrieved a source whose findings are still being verified"
   ) { () =>
     ingestHeld("paper-a.xml@endpoint_swap", "src:file:paper-a@endpoint_swap")
+    settleOnceWaiting = true
   }
 
   Given(

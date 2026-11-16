@@ -3,6 +3,8 @@ package com.thinkmorestupidless.experimentproposals.features.steps
 import com.thinkmorestupidless.experimentproposals.domain.design.Comparison
 import com.thinkmorestupidless.ankka.testkit.GherkinSuite
 
+import scala.concurrent.duration.*
+
 /** Steps for `features/design/candidates.feature` (US7) and `experimental-design.feature` (US8). */
 trait DesignSteps extends GherkinSuite with SearchSteps:
 
@@ -35,12 +37,22 @@ trait DesignSteps extends GherkinSuite with SearchSteps:
 
   protected def candidatesGenerated(): String =
     // The investigation proposes candidates by itself (feature 002); a manual packaging proposes
-    // them again, so wait for the pause and for the approaches to be there.
-    approachesJson = eventually("the candidates are compared") {
-      val w = investigationView()
-      val a = get(s"/requests/$requestId/approaches")._2
-      Option.when(w.contains("awaiting-decision") && a.contains("\"hypothesis\":"))(a)
-    }
+    // them again, so wait for the pause and for the approaches to be there. The whole investigation
+    // runs before that pause, longer than one workflow's patience.
+    val within = if patience > 45.seconds then patience else 4.minutes
+    approachesJson =
+      try
+        testKit.eventually("the candidates are compared", within) {
+          val w = investigationView()
+          val a = get(s"/requests/$requestId/approaches")._2
+          Option.when(w.contains("awaiting-decision") && a.contains("\"hypothesis\":"))(a)
+        }
+      catch
+        case e: Throwable =>
+          fail(
+            s"${e.getMessage}; the investigation: ${investigationView().take(2500)}; " +
+              s"the approaches: ${get(s"/requests/$requestId/approaches")._2.take(1500)}"
+          )
     approachesJson
 
   // ── candidates.feature ───────────────────────────────────────────────────────
