@@ -9,6 +9,8 @@ import com.thinkmorestupidless.ankka.http.HttpServer
 import com.thinkmorestupidless.ankka.runtime.ProjectionRuntime
 import com.thinkmorestupidless.ankka.testkit.{AnkkaTestKit, LogCapturing}
 
+import com.typesafe.config.{Config, ConfigFactory}
+
 import java.net.URI
 import java.net.http.{HttpClient, HttpRequest as JdkRequest, HttpResponse as JdkResponse}
 import java.time.Duration
@@ -34,6 +36,9 @@ trait ServiceFixture extends munit.FunSuite with LogCapturing:
   protected val model: TestModelProvider     = TestModelProvider()
   protected def modelProvider: ModelProvider = model
 
+  /** Configuration the service starts with above ankka's own; nothing by default. */
+  protected def serviceSettings: Config = ConfigFactory.empty()
+
   protected var testKit: AnkkaTestKit = null
   protected var baseUrl: String       = ""
   protected var server: HttpServer    = null
@@ -44,7 +49,8 @@ trait ServiceFixture extends munit.FunSuite with LogCapturing:
     server = HttpServer.at("127.0.0.1", 0)(Main.endpoints(settings)*)
     testKit = AnkkaTestKit.start(
       Main.descriptors,
-      Seq(ProjectionRuntime(), Main.agentRuntime(settings, modelProvider), server)
+      Seq(ProjectionRuntime(), Main.agentRuntime(settings, modelProvider), server),
+      settings = serviceSettings
     )
     baseUrl = s"http://127.0.0.1:${server.boundPort.getOrElse(fail("server did not bind"))}"
     Configured.views = Some(testKit.service.viewClient)

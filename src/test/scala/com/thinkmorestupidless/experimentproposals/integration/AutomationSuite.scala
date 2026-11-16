@@ -11,6 +11,8 @@ import com.thinkmorestupidless.ankka.agent.{
   ModelResponse
 }
 
+import com.typesafe.config.{Config, ConfigFactory}
+
 import java.nio.file.Path
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.concurrent.duration.*
@@ -158,6 +160,14 @@ trait AutomationFixture extends ServiceFixture:
    * The reference sources ingested with every verification call of Paper A's records held, so they
    * are still being verified when the lipid question resolves; then the request confirmed.
    */
+  /**
+   * A held model call ends at ankka.ask-timeout, 10 seconds by default, and a verification that
+   * ends so is settled as requiring review. Paper A's held verification must outlast the question's
+   * arrival, so the suites that hold it wait longer.
+   */
+  protected val HoldsOutlastTheQuestion: Config =
+    ConfigFactory.parseString("ankka.ask-timeout = 200s")
+
   protected val PaperAVerify =
     Vector("fd1", "cl1").map(k => s"# case: verify:src:file:paper-a:v1:$k")
 
@@ -266,6 +276,7 @@ class AutomationSuite extends AutomationFixture:
 
 /** Assessment waits for the retrieved records' verification to settle (feature 002, US2). */
 class AutomationVerificationWaitSuite extends AutomationFixture:
+  override protected def serviceSettings: Config = HoldsOutlastTheQuestion
   override def beforeAll(): Unit =
     super.beforeAll(); scriptFromCassettes(stagesScripted*)
 
@@ -301,7 +312,8 @@ class AutomationVerificationWaitSuite extends AutomationFixture:
 
 /** The unsettled bound: verification that does not settle fails the stage (feature 002, US2). */
 class AutomationUnsettledSuite extends AutomationFixture:
-  private var bound = Configured.verificationBound
+  override protected def serviceSettings: Config = HoldsOutlastTheQuestion
+  private var bound                              = Configured.verificationBound
   override def beforeAll(): Unit =
     super.beforeAll(); scriptFromCassettes(stagesScripted*)
     bound = Configured.verificationBound
