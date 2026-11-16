@@ -72,9 +72,11 @@ trait ImpactSteps extends GherkinSuite with AssuranceSteps:
 
   Given("the source {string} has been marked {string}") { (name: String, status: String) =>
     markSource(name, status)
-    testKit.eventually("the design is flagged", 6.minutes) {
+    // Any flag is not enough: the previous scenario's restore of the source can reach this
+    // design late and flag it first. Wait for the flag this change raises.
+    testKit.eventually(s"the design is flagged for the source $status", 6.minutes) {
       val d = get(s"/designs/$designId")._2
-      Option.when(d.contains("\"flags\":[{"))(d)
+      Option.when(d.contains(s"\"reason\":\"the source's status changed to $status"))(d)
     }
   }
 
