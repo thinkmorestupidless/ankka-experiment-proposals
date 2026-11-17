@@ -73,7 +73,7 @@ object Enumerations:
     case schema_invalid, span_unresolved, unit_invalid, status_invalid, negation_error,
       species_overgeneralisation, endpoint_mismatch, failure_as_success, unsupported_by_span,
       scope_loss, context_mismatch, model_refused, coverage_gap, fewer_than_two,
-      unverified_claim_ref, other
+      unverified_claim_ref, other, verification_unsettled
 
   enum Severity:
     case critical, major, minor

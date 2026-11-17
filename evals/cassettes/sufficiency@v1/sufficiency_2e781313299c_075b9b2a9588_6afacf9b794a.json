@@ -1,0 +1,7 @@
+{
+  "promptVersion": "sufficiency@v1",
+  "case": "sufficiency:2e781313299c:075b9b2a9588:6afacf9b794a",
+  "reply": "{\n  \"proposition\": \"Oil Red O staining, triglyceride content and cell counts are measurements a feasibility experiment can use.\",\n  \"status\": \"sufficient_for_proposed_next_step\",\n  \"assumptions\": [\n    \"that the Oil Red O and triglyceride assays work in avian hepatocytes as in HepG2 cells\"\n  ],\n  \"supportingAssessments\": [\n    \"src:file:paper-b:v1:fd1\",\n    \"src:file:paper-b:v1:cl1\",\n    \"src:file:paper-a:v1:fd1\"\n  ],\n  \"criticalGaps\": [\n    {\n      \"description\": \"the lipid assays have not been run in avian cells\",\n      \"kind\": \"absence\",\n      \"escalation\": \"exploratory_question\"\n    }\n  ],\n  \"coverageJudgement\": \"mixed\",\n  \"rationale\": \"The experiment's measurements are available; the assays' transfer to avian cells is an assumption it must check.\",\n  \"escalation\": \"exploratory_question\"\n}",
+  "recorded": false,
+  "authoredBy": "thinkmore"
+}

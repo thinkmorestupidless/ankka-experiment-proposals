@@ -52,7 +52,7 @@ class AssessmentSuite extends ServiceFixture:
     }
     eventually("the lipid question waits for retrieval") {
       val (_, q) = get(api(s"/questions/$id:q4"))
-      Option.when(q.contains("\"status\":\"retrieved\"") || q.contains("awaiting-retrieval"))(q)
+      Option.when(rests(q) || q.contains("awaiting-retrieval"))(q)
     }
     (s"$id:q4", s"$id:q6")
 

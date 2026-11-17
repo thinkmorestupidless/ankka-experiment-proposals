@@ -1,0 +1,7 @@
+{
+  "promptVersion": "sufficiency@v1",
+  "case": "sufficiency:9f8ec27cf136:075b9b2a9588:6afacf9b794a",
+  "reply": "{\n  \"proposition\": \"Primary duck hepatocytes are a feasible candidate for a feasibility experiment.\",\n  \"status\": \"sufficient_for_proposed_next_step\",\n  \"assumptions\": [\n    \"that duck hepatocytes stay hepatic in phenotype through expansion\"\n  ],\n  \"supportingAssessments\": [\n    \"src:file:paper-a:v1:fd1\",\n    \"src:file:paper-a:v1:cl1\"\n  ],\n  \"criticalGaps\": [\n    {\n      \"description\": \"hepatic phenotype after expansion was not reported\",\n      \"kind\": \"absence\",\n      \"escalation\": \"exploratory_question\"\n    }\n  ],\n  \"coverageJudgement\": \"mixed\",\n  \"rationale\": \"One candidate cell type is enough to choose the experiment's cells; the experiment must check it stays hepatic.\",\n  \"escalation\": \"exploratory_question\"\n}",
+  "recorded": false,
+  "authoredBy": "thinkmore"
+}

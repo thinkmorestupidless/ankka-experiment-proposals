@@ -116,7 +116,11 @@ trait SourceSteps extends GherkinSuite with CommonSteps:
   Then("no duplicate record is created") { () =>
     assertEquals("\"version\":1".r.findAllIn(sourceJson).size, 1, sourceJson)
     assert(!sourceJson.contains("\"version\":2"), sourceJson)
-    val (_, listed) = get("/sources")
+    // The listing is a view, which lags the entity: wait for the source to be listed, then count.
+    val listed = eventually(s"$ingestedSource is listed") {
+      val (_, body) = get("/sources")
+      Option.when(body.contains(s""""id":"$ingestedSource""""))(body)
+    }
     assertEquals(s""""id":"$ingestedSource"""".r.findAllIn(listed).size, 1, listed)
   }
 

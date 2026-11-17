@@ -41,6 +41,7 @@ step runs again, otherwise the stage is recorded as failed.
 | eligibility | the round's executions | no | eligible results and exclusions, after ranking | eligibility rules per source version | nothing eligible opens a coverage gap |
 | supplemental | a coverage gap | no | another round with the plan's expansions, linked to the gap | the gap's budget, two rounds | refused once spent |
 | resolve | the eligible hits | no | each chunk's context; the verified records of the hit sources | | |
+| await verification | the records the search retrieved | no | which of them are verified, rejected or still being verified | every retrieved record's verification has ended, within `EDP_VERIFICATION_BOUND` (three minutes by default) | the defect `verification_unsettled`; retry up to two, then the question rests with the defect |
 | assess | the question and verified records | evidence agent | relationship and applicability per record | applicability rules: a species or endpoint mismatch is never direct; unknown species is unknown | retry up to two |
 | sufficiency | the question, assessments, gaps, one decision | evidence agent | a status, assumptions, critical gaps, coverage judgement | a record that is the only affirmative evidence sends the judgement to review | retry up to two |
 | build packages | each question's assessments | no | one package per question | spans resolve, contradictions included, only verified and eligible records, no critical trim | the package is invalid, and says why |
@@ -48,6 +49,25 @@ step runs again, otherwise the stage is recorded as failed.
 | await decision | | no | pause | a configured reviewer, a reason for each rejected approach | the decide command is refused |
 | design | the decision, the approach, verified claims | design agent | a twelve-section design | every cited claim verified, every span resolves, mandatory facets accounted for | retry up to two |
 | await approval | | no | pause | a configured reviewer, a rationale | changes requested run the design stage again with the changes |
+
+## What runs by itself
+
+Between the reviewer's pauses the investigation runs every stage without being asked. Confirming the
+facets starts it. Each question is planned, searched and filtered. Its retrieved records' verification
+is awaited, and every verified eligible record is assessed. Sufficiency is then judged once for each
+decision in `EDP_DECISIONS`. When every question has been judged, the packages are built and the
+candidates proposed. The investigation then pauses for the choice of approach. A stage that runs by
+itself records its stage run with the actor `system:investigation`.
+
+The investigation pauses only where a reviewer decides, or where a stage has failed after its retries.
+A question whose stage failed rests with the defect on its state, and the request's journey shows it
+paused there. The operator resumes it with the stage's own route. `POST /questions/{id}/assess` and
+`POST /questions/{id}/sufficiency` still work at any time and record a further stage run, as does
+`POST /requests/{id}/packages`.
+
+Ingestion is never automatic. What is in the corpus is a person's choice, made with
+`POST /sources:ingest`. A search that finds nothing eligible opens a coverage gap, and sufficiency then
+abstains.
 
 ## What a reviewer sees
 

@@ -291,7 +291,125 @@ The removal of material from an evidence package to fit a budget, logged and nev
 ### link
 A versioned connection between two records, naming the version of each; impact propagation follows links.
 
+### interface
+The web application a person uses the system through: the conversation, the journey, the cards and the decisions.
+
+Avoid: frontend, UI, app, dashboard
+
+### investigation
+The whole process a customer request goes through, from submission to an approved experimental design; it runs itself between pauses.
+
+Avoid: pipeline, workflow, process
+
+### stage
+One step of the investigation, such as facets, search or assessment; each produces records and a stage run.
+
+### stage run
+The provenance record of one execution of a stage: what it read, what it produced, which checks ran, and its status.
+
+### automatic stage
+A stage the investigation runs without being asked, between pauses.
+
+### pause
+Where the investigation waits: for a reviewer's decision (facets, the choice of approach, the design) or because a stage failed after its retries.
+
+Avoid: block, stop
+
+### journey
+A customer request's path through the stages, shown as a graph; derived from the investigation's state and the stage runs, never stored.
+
+Avoid: pipeline view, progress bar, timeline
+
+### card
+The rendering of one record in the form made for its kind; its content is the stored record, never a retelling of it.
+
+Avoid: widget, panel, view
+
+### inspector
+Where the card of the selected stage is shown, beside the journey.
+
+Avoid: sidebar, detail pane
+
+### rail
+The list of areas a person moves between: requests, the review queue, sources and the conversation.
+
+Avoid: menu, navigation, sidebar
+
+### review queue
+The records awaiting a reviewer's decision, each beside the passages its source spans resolve to.
+
+Avoid: inbox, backlog
+
+### conversation
+One person's exchange with the assistant, with its own history; two conversations share nothing. A request's conversation has that request as its subject and is opened from its journey; the free-standing conversation is opened from the rail and ranges across requests.
+
+Avoid: chat, session, thread
+
+### budget
+The tokens a conversation may spend, configured; shown on the conversation as used against total, and reaching it ends the assistant's answers in that conversation.
+
+Avoid: quota, limit, cap
+
+### assistant
+The conversational agent inside the system that answers from the records, proposes actions and decides nothing.
+
+Avoid: bot, chatbot, agent, copilot
+
+### person
+Whoever is using the interface: the operator or the reviewer. Named when their role matters.
+
+Avoid: user
+
+### operator
+The person who runs the system: submits requests on a customer's behalf, ingests sources, injects faults, changes a source's status and reads provenance.
+
+Avoid: admin, administrator
+
+### answer
+The assistant's reply to a question, in words, citing the records it read by reference.
+
+Avoid: response, completion
+
+### reference
+A typed pointer in an answer to one record: its kind, its identifier and, where the record is versioned, its version; shown as the record's card or marked unresolved.
+
+Avoid: link, citation
+
+### action
+An operator's act the assistant proposes with its exact arguments and performs only when the person confirms: submit a request, ingest a source, inject a fault, change a source's status.
+
+Avoid: tool call
+
+### prefilled decision
+A decision card filled in from what a person typed, awaiting the reviewer's act; nothing is recorded until the reviewer completes it.
+
+### model
+The language model behind the assistant or a stage; configured, not part of the system's own rules.
+
+Avoid: LLM, AI
+
+### approval
+The reviewer's recorded decision on one version of an experimental design: approved, rejected or changes requested, with reviewer, time and rationale.
+
+### importance
+How much a facet matters to a proposal: mandatory, preferred or exploratory.
+
+Avoid: priority, weight
+
+### quotation
+The exact text a source span cites, as it stands in the source.
+
+### shared token
+The one credential that admits a person to the interface and the operator's routes; it identifies nobody.
+
+Avoid: password, API key
+
+### operator's route
+The way the operator asks the system for something directly, as a script does; every decision and action has one, and a card does exactly what it does.
+
+Avoid: API call
+
 ## Everyday words
 
 a, an, the, and, or, not, no, nothing, is, are, was, has, have, been, be, it, its, that, this, those, with, without, in, on, of, to, for, from, by, as, at, against, under, into, than, one, two, every, each, all, at least, least, any, same, other, another, earlier, later, before, after, again, alone, also, only,
-absent, accepted, adjacent, admitted, aggregate, altered, ambiguous, applied, approved, asserted, assessed, associated, assumes, attempt, authorised, authors, automatically, available, awaiting, becomes, blocking, bounded, built, carries, category, changed, cited, clarification, classified, compared, completes, confirmation, confirmed, confirms, contains, context, contrary, conversion, copy, corrupt, covers, created, dataset, date, depends, derived, detailed, detected, direct, disabled, disposable, distinguishes, downgraded, dropped, duplicate, entered, excluded, executed, exploratory, extracted, failed, fails, filters, first-ranked, generated, identical, impossible, inadequate, ingested, inspected, interpreted, investigated, investigates, judged, kept, labelled, list, listed, lists, location, marked, materially, metadata, method, mismatch, names, naming, number, numeric, parameters, parent, parse, parsed, part, persistent, persists, presented, prevents, probability, produced, proposed, read, reason, reasons, recognised, reference, regardless, rejected, rejection, rejects, reliably, remain, remains, removed, reported, reporting, required, requires, resembles, resolve, resolved, resolves, retained, retains, retried, retrievable, retrieved, retryable, returned, returns, scores, selected, selects, separately, shown, silently, single, specified, stored, structured, success, suite, summary, support, supporting, supports, surfaced, system, text, time, title, treated, triggered, twelve, unchanged, unresolved, unsuccessful, valid, validated, value, venue, verified, visible, which, whose, stated, states, state, result, avian, re-run, linked, run, fetched, record, full
+absent, accepted, adjacent, admitted, aggregate, altered, ambiguous, applied, approved, asserted, assessed, associated, assumes, attempt, authorised, authors, automatically, available, awaiting, becomes, blocking, bounded, built, carries, category, changed, cited, clarification, classified, compared, completes, confirmation, confirmed, confirms, contains, context, contrary, conversion, copy, corrupt, covers, created, dataset, date, depends, derived, detailed, detected, direct, disabled, disposable, distinguishes, downgraded, dropped, duplicate, entered, excluded, executed, exploratory, extracted, failed, fails, filters, first-ranked, generated, identical, impossible, inadequate, ingested, inspected, interpreted, investigated, investigates, judged, kept, labelled, list, listed, lists, location, marked, materially, metadata, method, mismatch, names, naming, number, numeric, parameters, parent, parse, parsed, part, persistent, persists, presented, prevents, probability, produced, proposed, read, reason, reasons, recognised, reference, regardless, rejected, rejection, rejects, reliably, remain, remains, removed, reported, reporting, required, requires, resembles, resolve, resolved, resolves, retained, retains, retried, retrievable, retrieved, retryable, returned, returns, scores, selected, selects, separately, shown, silently, single, specified, stored, structured, success, suite, summary, support, supporting, supports, surfaced, system, text, time, title, treated, triggered, twelve, unchanged, unresolved, unsuccessful, valid, validated, value, venue, verified, visible, which, whose, stated, states, state, result, avian, re-run, linked, run, fetched, record, full, asks, asked, asking, answers, answered, appears, written, being, beside, browser, cases, command, completes, configured, confirm, confirmed, confirms, content, corpus, declines, deployed, documented, does, edit, enters, exactly, exist, exists, explicit, failed, finds, five, flag, follows, holds, identical, inject, ingest, lit, locally, longer, machine, made, make, marks, minute, moves, named, neither, new, next, nobody, now, opened, order, own, passed, person, proceeds, question, rank, reached, reaches, refused, refusal, refuses, resumes, resuming, retries, rendered, route, routes, running, runs, says, say, seconds, sees, selected, settled, show, shows, side, so, stored, stops, submit, submitted, supplies, than, three, typed, types, typed, unavailable, unreached, unsettled, usable, waits, while, why, wish, works, would, written, yet, service, beyond, what, starts, within, indirect, retracted, decide, established, belongs, where, keeps, else, choice, between, unverified, abstains, further, wants, know, see, tells, put, done, requests, requested, ends, documented, settle, settled, bound, waiting, findings, subject, free-standing, across, naming, second, named, spent, spend, tokens, total, fresh, used, declines, reached

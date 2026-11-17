@@ -64,7 +64,9 @@ final case class InvestigationState(
     packagedBy: Option[String] = None,
     designVersions: Int = 0,
     requestedChanges: Vector[String] = Vector.empty,
-    lastApproval: Option[ApprovalOutcome] = None
+    lastApproval: Option[ApprovalOutcome] = None,
+    // The questions whose investigation has reported (feature 002, the automation).
+    reportedQuestions: Vector[String] = Vector.empty
 ):
   def started: Boolean = status != "not-started"
 
@@ -94,7 +96,9 @@ final class InvestigationWorkflow(context: WorkflowContext) extends Workflow[Inv
       .stepTimeout(InvestigationWorkflow.investigateQuestions, 31.minutes)
       .build
 
-  private def stages            = StageCall(client, currentState.runId, "investigation")
+  private def stages = StageCall(client, currentState.runId, "investigation")
+  private def packagingStages =
+    StageCall(client, currentState.runId, "investigation", currentState.packagedBy)
   private def request           = client.forEventSourcedEntity(EntityId(currentState.requestId))
   private def facet(id: String) = client.forEventSourcedEntity(EntityId(id))
   private def requestRef        = Ref(RecordKind.request, currentState.requestId, 1)
@@ -144,6 +148,26 @@ final class InvestigationWorkflow(context: WorkflowContext) extends Workflow[Inv
         .updateState(currentState.copy(status = "building-packages", packagedBy = Some(by)))
         .transitionTo(InvestigationWorkflow.buildPackages.ref)
         .thenReplyState
+
+  /**
+   * A question's investigation has assessed and judged (feature 002): once every question has, the
+   * packages are built and the candidates proposed, by `system:investigation`. A repeat, or a
+   * report while the investigation is elsewhere, only records the id.
+   */
+  def questionReported(questionId: String): Effect[InvestigationState] =
+    if !currentState.started then
+      effects.error("the investigation has not started", ErrorCode.NotFound)
+    else
+      val reported = (currentState.reportedQuestions :+ questionId).distinct
+      val next     = currentState.copy(reportedQuestions = reported)
+      val all =
+        currentState.questionIds.nonEmpty && currentState.questionIds.forall(reported.contains)
+      if all && currentState.status == "questions-investigating" then
+        effects
+          .updateState(next.copy(status = "building-packages", packagedBy = Some(SystemActor)))
+          .transitionTo(InvestigationWorkflow.buildPackages.ref)
+          .thenReplyState
+      else effects.updateState(next).thenReplyState
 
   /** A reviewer decided (recorded on the `decision` entity first): on to the design (US8). */
   def decided(decisionId: String): Effect[InvestigationState] =
@@ -363,7 +387,7 @@ final class InvestigationWorkflow(context: WorkflowContext) extends Workflow[Inv
     val constraints = facets
       .filter(f => Set("resources", "time").contains(f.name))
       .map(f => s"${f.name}: ${f.statement}")
-    val built = stages.plain(
+    val built = packagingStages.plain(
       "build-packages",
       1,
       currentState.questionIds.map(Ref(RecordKind.question, _, 1)),
@@ -540,7 +564,7 @@ final class InvestigationWorkflow(context: WorkflowContext) extends Workflow[Inv
         p.resourceConstraints
       )
     }
-    val outcome = stages.model(
+    val outcome = packagingStages.model(
       stage,
       1,
       packages.map(p => Ref(RecordKind.`package`, p.id, p.version)),
@@ -571,7 +595,7 @@ final class InvestigationWorkflow(context: WorkflowContext) extends Workflow[Inv
       case StageOutcome.Done(attempt, set, modelCall) =>
         InvestigationWorkflow.gateCandidates(set) match
           case Left(defect) =>
-            stages.fail(stage, attempt, defect, modelCalls = Vector(modelCall))
+            packagingStages.fail(stage, attempt, defect, modelCalls = Vector(modelCall))
             retryOrFail(stage, defect, InvestigationWorkflow.candidates.ref)
           case Right(approaches) =>
             val facetsByName =
@@ -651,7 +675,7 @@ final class InvestigationWorkflow(context: WorkflowContext) extends Workflow[Inv
                 .call(ApproachEntity.compared)
                 .invoke(comparisonId)
             )
-            stages.complete(
+            packagingStages.complete(
               stage,
               attempt,
               idsByTitle.values.headOption.map(Ref(RecordKind.approach, _, 1)),
@@ -944,6 +968,7 @@ object InvestigationWorkflow
   val facetsConfirmed  = command("facets-confirmed")(_.facetsConfirmed)
   val rerunRoundTrip   = command("rerun-round-trip")(_.rerunRoundTrip)
   val packageEvidence  = command("package")(_.packageEvidence)
+  val questionReported = command("question-reported")(_.questionReported)
   val decided          = command("decided")(_.decided)
   val approvalRecorded = command("approval-recorded")(_.approvalRecorded)
   val status           = query("status")(_.status)

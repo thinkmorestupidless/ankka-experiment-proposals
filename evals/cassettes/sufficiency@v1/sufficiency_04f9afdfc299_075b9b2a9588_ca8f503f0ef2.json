@@ -1,0 +1,7 @@
+{
+  "promptVersion": "sufficiency@v1",
+  "case": "sufficiency:04f9afdfc299:075b9b2a9588:ca8f503f0ef2",
+  "reply": "{\n  \"proposition\": \"Lipid loading works in a human hepatoma line and goose hepatocytes failed in suspension; without the duck hepatocyte result there is no avian cell shown to grow for the experiment.\",\n  \"status\": \"insufficient_for_recommendation\",\n  \"assumptions\": [],\n  \"supportingAssessments\": [],\n  \"criticalGaps\": [\n    {\n      \"description\": \"no verified evidence that an avian hepatic cell can be expanded in culture\",\n      \"kind\": \"absence\",\n      \"escalation\": \"exploratory_question\"\n    }\n  ],\n  \"coverageJudgement\": \"mixed\",\n  \"rationale\": \"The experiment needs avian cells that grow; the only record that showed it is not verified, so the next step is not yet justified by the assessed material.\",\n  \"escalation\": \"exploratory_question\"\n}",
+  "recorded": false,
+  "authoredBy": "thinkmore"
+}

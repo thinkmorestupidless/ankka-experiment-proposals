@@ -1,0 +1,9 @@
+{
+  "name": "experiment-proposals-web",
+  "service": {
+    "image": "experiment-proposals-web:latest",
+    "hosting": "web",
+    "processPort": 3000,
+    "mounts": [{ "path": "/backend", "service": "ankka-experiment-proposals" }]
+  }
+}

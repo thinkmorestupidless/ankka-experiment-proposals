@@ -15,6 +15,10 @@ and a typed experimental design that a named scientific reviewer approves or rej
 - The documentation, with the motivation, the architecture and how to run and deploy it:
   https://thinkmorestupidless.github.io/ankka-experiment-proposals/ (source under `docs/`)
 - What it does not do: `docs/reference/limitations.md`
+- The interface: a web application in `web/`, with the request's journey drawn on a canvas, each stage's
+  record as a card, the reviewer's decisions on their cards, and a conversation with an assistant that
+  answers from the records. Its specification is `specs/002-chat-canvas-interface/`; how to run it:
+  `docs/get-started/interface.md`, and how to deploy it: `docs/deploy/interface.md`.
 
 ## How it works
 
@@ -93,6 +97,12 @@ decides admissibility, separately: a retracted paper can rank first and is still
 rule that removed it recorded on the search. And an empty or ineligible result is a coverage gap
 caused by the search, never evidence that the answer is "no"; the system can conclude "insufficient
 evidence" and does.
+
+Between the three decisions nobody calls a stage. Once the facets are confirmed, the investigation runs
+by itself through the search, the assessment of every verified eligible record, sufficiency for each
+configured decision, the packages and the candidates, and pauses for the choice of approach. It pauses
+earlier only where a stage has failed after its retries. Ingesting a source is the one act it never
+does by itself: what is in the corpus is a person's choice.
 
 ### How one piece of evidence earns its place
 

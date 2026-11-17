@@ -1,0 +1,7 @@
+{
+  "promptVersion": "sufficiency@v1",
+  "case": "sufficiency:75b347493785:075b9b2a9588:e3b0c44298fc",
+  "reply": "{\n  \"proposition\": \"Nothing has been retrieved for the hepatic cell culture question.\",\n  \"status\": \"requires_expert_review\",\n  \"assumptions\": [],\n  \"supportingAssessments\": [],\n  \"criticalGaps\": [\n    {\n      \"description\": \"no internal records or literature were retrieved for this question\",\n      \"kind\": \"coverage\",\n      \"escalation\": \"supplemental_search\"\n    }\n  ],\n  \"coverageJudgement\": \"search_inadequate\",\n  \"rationale\": \"An empty search says nothing about whether the evidence for a feasibility experiment exists, only that nothing was retrieved. A bounded supplemental search should follow.\",\n  \"escalation\": \"supplemental_search\"\n}",
+  "recorded": false,
+  "authoredBy": "thinkmore"
+}

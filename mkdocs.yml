@@ -71,13 +71,16 @@ nav:
   - Get started:
       - Run it locally: get-started/run-locally.md
       - The demonstration walkthrough: get-started/walkthrough.md
+      - Use the interface: get-started/interface.md
   - Build:
       - Add a model-backed stage: build/add-a-stage.md
       - Test the application: build/test.md
   - Deploy:
       - Deploy on ankka: deploy/deploy-on-ankka.md
+      - Deploy the interface: deploy/interface.md
   - Reference:
       - HTTP API: reference/http-api.md
+      - The assistant's script: reference/assistant-script.md
       - Configuration: reference/configuration.md
       - Limitations: reference/limitations.md
   - Contributing:

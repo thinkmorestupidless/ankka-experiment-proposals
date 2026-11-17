@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.git/
+test/
+test-results/
+playwright-report/
+.features-gen/

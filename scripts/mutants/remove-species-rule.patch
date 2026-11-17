@@ -1,9 +1,9 @@
---- a/src/main/scala/com/thinkmorestupidless/experimentproposals/rules/Applicability.scala
-+++ b/src/main/scala/com/thinkmorestupidless/experimentproposals/rules/Applicability.scala
-@@ -66,7 +66,7 @@
-       val endpoint      = dims.getOrElse("endpoint", DimensionMatch.unknown)
+--- a/src/main/scala/com/thinkmorestupidless/experimentproposals/rules/Applicability.scala	2026-11-04 17:07:37
++++ b/src/main/scala/com/thinkmorestupidless/experimentproposals/rules/Applicability.scala	2026-11-04 17:07:37
+@@ -67,7 +67,7 @@
        val results       = Vector.newBuilder[RuleOutcomeRecord]
        var applicability = proposed
+       // docs:start species-rule
 -      if species == DimensionMatch.mismatch && applicability == Applicability.direct then
 +      if false && species == DimensionMatch.mismatch && applicability == Applicability.direct then
          applicability = Applicability.indirect

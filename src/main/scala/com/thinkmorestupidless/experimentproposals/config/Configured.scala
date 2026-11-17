@@ -3,7 +3,10 @@ package com.thinkmorestupidless.experimentproposals.config
 import com.thinkmorestupidless.experimentproposals.adapters.{Adapter, Adapters}
 import com.thinkmorestupidless.experimentproposals.domain.provenance.Reviewers
 import com.thinkmorestupidless.experimentproposals.retrieval.{Embedder, HashEmbedder}
+import com.thinkmorestupidless.ankka.agent.ModelProvider
 import com.thinkmorestupidless.ankka.runtime.ViewClient
+
+import scala.concurrent.duration.FiniteDuration
 
 /**
  * What entities consult that is fixed for the life of the process: the configured reviewer list and
@@ -23,6 +26,14 @@ object Configured:
   @volatile var views: Option[ViewClient] = None
   @volatile var decisions: Vector[String] = Settings.DefaultDecisions
 
+  /**
+   * The assistant's model, apart from the pipeline's (research.md R12); None when none is
+   * configured.
+   */
+  @volatile var assistantModel: Option[ModelProvider] = None
+  @volatile var conversationBudget: Long              = Settings.DefaultConversationBudget
+  @volatile var verificationBound: FiniteDuration     = Settings.DefaultVerificationBound
+
   def apply(
       settings: Settings,
       reviewers: Reviewers,
@@ -37,6 +48,8 @@ object Configured:
     this.modelName = if settings.tier == Tier.replay then "replay" else settings.model
     this.tier = settings.tier
     this.decisions = settings.decisions
+    this.conversationBudget = settings.conversationBudget
+    this.verificationBound = settings.verificationBound
 
   /** `operator` or a configured reviewer; anyone else is refused before anything is persisted. */
   /** External indexes are searched only in the live tier; the replay tier reaches no network. */

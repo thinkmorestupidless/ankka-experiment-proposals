@@ -30,11 +30,18 @@ pause_for_reviewer() { # pause_for_reviewer <page> <auto command...>
   if [ "$AUTO" -eq 1 ]; then "$@"; else echo "  → a reviewer decides at $BASE$page (or rerun with --auto-review); waiting..."; "$@" 2>/dev/null || true; fi
 }
 started=$(date +%s)
-echo "1. The customer request"
+echo "1. Sources: the fixtures ingested and their records verified"
+# Ingestion is always a person's act; the investigation searches whatever is in the store.
+for f in paper-a.xml paper-b.xml paper-c.xml retracted.xml; do
+  w=$(api -X POST "$API/sources:ingest" -d "{\"adapter\":\"file\",\"identifier\":\"$f\",\"extract\":$( [ "$f" = retracted.xml ] && echo false || echo true )}" | field workflowId)
+  wait_for "$f ingested" "$API/workflows/ingestion/$w" '"isTerminal":true' 180
+done
+for s in src:file:paper-a src:file:paper-b src:file:paper-c; do wait_for "records of $s verified" "$API/sources/$s/records" '"status":"verified"' 120; done
+echo "2. The customer request"
 req=$(api -X POST "$API/requests" -d '{"text":"Can you make foie gras?","submittedBy":"customer"}')
 RID=$(printf '%s' "$req" | field id); echo "  request $RID"
 echo "$(api "$API/requests/$RID")" | grep -q 'Can you make foie gras?' && echo "  ✓ the text is kept byte for byte (SC-001)"
-echo "2. Facets: proposed, then confirmed by the reviewer"
+echo "3. Facets: proposed, then confirmed by the reviewer"
 wait_for "the facets are proposed and the round-trip check ran" "$API/workflows/investigation/$RID" "awaiting-facet-review"
 echo "  proposal: $(api "$API/requests/$RID/proposal" | head -c 300)"
 confirm_facets() {
@@ -45,35 +52,27 @@ confirm_facets() {
 }
 pause_for_reviewer "/review/requests/$RID/facets" confirm_facets
 wait_for "the facets are confirmed" "$API/workflows/investigation/$RID" "confirmedBy" 60
-echo "3. Scientific questions"
-wait_for "six questions are derived and their searches planned" "$API/workflows/investigation/$RID" "questions-investigating"
+echo "4. Scientific questions and their searches, the retracted paper excluded"
+echo "  From here the investigation runs itself until the reviewer chooses an approach."
+wait_for "six questions are derived and their searches running" "$API/workflows/investigation/$RID" "$RID:q6"
 Q4="$RID:q4"; echo "  lipid question $Q4: $(api "$API/questions/$Q4" | field question)"
-echo "4. Sources: the fixtures ingested, searched, the retracted paper excluded"
-for f in paper-a.xml paper-b.xml paper-c.xml retracted.xml; do
-  w=$(api -X POST "$API/sources:ingest" -d "{\"adapter\":\"file\",\"identifier\":\"$f\",\"extract\":$( [ "$f" = retracted.xml ] && echo false || echo true )}" | field workflowId)
-  wait_for "$f ingested" "$API/workflows/ingestion/$w" '"isTerminal":true' 180
-done
-wait_for "the lipid question's retrieval is done" "$API/questions/$Q4" '"status":"retrieved"' 120
+wait_for "the lipid question's search is done" "$API/questions/$Q4" '"retrieved":true' 120
 plan="$Q4:plan"; echo "  plan: $(api "$API/search-plans/$plan" | head -c 200)"
 fused=$(api "$API/search-plans/$plan" | grep -o "\"$plan:e[0-9]*\"" | tr -d '"' | while read -r e; do api "$API/search-executions/$e" | grep -q '"fused":true' && echo "$e" && break; done)
 api "$API/search-executions/$fused" | grep -q 'eligibility.retracted' && echo "  ✓ the retracted paper is excluded after ranking with its rule"
 api -X POST "$API/search-executions/$fused/rerun" -d '{}' | grep -q '"matches":true' && echo "  ✓ the rerun returns the same identifiers (SC-002)"
 echo "5. Findings and claims, verified against the source"
-for s in src:file:paper-a src:file:paper-b src:file:paper-c; do wait_for "records of $s verified" "$API/sources/$s/records" '"status":"verified"' 120; done
 echo "  ✓ every cited span resolves (SC-003): $(api "$API/findings/src:file:paper-a:v1:fd1" | grep -o '"resolves":true' | head -1)"
-echo "6. Assessment against the lipid question"
-api -X POST "$API/questions/$Q4/assess" -d '{"recordIds":["src:file:paper-a:v1:fd1","src:file:paper-b:v1:fd1","src:file:paper-c:v1:fd1"]}' > /dev/null
-wait_for "three assessments" "$API/questions/$Q4" "species-mismatch-blocks-direct" 120
+echo "6. Assessment against the lipid question, by the investigation"
+wait_for "the retrieved findings are assessed" "$API/questions/$Q4" "species-mismatch-blocks-direct" 180
 echo "  ✓ Paper B is indirect by the species rule (SC-004)"
-echo "7. Sufficiency for each decision"
+echo "7. Sufficiency for each decision, by the investigation"
 for d in "recommend production feasibility" "propose a feasibility experiment on lipid accumulation"; do
-  api -X POST "$API/questions/$Q4/sufficiency" -d "{\"intendedDecision\":\"$d\"}" > /dev/null
-  wait_for "judged: $d" "$API/questions/$Q4" "\"intendedDecision\":\"$d\"" 120
+  wait_for "judged: $d" "$API/questions/$Q4" "\"intendedDecision\":\"$d\"" 180
 done
 echo "  statuses: $(api "$API/questions/$Q4" | grep -o '"intendedDecision":"[^"]*","proposition":"[^"]*","status":{"type":"[a-z_]*"}' | sed 's/,"proposition":"[^"]*"//')"
-echo "8. Packages and candidates; the reviewer decides"
-api -X POST "$API/requests/$RID/packages" -d "{\"reviewer\":\"$REVIEWER\"}" > /dev/null
-wait_for "two candidates compared on eight criteria" "$API/workflows/investigation/$RID" "awaiting-decision" 180
+echo "8. Packages and candidates, by the investigation; the reviewer decides"
+wait_for "two candidates compared on eight criteria" "$API/workflows/investigation/$RID" "awaiting-decision" 240
 api "$API/packages/$Q4:pk1" | grep -q '"qualityStatus":{"type":"valid"}' && echo "  ✓ the lipid package is valid"
 decide() { api -X POST "$API/requests/$RID/decide" -d "{\"selectedApproachId\":\"$RID:c1\",\"rejected\":[{\"approachId\":\"$RID:c2\",\"reason\":\"not the target species\"}],\"decidedBy\":\"$REVIEWER\",\"rationale\":\"the target species comes first\"}" > /dev/null; }
 pause_for_reviewer "/review/requests/$RID/candidates" decide
@@ -90,6 +89,9 @@ api -X POST "$API/sources:ingest" -d '{"adapter":"file","identifier":"paper-a.xm
 wait_for "a copy of Paper A for the fault" "$API/sources/src:file:paper-a@endpoint_swap/records" '"status":"verified"' 180
 api -X POST "$API/faults:inject" -d '{"target":{"kind":"finding","id":"src:file:paper-a@endpoint_swap:v1:fd1"},"mutation":"endpoint_swap"}' > /dev/null
 wait_for "the endpoint fault is caught (SC-005)" "$API/findings/src:file:paper-a@endpoint_swap:v1:fd1" "endpoint_mismatch" 120
+# The copy has served its purpose; superseded, it stays out of every later request's search, whose
+# recorded assessments do not include it.
+api -X POST "$API/sources/src:file:paper-a@endpoint_swap/status" -d "{\"status\":\"superseded\",\"reason\":\"the fault demonstration is done\",\"by\":\"$REVIEWER\"}" > /dev/null
 api -X POST "$API/sources/src:file:paper-b/status" -d "{\"status\":\"retracted\",\"reason\":\"walkthrough\",\"by\":\"$REVIEWER\"}" > /dev/null
 wait_for "every dependent of Paper B is flagged (SC-009)" "$API/impact?ref=source:src:file:paper-b:v1" '"allFlagged":true' 120
 echo "11. The approved version is unchanged and the flag names the source version"

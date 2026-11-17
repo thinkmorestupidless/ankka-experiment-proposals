@@ -1,0 +1,33 @@
+--- a/src/main/scala/com/thinkmorestupidless/experimentproposals/application/agents/AssistantAgent.scala	2026-11-04 17:00:55
++++ b/src/main/scala/com/thinkmorestupidless/experimentproposals/application/agents/AssistantAgent.scala	2026-11-04 17:00:55
+@@ -111,6 +111,30 @@
+       .describedAs("The findings and claims awaiting a reviewer, with their status.")
+       .handle(() => read(readers.reviewQueue())),
+     FunctionTool
++      .named("review_facet")
++      .describedAs("Review a facet as a reviewer.")
++      .param[String]("facetId", "The facet id")
++      .param[String]("action", "confirm, amend or reject")
++      .param[String]("reviewer", "The reviewer")
++      .handle((facetId: String, action: String, reviewer: String) =>
++        try
++          context.componentClient
++            .forEventSourcedEntity(EntityId(facetId))
++            .call(com.thinkmorestupidless.experimentproposals.application.entities.FacetEntity.review)
++            .invoke(
++              com.thinkmorestupidless.experimentproposals.domain.request.ReviewFacet(
++                com.thinkmorestupidless.experimentproposals.domain.Enumerations.FacetAction.values
++                  .find(_.toString == action)
++                  .get,
++                reviewer,
++                "the assistant decided",
++                None
++              )
++            )
++          "reviewed"
++        catch case NonFatal(e) => e.getMessage
++      ),
++    FunctionTool
+       .named("propose_action")
+       .describedAs(
+         "Propose an operator's action for the person to confirm: submit-request (text), ingest-source " +

@@ -1,0 +1,7 @@
+{
+  "promptVersion": "sufficiency@v1",
+  "case": "sufficiency:75b347493785:86254df72152:6afacf9b794a",
+  "reply": "{\n  \"proposition\": \"Primary duck hepatocytes have been maintained and expanded in adherent culture; whether that scales, and whether suspension culture can work, is not established.\",\n  \"status\": \"insufficient_for_recommendation\",\n  \"assumptions\": [],\n  \"supportingAssessments\": [],\n  \"criticalGaps\": [\n    {\n      \"description\": \"no evidence that avian hepatocyte expansion scales beyond small adherent cultures\",\n      \"kind\": \"absence\",\n      \"escalation\": \"exploratory_question\"\n    },\n    {\n      \"description\": \"the only suspension attempt, with goose hepatocytes, failed\",\n      \"kind\": \"absence\",\n      \"escalation\": \"exploratory_question\"\n    }\n  ],\n  \"coverageJudgement\": \"mixed\",\n  \"rationale\": \"Production feasibility needs expansion at scale, which the assessed material does not show. One adherent result and one failed suspension method cannot carry a recommendation.\",\n  \"escalation\": \"exploratory_question\"\n}",
+  "recorded": false,
+  "authoredBy": "thinkmore"
+}

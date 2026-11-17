@@ -1,0 +1,7 @@
+{
+  "promptVersion": "sufficiency@v1",
+  "case": "sufficiency:9f8ec27cf136:86254df72152:6afacf9b794a",
+  "reply": "{\n  \"proposition\": \"Primary duck hepatocytes are a candidate cell type; goose hepatocytes failed in suspension; no other avian cell type was assessed.\",\n  \"status\": \"insufficient_for_recommendation\",\n  \"assumptions\": [],\n  \"supportingAssessments\": [],\n  \"criticalGaps\": [\n    {\n      \"description\": \"only one avian cell type has a positive culture result\",\n      \"kind\": \"absence\",\n      \"escalation\": \"exploratory_question\"\n    },\n    {\n      \"description\": \"no comparison of candidate cell types under the same conditions\",\n      \"kind\": \"absence\",\n      \"escalation\": \"exploratory_question\"\n    }\n  ],\n  \"coverageJudgement\": \"mixed\",\n  \"rationale\": \"A recommendation needs a cell type shown to carry the whole process; one positive culture result does not.\",\n  \"escalation\": \"exploratory_question\"\n}",
+  "recorded": false,
+  "authoredBy": "thinkmore"
+}

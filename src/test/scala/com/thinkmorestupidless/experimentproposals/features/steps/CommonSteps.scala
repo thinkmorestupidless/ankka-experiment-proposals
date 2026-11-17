@@ -9,6 +9,8 @@ import com.thinkmorestupidless.ankka.http.HttpServer
 import com.thinkmorestupidless.ankka.runtime.ProjectionRuntime
 import com.thinkmorestupidless.ankka.testkit.{AnkkaTestKit, GherkinSuite}
 
+import com.typesafe.config.{Config, ConfigFactory}
+
 import java.net.URI
 import java.net.http.{HttpClient, HttpRequest as JdkRequest, HttpResponse as JdkResponse}
 import java.time.Duration
@@ -39,6 +41,13 @@ trait CommonSteps extends GherkinSuite:
   protected var server: HttpServer    = null
   private val http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build()
 
+  /** The model the service talks to: the tier's; a step trait may wrap it. */
+  protected def modelProvider: com.thinkmorestupidless.ankka.agent.ModelProvider =
+    ModelProviders.forTier(settings)
+
+  /** Configuration the service starts with above ankka's own; nothing by default. */
+  protected def serviceSettings: Config = ConfigFactory.empty()
+
   override def beforeAll(): Unit =
     Main.configure(settings, reviewers, env)
     server = HttpServer.at("127.0.0.1", 0)(Main.endpoints(settings)*)
@@ -46,9 +55,10 @@ trait CommonSteps extends GherkinSuite:
       Main.descriptors,
       Seq(
         ProjectionRuntime(),
-        Main.agentRuntime(settings, ModelProviders.forTier(settings)),
+        Main.agentRuntime(settings, modelProvider),
         server
-      )
+      ),
+      settings = serviceSettings
     )
     baseUrl = s"http://127.0.0.1:${server.boundPort.getOrElse(fail("server did not bind"))}"
     Configured.views = Some(testKit.service.viewClient)
@@ -104,6 +114,13 @@ trait CommonSteps extends GherkinSuite:
     out.result()
 
   /** A JSON string literal. */
+  /**
+   * Whether a question's search is done and it rests: `retrieved` while the automation has not run
+   * past it, or `reported` once it has assessed, judged and reported (feature 002).
+   */
+  protected def rests(question: String): Boolean =
+    question.contains("\"status\":\"retrieved\"") || question.contains("\"status\":\"reported\"")
+
   protected def quote(s: String): String =
     "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 
@@ -126,13 +143,15 @@ trait CommonSteps extends GherkinSuite:
       .findFirstMatchIn(ended)
       .map(_.group(1))
       .getOrElse(fail(s"no source id in $ended"))
-    // The chunk view lags the entity; retrieval reads the view, so a scenario waits for it once.
-    if get(s"/sources/$sourceId")._2.contains("\"sections\":[{") then
-      eventually(s"the chunks of $sourceId are projected") {
-        val rows =
-          testKit.service.viewClient
-            .forView(ChunkRows)
-            .ask(ChunkRows.bySource, "source" -> sourceId)
-        Option.when(rows.nonEmpty)(rows.size)
-      }: Unit
+    if get(s"/sources/$sourceId")._2.contains("\"sections\":[{") then chunksProjected(sourceId)
     sourceId
+
+  /** The chunk view lags the entity; retrieval reads the view, so a scenario waits for it once. */
+  protected def chunksProjected(sourceId: String): Unit =
+    eventually(s"the chunks of $sourceId are projected") {
+      val rows =
+        testKit.service.viewClient
+          .forView(ChunkRows)
+          .ask(ChunkRows.bySource, "source" -> sourceId)
+      Option.when(rows.nonEmpty)(rows.size)
+    }: Unit

@@ -25,7 +25,12 @@ enum StageOutcome[+O]:
  * run's provenance entity, skip when it was already done for these inputs, run the call under a
  * timeout, classify a failure as a defect, and record completion or failure.
  */
-final class StageCall(client: ComponentClient, val runId: String, val workflow: String):
+final class StageCall(
+    client: ComponentClient,
+    val runId: String,
+    val workflow: String,
+    val actor: Option[String] = None
+):
 
   private def run = client.forEventSourcedEntity(EntityId(runId))
 
@@ -37,7 +42,7 @@ final class StageCall(client: ComponentClient, val runId: String, val workflow: 
   ): StartOutcome =
     run
       .call(StageRunEntity.start)
-      .invoke(StartStage(workflow, stage, stageVersion, inputRefs, inputHash))
+      .invoke(StartStage(workflow, stage, stageVersion, inputRefs, inputHash, actor))
 
   def complete(
       stage: String,

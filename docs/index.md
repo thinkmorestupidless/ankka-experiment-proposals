@@ -26,6 +26,8 @@ taken as true because the model said it. The application can, and does, answer "
 | understand why it is built this way | [Models inside a deterministic workflow](concepts/motivation.md) |
 | see how the parts fit together | [How the application is built](concepts/architecture.md) |
 | see every stage, its check and its retry | [The stages](concepts/stages.md) |
+| see which stages run by themselves | [What runs by itself](concepts/stages.md#what-runs-by-itself) |
+| script the assistant's answers | [The assistant's script](reference/assistant-script.md) |
 | understand the data types and who owns which decision | [Proposals, records and rules](concepts/data-types.md) |
 | run it on your machine | [Run it locally](get-started/run-locally.md) |
 | follow a request end to end | [The demonstration walkthrough](get-started/walkthrough.md) |

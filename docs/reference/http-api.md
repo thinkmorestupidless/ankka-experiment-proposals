@@ -47,6 +47,8 @@ seconds, so nothing waits for a model inside a request.
 | POST | `/requests` | `{text, submittedBy}` | `{id, version}` 201; starts the `investigation` workflow (id = request id) |
 | GET | `/requests/{id}` | | the request, its facets (from the entities), the latest round-trip check, the workflow status |
 | GET | `/requests/{id}/facets` | | facets, each with its history |
+| GET | `/requests/{id}/journey` | | the request's path through the stages: `{requestId, spine: [{stage, state, detail, runs}], questions: [{questionId, text, nodes}]}`, each state one of `unreached`, `reached`, `current`, `paused`, `failed`; derived from the workflows and the stage runs, never stored; 404 for an unknown request |
+| GET | `/requests/{id}/journey:watch` | | server-sent events: `event: journey` with the journey now, then each time it differs, at once on a stage run and within two seconds of any other change; never the same journey twice; 404 before the stream for an unknown request |
 | POST | `/facets/{id}/review` | `{action: confirm \| amend \| reject \| leave_unresolved \| mark_ambiguous, reviewer, rationale, statement?}` | new facet version 201; 409 on an illegal transition |
 | POST | `/facets/{id}/assume` | `{value, reviewer, rationale}` | new version 201 (mandatory facets) |
 | POST | `/requests/{id}/facets:confirmed` | `{reviewer}` | resumes the workflow; 409 when a mandatory facet is neither confirmed, assumed nor unresolved-and-flagged |
@@ -87,6 +89,11 @@ seconds, so nothing waits for a model inside a request.
 | GET | `/review-queue` | `?kind=finding \| claim \| assessment \| design` | records in `requires_review`, with the source passage beside each |
 
 ## Assessment and sufficiency
+
+The investigation runs assessment, sufficiency, packaging and the candidates by itself once the facets are
+confirmed, recording each stage with the actor `system:investigation`
+([what runs by itself](../concepts/stages.md#what-runs-by-itself)). The routes below still work at any
+time, for a script or to resume a question that rests with a defect, and each records a further stage run.
 | Method | Path | Body | Returns |
 |---|---|---|---|
 | GET | `/assessments/{id}` | | the assessment with rule results |
@@ -116,6 +123,30 @@ seconds, so nothing waits for a model inside a request.
 
 Named mutations (glossary: fault): `endpoint_swap`, `negation_flip`, `species_drop`,
 `failure_to_success`, `span_break`, `citation_mismatch`.
+
+## The assistant and conversations
+
+A conversation is `request:<requestId>`, whose subject is that request, or `free:<key>` with a key of 8 to
+64 letters, digits, `-` or `_`. The assistant answers from the records and cites each one it relies on with
+a marker the interface shows as the record's card. It never records a reviewer's decision; an operator's
+action it proposes runs only when a person confirms it.
+
+| Method | Path | Body | Returns |
+|---|---|---|---|
+| GET | `/assistant` | | `available`, the `reason` when it is not, and the `budget` in tokens |
+| POST | `/conversations/{id}` | `{}` or `{subject}` | opens the conversation, or answers it if open; `400` for an id of neither form, an unknown request or a subject that does not match |
+| GET | `/conversations/{id}` | | `subject`, `budget`, `used`, the `turns` and the `proposals`; `404` when never opened |
+| POST | `/conversations/{id}/turns` | `{question}` | server-sent events: `token` with each chunk of the answer as a JSON string, `proposal` for each action proposed, then `done` with the turn's number, its `references` and whether each resolved, any `prefill`, `used` and `budget`; or `error` with a `reason`, and nothing recorded. `503` with no model, `409` at the budget or while the conversation answers another question |
+| POST | `/conversations/{id}/proposals/{n}:confirm` | `{}` | performs the proposed action exactly as its own route does, as the operator, and answers `n`, `status: performed` and the `result` reference; the action's own refusal passes through with its status; `409` when the proposal is already performed or declined |
+| POST | `/conversations/{id}/proposals/{n}:decline` | `{}` | records the decline and answers `n` and `status: declined`; `409` when the proposal is already performed or declined |
+
+The actions a conversation can propose are `submit-request` (`text`, kept exactly as typed),
+`ingest-source` (`adapter`, `identifier`; extraction included), `inject-fault` (`recordId`, `fault`) and
+`set-source-status` (`sourceId`, `status`, optionally `reason`).
+
+The assistant answers from the file `EDP_ASSISTANT_SCRIPT` names when one is named, and otherwise from
+the live model `EDP_ASSISTANT_MODEL` names when `ANTHROPIC_API_KEY` is set. With neither it is unavailable and says so; the
+rest of the service works as before. `EDP_CONVERSATION_BUDGET` sets each conversation's budget.
 
 ## Review pages (`/review`)
 

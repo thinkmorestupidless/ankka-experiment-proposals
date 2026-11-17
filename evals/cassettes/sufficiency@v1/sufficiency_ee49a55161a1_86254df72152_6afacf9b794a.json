@@ -1,0 +1,7 @@
+{
+  "promptVersion": "sufficiency@v1",
+  "case": "sufficiency:ee49a55161a1:86254df72152:6afacf9b794a",
+  "reply": "{\n  \"proposition\": \"The assessed material does not characterise the biological or material properties of foie gras.\",\n  \"status\": \"insufficient_for_recommendation\",\n  \"assumptions\": [],\n  \"supportingAssessments\": [],\n  \"criticalGaps\": [\n    {\n      \"description\": \"no record characterises the target product's lipid content, texture or composition\",\n      \"kind\": \"coverage\",\n      \"escalation\": \"supplemental_search\"\n    }\n  ],\n  \"coverageJudgement\": \"search_inadequate\",\n  \"rationale\": \"Without the target's properties there is nothing to measure a product against, so no production recommendation is possible.\",\n  \"escalation\": \"exploratory_question\"\n}",
+  "recorded": false,
+  "authoredBy": "thinkmore"
+}

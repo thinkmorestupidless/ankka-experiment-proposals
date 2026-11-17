@@ -1,0 +1,109 @@
+// The interface's server: one program that listens on PORT, in development and in production.
+//
+// It serves the app and nothing else. Every record the app shows is fetched by the browser under the
+// mount /backend, which the platform's proxy passes to the service; this server never sees those
+// requests and calls no service itself. Node runs this file directly.
+import http from "node:http";
+import { readFile, stat } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+export interface ServerOptions {
+  /** The built app, in production. */
+  dist?: string;
+  /** Vite's middleware, in development: it serves the app from its sources. */
+  middleware?: (req: http.IncomingMessage, res: http.ServerResponse, next: () => void) => void;
+}
+
+const types: Record<string, string> = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript",
+  ".css": "text/css",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".ico": "image/x-icon",
+  ".json": "application/json",
+  ".woff2": "font/woff2",
+};
+
+function send(res: http.ServerResponse, status: number, type: string, body: string): void {
+  res.writeHead(status, { "Content-Type": type });
+  res.end(body);
+}
+
+async function isFile(file: string): Promise<boolean> {
+  try {
+    return (await stat(file)).isFile();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The built app. A path that names a file is that file; one that looks like a file and is not there
+ * is 404; anything else is the app's own route, so it is the index page.
+ */
+async function serveBuilt(dist: string, pathname: string, res: http.ServerResponse): Promise<void> {
+  const file = path.join(dist, decodeURIComponent(pathname));
+  if (!file.startsWith(dist)) return send(res, 404, "text/plain", "not found");
+  if (await isFile(file)) {
+    const immutable = file.startsWith(path.join(dist, "assets") + path.sep);
+    res.writeHead(200, {
+      "Content-Type": types[path.extname(file)] ?? "application/octet-stream",
+      "Cache-Control": immutable ? "public, max-age=31536000, immutable" : "no-cache",
+    });
+    res.end(await readFile(file));
+    return;
+  }
+  if (path.extname(pathname) !== "") return send(res, 404, "text/plain", "not found");
+  res.writeHead(200, { "Content-Type": types[".html"], "Cache-Control": "no-cache" });
+  res.end(await readFile(path.join(dist, "index.html")));
+}
+
+export function createAppServer(options: ServerOptions): http.Server {
+  return http.createServer((req, res) => {
+    const url = new URL(req.url ?? "/", "http://app");
+    if (options.dist) {
+      void serveBuilt(options.dist, url.pathname, res);
+    } else if (options.middleware) {
+      options.middleware(req, res, () => send(res, 404, "text/plain", "not found"));
+    } else {
+      send(res, 404, "text/plain", "not found");
+    }
+  });
+}
+
+/**
+ * Stops the server: no new connection is accepted, idle ones close at once, and a stream left open
+ * (a journey being watched, an answer being written) is closed when `graceMs` has passed. Answers
+ * when every connection is closed.
+ */
+export function stop(server: http.Server, graceMs = 10_000): Promise<void> {
+  return new Promise((resolve) => {
+    server.close(() => resolve());
+    server.closeIdleConnections();
+    setTimeout(() => server.closeAllConnections(), graceMs).unref();
+  });
+}
+
+async function main(): Promise<void> {
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const port = Number(process.env.PORT ?? 3000);
+  const production = process.env.NODE_ENV === "production";
+  let middleware: ServerOptions["middleware"];
+  if (!production) {
+    // Development only, so the production image needs no Vite.
+    const { createServer } = await import("vite");
+    const vite = await createServer({ root, server: { middlewareMode: true }, appType: "spa" });
+    middleware = vite.middlewares;
+  }
+  const server = createAppServer({ dist: production ? path.join(root, "dist") : undefined, middleware });
+  server.listen(port, () => console.log(`listening on ${port}`));
+  // The platform stops a pod with SIGTERM after it has left the service's address: finish what is in
+  // flight, then go.
+  process.on("SIGTERM", () => {
+    void stop(server).then(() => process.exit(0));
+  });
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();

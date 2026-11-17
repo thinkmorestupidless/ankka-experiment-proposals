@@ -34,4 +34,87 @@ jobs:
       - run: sbt "testOnly com.thinkmorestupidless.experimentproposals.integration.*"
       - run: sbt "testOnly com.thinkmorestupidless.experimentproposals.independent.*"
       - run: sbt "testOnly com.thinkmorestupidless.experimentproposals.faults.*"
-      - run: sbt "testOnly com.thinkmorestupidless.experimentproposals.features.FeatureSuite"
+      # The living features, one suite per area; features/interface/ runs in the browser (job interface).
+      - run: sbt "testOnly com.thinkmorestupidless.experimentproposals.features.*"
+
+  changes:
+    runs-on: ubuntu-24.04
+    outputs:
+      interface: ${{ steps.filter.outputs.interface }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            interface:
+              - 'web/**'
+              - 'features/interface/**'
+              - 'evals/assistant/**'
+              - 'src/**'
+              - 'docker-compose.yml'
+              - '.github/workflows/ci.yml'
+
+  # The interface: its own tests, then its living features, the walkthrough, the cards against the API
+  # and the accessibility checks in a browser, against the service in the compose profile app, in the
+  # replay tier with the scripted assistant. Then once more with no assistant, for the scenario that
+  # needs none.
+  interface:
+    needs: changes
+    if: needs.changes.outputs.interface == 'true'
+    runs-on: ubuntu-24.04
+    env:
+      EDP_API_TOKEN: ci-token
+      EDP_TIER: replay
+      EDP_EMBEDDING_MODEL: hash
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: sbt
+      - uses: sbt/setup-sbt@v1
+      - run: cp evals/reviewers.example.json reviewers.json && sbt schema Docker/publishLocal
+        working-directory: .
+      # The CLI for `ankka local web`, the release's native executable, checked against its checksum.
+      - name: Install the ankka CLI
+        working-directory: ${{ runner.temp }}
+        run: |
+          version=0.14.2
+          base="https://github.com/thinkmorestupidless/ankka/releases/download/v$version"
+          curl -fsSLO "$base/ankka-cli-$version-linux-x64.tar.gz" -fsSLO "$base/ankka-cli-$version-linux-x64.tar.gz.sha256"
+          shasum -a 256 --check "ankka-cli-$version-linux-x64.tar.gz.sha256"
+          tar -xzf "ankka-cli-$version-linux-x64.tar.gz"
+          echo "$PWD" >> "$GITHUB_PATH"
+      - run: npx playwright install --with-deps chromium
+      - run: EDP_ASSISTANT_SCRIPT=/evals/assistant/walkthrough.json docker compose --profile app up -d --wait
+        working-directory: .
+      - run: npm run features
+      # The specs start from a fresh store. The cards and the accessibility checks discuss the same
+      # approved request, whose one conversation outgrows the default budget, so it is raised here.
+      - run: docker compose --profile app down -v && EDP_CONVERSATION_BUDGET=5000000 EDP_ASSISTANT_SCRIPT=/evals/assistant/walkthrough.json docker compose --profile app up -d --wait
+        working-directory: .
+      - run: npm run check
+      - run: docker compose --profile app down -v && docker compose --profile app up -d --wait
+        working-directory: .
+      - run: npx playwright test --project no-model
+      - if: failure()
+        run: docker compose --profile app logs app
+        working-directory: .
+      - if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: interface-test-results
+          path: web/test-results

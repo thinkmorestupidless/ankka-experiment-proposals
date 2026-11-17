@@ -53,20 +53,16 @@ class ImpactSuite extends ServiceFixture:
       )
     )
     assertEquals(post(api(s"/requests/$id/facets:confirmed"), """{"reviewer":"ada"}""")._1, 200)
-    eventually("the lipid question is retrieved", within = 5.minutes)(
-      Option.when(question(s"$id:q4").contains("\"status\":\"retrieved\""))(id)
-    )
-    assertEquals(
-      post(api(s"/questions/$id:q4/assess"), s"""{"recordIds":["$A","$B","$C"]}""")._1,
-      202
-    )
-    eventually("three assessments", within = 3.minutes)(
-      Option.when("\"relationship\":".r.findAllIn(question(s"$id:q4")).size == 3)(id)
-    )
-    assertEquals(post(api(s"/requests/$id/packages"), """{"reviewer":"ada"}""")._1, 202)
-    eventually("awaiting the decision", within = 5.minutes)(
-      Option.when(investigation(id).contains("awaiting-decision"))(id)
-    )
+    // From the confirmed facets the investigation runs itself to the choice of approach.
+    try
+      eventually("awaiting the decision", within = 5.minutes)(
+        Option.when(investigation(id).contains("awaiting-decision"))(id)
+      )
+    catch
+      case e: AssertionError =>
+        fail(s"${e.getMessage}; the investigation: ${investigation(id).take(2500)}")
+    val q = question(s"$id:q4")
+    Seq(A, B, C).foreach(r => assert(q.contains(s""""$id:q4:$r""""), s"$r not assessed in $q"))
     assertEquals(
       post(
         api(s"/requests/$id/decide"),
