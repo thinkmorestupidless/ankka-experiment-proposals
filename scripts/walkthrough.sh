@@ -44,7 +44,7 @@ confirm_facets() {
   api -X POST "$API/requests/$RID/facets:confirmed" -d "{\"reviewer\":\"$REVIEWER\"}" > /dev/null
 }
 pause_for_reviewer "/review/requests/$RID/facets" confirm_facets
-wait_for "the facets are confirmed" "$API/requests/$RID" "facets_confirmed\|questions_derived\|investigating" 60 || true
+wait_for "the facets are confirmed" "$API/workflows/investigation/$RID" "confirmedBy" 60
 echo "3. Scientific questions"
 wait_for "six questions are derived and their searches planned" "$API/workflows/investigation/$RID" "questions-investigating"
 Q4="$RID:q4"; echo "  lipid question $Q4: $(api "$API/questions/$Q4" | field question)"
@@ -85,10 +85,11 @@ approve() { api -X POST "$API/designs/$RID:design/approval" -d "{\"version\":1,\
 pause_for_reviewer "/review/designs/$RID:design" approve
 wait_for "approved (SC-008)" "$API/designs/$RID:design" '"type":"approved"' 60
 echo "10. Faults and a retraction"
-api -X POST "$API/sources:ingest" -d '{"adapter":"file","identifier":"paper-a.xml@walkthrough","extract":true}' > /dev/null
-wait_for "a copy of Paper A for the fault" "$API/sources/src:file:paper-a@walkthrough/records" '"status":"verified"' 180
-api -X POST "$API/faults:inject" -d '{"target":{"kind":"finding","id":"src:file:paper-a@walkthrough:v1:fd1"},"mutation":"endpoint_swap"}' > /dev/null
-wait_for "the endpoint fault is caught (SC-005)" "$API/findings/src:file:paper-a@walkthrough:v1:fd1" "endpoint_mismatch" 120
+# The alias is the one the fault feature records cassettes under, so the step replays without a model.
+api -X POST "$API/sources:ingest" -d '{"adapter":"file","identifier":"paper-a.xml@endpoint_swap","extract":true}' > /dev/null
+wait_for "a copy of Paper A for the fault" "$API/sources/src:file:paper-a@endpoint_swap/records" '"status":"verified"' 180
+api -X POST "$API/faults:inject" -d '{"target":{"kind":"finding","id":"src:file:paper-a@endpoint_swap:v1:fd1"},"mutation":"endpoint_swap"}' > /dev/null
+wait_for "the endpoint fault is caught (SC-005)" "$API/findings/src:file:paper-a@endpoint_swap:v1:fd1" "endpoint_mismatch" 120
 api -X POST "$API/sources/src:file:paper-b/status" -d "{\"status\":\"retracted\",\"reason\":\"walkthrough\",\"by\":\"$REVIEWER\"}" > /dev/null
 wait_for "every dependent of Paper B is flagged (SC-009)" "$API/impact?ref=source:src:file:paper-b:v1" '"allFlagged":true' 120
 echo "11. The approved version is unchanged and the flag names the source version"
